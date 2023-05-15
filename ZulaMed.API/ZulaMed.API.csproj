@@ -7,4 +7,21 @@
         <DockerDefaultTargetOS>Linux</DockerDefaultTargetOS>
     </PropertyGroup>
 
+    <ItemGroup>
+      <PackageReference Include="FastEndpoints" Version="5.10.0" />
+      <PackageReference Include="FastEndpoints.Generator" Version="5.10.0">
+        <PrivateAssets>all</PrivateAssets>
+        <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
+      </PackageReference>
+      <PackageReference Include="FastEndpoints.Swagger" Version="5.10.0" />
+      <PackageReference Include="FluentValidation" Version="11.5.2" />
+      <PackageReference Include="Mediator.Abstractions" Version="2.2.0-preview.2" />
+      <PackageReference Include="Mediator.SourceGenerator" Version="2.2.0-preview.2">
+        <PrivateAssets>all</PrivateAssets>
+        <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
+      </PackageReference>
+      <PackageReference Include="Microsoft.EntityFrameworkCore" Version="7.0.5" />
+      <PackageReference Include="Npgsql.EntityFrameworkCore.PostgreSQL" Version="7.0.4" />
+    </ItemGroup>
+
 </Project>
