@@ -2,7 +2,6 @@ using Vogen;
 
 namespace ZulaMed.API.Domain.Video;
 
-
 [ValueObject<string>]
 public readonly partial struct VideoTitle
 {
