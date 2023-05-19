@@ -2,10 +2,10 @@ namespace ZulaMed.API.Domain.Video;
 
 public class Video
 {
-    public VideoId Id { get; init; }
-    public VideoTitle VideoTitle { get; init; }
-    public VideoUrl VideoUrl { get; init; }
-    public VideoThumbnail VideoThumbnail { get; init; }
-    public VideoDescription VideoDescription { get; init; }
-    public VideoPublishedDate VideoPublishedDate { get; init; }
+    public required VideoId Id { get; init; }
+    public required VideoTitle VideoTitle { get; init; }
+    public required VideoUrl VideoUrl { get; init; }
+    public required VideoThumbnail VideoThumbnail { get; init; }
+    public required VideoDescription VideoDescription { get; init; }
+    public required VideoPublishedDate VideoPublishedDate { get; init; }
 }
