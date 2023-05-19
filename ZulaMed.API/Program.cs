@@ -1,5 +1,7 @@
+using Amazon.S3;
 using FastEndpoints;
 using FastEndpoints.Swagger;
+using ZulaMed.API;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -18,6 +20,12 @@ builder.Services.SwaggerDocument(o =>
     o.TagCase = TagCase.TitleCase;
     o.RemoveEmptyRequestSchema = false;
 });
+
+builder.Services.AddOptions<S3BucketOptions>()
+    .BindConfiguration("S3BucketOptions")
+    .ValidateDataAnnotations();
+
+builder.Services.AddSingleton<IAmazonS3, AmazonS3Client>();
 
 builder.Services.AddMediator(x => { x.ServiceLifetime = ServiceLifetime.Scoped; });
 

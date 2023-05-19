@@ -8,6 +8,7 @@
     </PropertyGroup>
 
     <ItemGroup>
+      <PackageReference Include="AWSSDK.S3" Version="3.7.104.17" />
       <PackageReference Include="FastEndpoints" Version="5.10.0" />
       <PackageReference Include="FastEndpoints.Generator" Version="5.10.0">
         <PrivateAssets>all</PrivateAssets>
