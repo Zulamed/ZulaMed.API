@@ -5,10 +5,10 @@ EXPOSE 443
 
 FROM mcr.microsoft.com/dotnet/sdk:7.0 AS build
 WORKDIR /src
-COPY ["ZulaMed.API/ZulaMed.API.csproj", "ZulaMed.API/"]
-RUN dotnet restore "ZulaMed.API/ZulaMed.API.csproj"
+COPY ["ZulaMed.API.csproj", "."]
+RUN dotnet restore "ZulaMed.API.csproj"
 COPY . .
-WORKDIR "/src/ZulaMed.API"
+WORKDIR /src 
 RUN dotnet build "ZulaMed.API.csproj" -c Release -o /app/build
 
 FROM build AS publish
