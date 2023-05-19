@@ -7,6 +7,6 @@ public readonly partial struct VideoUrl
 {
     private static Validation Validate(string input)
     {
-        return string.IsNullOrWhiteSpace(input) ? Validation.Ok : Validation.Invalid("url can't be empty");
+        return Uri.IsWellFormedUriString(input, UriKind.Absolute) ? Validation.Ok : Validation.Invalid("url must to be valid");
     }
 }
