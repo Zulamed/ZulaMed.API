@@ -16,7 +16,8 @@ public class RequestValidator : Validator<Request>
         RuleFor(x => x.Video)
             .NotNull()
             .WithMessage("Video is required")
-            .Must(x => x.ContentType.StartsWith("video/"));
+            .Must(x => x.ContentType.StartsWith("video/"))
+            .WithMessage("Sent file must be a video file");
     } 
 }
 
