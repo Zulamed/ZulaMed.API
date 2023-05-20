@@ -28,6 +28,7 @@ public class UploadVideoCommandHandler : Mediator.ICommandHandler<UploadVideoCom
         {
             BucketName = _s3Options.Value.BucketName,
             Key = $"videos/{guid}",
+            ContentType = command.Video.ContentType,
             InputStream = command.Video.OpenReadStream(),
             Metadata =
             {
@@ -61,18 +62,12 @@ public class UploadVideoEndpoint : Endpoint<Request, Response>
 
     public override async Task HandleAsync(Request req, CancellationToken ct)
     {
-        var response = await _mediator.Send(new UploadVideoCommand
-        {
-            Video = req.Video
-        }, ct);
+        var response = await _mediator.Send(req.MapToCommand(), ct);
         switch (response.PutResponse.HttpStatusCode)
         {
             case HttpStatusCode.OK:
             {
-                await SendOkAsync(new Response()
-                {
-                    VideoUrl = response.VideoUrl
-                }, cancellation: ct);
+                await SendOkAsync(response.MapToResponse(), ct);
                 break;
             }
             default:
