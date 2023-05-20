@@ -1,5 +1,8 @@
 using FastEndpoints;
 using FastEndpoints.Swagger;
+using Microsoft.EntityFrameworkCore;
+using Npgsql;
+using ZulaMed.API.Data;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -20,6 +23,15 @@ builder.Services.SwaggerDocument(o =>
 });
 
 builder.Services.AddMediator(x => { x.ServiceLifetime = ServiceLifetime.Scoped; });
+
+var dataSourceBuilder = new NpgsqlDataSourceBuilder(builder.Configuration["Database:ConnectionString"]);
+var dataSource = dataSourceBuilder.Build();
+
+
+builder.Services.AddDbContext<ZulaMedDbContext>(options =>
+{
+    options.UseNpgsql(dataSource);
+});
 
 var app = builder.Build();
 
