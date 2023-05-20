@@ -1,4 +1,6 @@
 using Amazon.S3.Model;
+using FastEndpoints;
+using FluentValidation;
 
 namespace ZulaMed.API.Endpoints.Video.Post;
 
@@ -6,6 +8,18 @@ public class Request
 {
    public required IFormFile Video { get; set; }
 }
+
+public class RequestValidator : Validator<Request>
+{
+    public RequestValidator()
+    {
+        RuleFor(x => x.Video)
+            .NotNull()
+            .WithMessage("Video is required")
+            .Must(x => x.ContentType.StartsWith("video/"));
+    } 
+}
+
 
 public class Response
 {
