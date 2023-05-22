@@ -2,7 +2,7 @@ using Vogen;
 
 namespace ZulaMed.API.Domain.Video;
 
-[ValueObject<Guid>]
+[ValueObject<Guid>(Conversions.EfCoreValueConverter)]
 [Instance("Unspecified", "Guid.Empty")]
 public readonly partial struct VideoId
 {
