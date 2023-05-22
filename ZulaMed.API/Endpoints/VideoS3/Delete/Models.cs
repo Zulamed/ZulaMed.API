@@ -2,7 +2,7 @@ using System.Net;
 using FastEndpoints;
 using FluentValidation;
 
-namespace ZulaMed.API.Endpoints.Video.Delete;
+namespace ZulaMed.API.Endpoints.VideoS3.Delete;
 
 public class Request
 {

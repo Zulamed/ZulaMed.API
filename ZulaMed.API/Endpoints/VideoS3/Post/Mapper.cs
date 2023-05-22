@@ -1,4 +1,4 @@
-namespace ZulaMed.API.Endpoints.Video.Post;
+namespace ZulaMed.API.Endpoints.VideoS3.Post;
 
 public static class Mapper
 {
