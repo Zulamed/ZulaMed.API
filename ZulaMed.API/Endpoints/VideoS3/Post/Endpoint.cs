@@ -5,7 +5,7 @@ using FastEndpoints;
 using Mediator;
 using Microsoft.Extensions.Options;
 
-namespace ZulaMed.API.Endpoints.Video.Post;
+namespace ZulaMed.API.Endpoints.VideoS3.Post;
 
 
 

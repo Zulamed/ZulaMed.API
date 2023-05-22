@@ -2,7 +2,7 @@ using Amazon.S3.Model;
 using FastEndpoints;
 using FluentValidation;
 
-namespace ZulaMed.API.Endpoints.Video.Post;
+namespace ZulaMed.API.Endpoints.VideoS3.Post;
 
 public class Request
 {
