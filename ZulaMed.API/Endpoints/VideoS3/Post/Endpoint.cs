@@ -55,7 +55,7 @@ public class UploadVideoEndpoint : Endpoint<Request, Response>
 
     public override void Configure()
     {
-        Post("/videos");
+        Post("/uploadVideo");
         AllowFileUploads();
         AllowAnonymous();
     }
