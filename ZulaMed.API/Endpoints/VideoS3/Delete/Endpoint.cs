@@ -45,7 +45,7 @@ public class Endpoint : Endpoint<Request>
 
     public override void Configure()
     {
-        Delete("/videos/{id}");
+        Delete("/uploadVideo/{id}");
         AllowAnonymous();
     }
 
