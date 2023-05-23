@@ -27,4 +27,9 @@
       <PackageReference Include="Vogen" Version="3.0.16" />
     </ItemGroup>
 
+    <ItemGroup>
+      <Folder Include="Endpoints\Video\GetById" />
+      <Folder Include="Endpoints\Video\GetByTitle" />
+    </ItemGroup>
+
 </Project>
