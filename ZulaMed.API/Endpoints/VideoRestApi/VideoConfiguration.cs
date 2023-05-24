@@ -2,11 +2,11 @@ using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
 using ZulaMed.API.Domain.Video;
 
-namespace ZulaMed.API.Endpoints.Video;
+namespace ZulaMed.API.Endpoints.VideoRestApi;
 
-public class VideoConfiguration : IEntityTypeConfiguration<Domain.Video.Video>
+public class VideoConfiguration : IEntityTypeConfiguration<Video>
 {
-    public void Configure(EntityTypeBuilder<Domain.Video.Video> builder)
+    public void Configure(EntityTypeBuilder<Video> builder)
     {
         builder.HasKey(x => x.Id);
 

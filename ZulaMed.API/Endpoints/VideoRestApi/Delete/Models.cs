@@ -1,7 +1,7 @@
 using FastEndpoints;
 using FluentValidation;
 
-namespace ZulaMed.API.Endpoints.Video.Delete;
+namespace ZulaMed.API.Endpoints.VideoRestApi.Delete;
 
 public class Request 
 {

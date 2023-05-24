@@ -4,13 +4,12 @@ using OneOf.Types;
 using Vogen;
 using ZulaMed.API.Data;
 using ZulaMed.API.Domain.Video;
-
 using VoException = Vogen.ValueObjectValidationException;
 
-namespace ZulaMed.API.Endpoints.Video.Post;
+namespace ZulaMed.API.Endpoints.VideoRestApi.Post;
 
 public class CreateVideoCommandHandler 
-    : Mediator.ICommandHandler<CreateVideoCommand, Result<Domain.Video.Video, VoException>>
+    : Mediator.ICommandHandler<CreateVideoCommand, Result<Video, VoException>>
 {
     private readonly ZulaMedDbContext _dbContext;
 
@@ -19,13 +18,13 @@ public class CreateVideoCommandHandler
         _dbContext = dbContext;
     }
 
-    public async ValueTask<Result<Domain.Video.Video, ValueObjectValidationException>> Handle(CreateVideoCommand command,
+    public async ValueTask<Result<Video, ValueObjectValidationException>> Handle(CreateVideoCommand command,
         CancellationToken cancellationToken)
     {
-        var dbSet = _dbContext.Set<Domain.Video.Video>();
+        var dbSet = _dbContext.Set<Video>();
         try
         {
-            var entity = await dbSet.AddAsync(new Domain.Video.Video()
+            var entity = await dbSet.AddAsync(new Video()
             {
                 Id = (VideoId)Guid.NewGuid(),
                 VideoDescription = (VideoDescription)command.VideoDescription,

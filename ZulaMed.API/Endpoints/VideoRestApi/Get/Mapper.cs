@@ -1,8 +1,10 @@
-namespace ZulaMed.API.Endpoints.Video.Get;
+using ZulaMed.API.Domain.Video;
+
+namespace ZulaMed.API.Endpoints.VideoRestApi.Get;
 
 public static class Mapper 
 {
-    public static VideoDTO ToResponse(this Domain.Video.Video video)
+    public static VideoDTO ToResponse(this Video video)
     {
         return new VideoDTO()
         {

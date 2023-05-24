@@ -30,8 +30,8 @@
     </ItemGroup>
 
     <ItemGroup>
-      <Folder Include="Endpoints\Video\GetById" />
-      <Folder Include="Endpoints\Video\GetByTitle" />
+      <Folder Include="Endpoints\VideoRestApi\GetById" />
+      <Folder Include="Endpoints\VideoRestApi\GetByTitle" />
     </ItemGroup>
 
 </Project>

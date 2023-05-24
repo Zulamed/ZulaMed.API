@@ -1,4 +1,4 @@
-namespace ZulaMed.API.Endpoints.Video.Delete;
+namespace ZulaMed.API.Endpoints.VideoRestApi.Delete;
 
 public static class Mapper
 {
