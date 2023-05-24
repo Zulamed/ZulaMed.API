@@ -1,10 +1,9 @@
 using FastEndpoints;
 using FluentValidation;
-using OneOf;
-using OneOf.Types;
 using Vogen;
+using ZulaMed.API.Domain.Video;
 
-namespace ZulaMed.API.Endpoints.Video.Post;
+namespace ZulaMed.API.Endpoints.VideoRestApi.Post;
 
 
 
@@ -30,7 +29,7 @@ public class Validator : Validator<Request>
     }
 }
 
-public class CreateVideoCommand : Mediator.ICommand<Result<Domain.Video.Video, ValueObjectValidationException>>
+public class CreateVideoCommand : Mediator.ICommand<Result<Video, ValueObjectValidationException>>
 {
     public required string VideoTitle { get; init; }
     public required string VideoUrl { get; init; }

@@ -1,4 +1,4 @@
-namespace ZulaMed.API.Endpoints.Video;
+namespace ZulaMed.API.Endpoints.VideoRestApi;
 
 public class VideoDTO
 {

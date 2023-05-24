@@ -1,4 +1,6 @@
-namespace ZulaMed.API.Endpoints.Video.Post;
+using ZulaMed.API.Domain.Video;
+
+namespace ZulaMed.API.Endpoints.VideoRestApi.Post;
 
 
 public static class Mapper
@@ -15,7 +17,7 @@ public static class Mapper
         };
     }
 
-    public static VideoDTO MapToResponse(this Domain.Video.Video video)
+    public static VideoDTO MapToResponse(this Video video)
     {
         return new VideoDTO
         {

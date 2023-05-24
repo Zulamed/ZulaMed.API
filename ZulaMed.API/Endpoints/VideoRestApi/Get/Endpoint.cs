@@ -2,11 +2,12 @@ using FastEndpoints;
 using Mediator;
 using Microsoft.EntityFrameworkCore;
 using ZulaMed.API.Data;
+using ZulaMed.API.Domain.Video;
 
-namespace ZulaMed.API.Endpoints.Video.Get;
+namespace ZulaMed.API.Endpoints.VideoRestApi.Get;
 
 
-public class GetAllVideosQueryHandler : IQueryHandler<GetAllVideosQuery, Domain.Video.Video[]>
+public class GetAllVideosQueryHandler : IQueryHandler<GetAllVideosQuery, Video[]>
 {
     private readonly ZulaMedDbContext _context;
 
@@ -14,9 +15,9 @@ public class GetAllVideosQueryHandler : IQueryHandler<GetAllVideosQuery, Domain.
     {
         _context = context;
     }
-    public async ValueTask<Domain.Video.Video[]> Handle(GetAllVideosQuery query, CancellationToken cancellationToken)
+    public async ValueTask<Video[]> Handle(GetAllVideosQuery query, CancellationToken cancellationToken)
     {
-        var videos = await _context.Set<Domain.Video.Video>().ToArrayAsync(cancellationToken: cancellationToken);
+        var videos = await _context.Set<Video>().ToArrayAsync(cancellationToken: cancellationToken);
         return videos;
     }
 }

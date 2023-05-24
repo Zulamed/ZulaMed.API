@@ -2,8 +2,9 @@ using FastEndpoints;
 using Mediator;
 using Microsoft.EntityFrameworkCore;
 using ZulaMed.API.Data;
+using ZulaMed.API.Domain.Video;
 
-namespace ZulaMed.API.Endpoints.Video.Delete;
+namespace ZulaMed.API.Endpoints.VideoRestApi.Delete;
 
 public class DeleteVideoCommandHandler : Mediator.ICommandHandler<DeleteVideoCommand, bool>
 {
@@ -16,7 +17,7 @@ public class DeleteVideoCommandHandler : Mediator.ICommandHandler<DeleteVideoCom
 
     public async ValueTask<bool> Handle(DeleteVideoCommand command, CancellationToken cancellationToken)
     {
-        var rows = await _dbContext.Set<Domain.Video.Video>().Where(x => command.Id == x.Id)
+        var rows = await _dbContext.Set<Video>().Where(x => command.Id == x.Id)
             .ExecuteDeleteAsync(cancellationToken: cancellationToken);
         return rows > 0;
     }
