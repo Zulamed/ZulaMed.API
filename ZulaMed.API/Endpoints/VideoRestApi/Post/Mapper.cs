@@ -13,7 +13,6 @@ public static class Mapper
             VideoUrl = request.VideoUrl,
             VideoThumbnail = request.VideoThumbnail,
             VideoDescription = request.VideoDescription,
-            VideoPublishedDate = request.VideoPublishedDate
         };
     }
 

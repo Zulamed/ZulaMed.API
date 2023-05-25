@@ -28,7 +28,7 @@ public class CreateVideoCommandHandler
             {
                 Id = (VideoId)Guid.NewGuid(),
                 VideoDescription = (VideoDescription)command.VideoDescription,
-                VideoPublishedDate = (VideoPublishedDate)command.VideoPublishedDate,
+                VideoPublishedDate = (VideoPublishedDate)DateTime.Now,
                 VideoThumbnail = (VideoThumbnail)command.VideoThumbnail,
                 VideoTitle = (VideoTitle)command.VideoTitle,
                 VideoUrl = (VideoUrl)command.VideoUrl 
