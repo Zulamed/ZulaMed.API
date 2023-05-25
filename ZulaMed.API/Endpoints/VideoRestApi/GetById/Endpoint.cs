@@ -18,11 +18,7 @@ public class GetVideoByIdQueryHandler : IQueryHandler<GetVideoByIdQuery, Respons
     public async ValueTask<Response> Handle(GetVideoByIdQuery query, CancellationToken cancellationToken)
     {
         var video = await _context.Set<Video>().FirstOrDefaultAsync(x => x.Id == query.Id, cancellationToken);
-        if (video is null)
-        {
-            return new Response{Video = null};
-        }
-        return video.ToResponse();
+        return new Response { Video = video?.ToResponse() };
     }
 }
 
