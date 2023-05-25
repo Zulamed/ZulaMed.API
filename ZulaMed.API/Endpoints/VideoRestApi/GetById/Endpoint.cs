@@ -17,7 +17,11 @@ public class GetVideoByIdQueryHandler : IQueryHandler<GetVideoByIdQuery, Respons
     
     public async ValueTask<Response> Handle(GetVideoByIdQuery query, CancellationToken cancellationToken)
     {
-        var video = await _context.Set<Video>().FirstAsync(x => x.Id == query.Id, cancellationToken);
+        var video = await _context.Set<Video>().FirstOrDefaultAsync(x => x.Id == query.Id, cancellationToken);
+        if (video is null)
+        {
+            return new Response{Video = null};
+        }
         return video.ToResponse();
     }
 }
@@ -43,7 +47,10 @@ public class Endpoint : Endpoint<Request>
         {
             Id = req.Id
         }, ct);
-
+        if (response.Video is null)
+        {
+            await SendNotFoundAsync(ct);
+        }
         await SendAsync(response, cancellation: ct);
     }
 }
