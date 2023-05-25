@@ -29,9 +29,4 @@
       <PackageReference Include="Vogen" Version="3.0.16" />
     </ItemGroup>
 
-    <ItemGroup>
-      <Folder Include="Endpoints\VideoRestApi\GetById" />
-      <Folder Include="Endpoints\VideoRestApi\GetByTitle" />
-    </ItemGroup>
-
 </Project>
