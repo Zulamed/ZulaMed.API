@@ -13,7 +13,6 @@ public class Request
     public required string VideoUrl { get; init; }
     public required string VideoThumbnail { get; init; }
     public required string VideoDescription { get; init; }
-    public required DateTime VideoPublishedDate { get; init; }
 }
 
 
@@ -25,7 +24,6 @@ public class Validator : Validator<Request>
         RuleFor(x => x.VideoUrl).NotEmpty();
         RuleFor(x => x.VideoThumbnail).NotEmpty();
         RuleFor(x => x.VideoDescription).NotEmpty();
-        RuleFor(x => x.VideoPublishedDate).NotEmpty();
     }
 }
 
@@ -35,5 +33,4 @@ public class CreateVideoCommand : Mediator.ICommand<Result<Video, ValueObjectVal
     public required string VideoUrl { get; init; }
     public required string VideoThumbnail { get; init; }
     public required string VideoDescription { get; init; }
-    public required DateTime VideoPublishedDate { get; init; }
 }
