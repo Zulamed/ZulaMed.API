@@ -6,7 +6,7 @@ namespace ZulaMed.API.Endpoints.VideoRestApi.GetById;
 
 public class Response
 {
-    public required VideoDTO Video { get; init; }
+    public required VideoDTO? Video { get; init; }
 }
 
 public class Request
