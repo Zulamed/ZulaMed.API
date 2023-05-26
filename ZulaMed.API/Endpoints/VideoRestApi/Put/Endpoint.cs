@@ -9,7 +9,7 @@ using ZulaMed.API.Domain.Video;
 namespace ZulaMed.API.Endpoints.VideoRestApi.Put;
 
 public class UpdateVideoCommandHandler : Mediator.ICommandHandler<UpdateVideoCommand,
-    Result<Success, ValueObjectValidationException>>
+    Result<bool, ValueObjectValidationException>>
 {
     private readonly ZulaMedDbContext _dbContext;
 
@@ -18,18 +18,18 @@ public class UpdateVideoCommandHandler : Mediator.ICommandHandler<UpdateVideoCom
         _dbContext = dbContext;
     }
 
-    public async ValueTask<Result<Success, ValueObjectValidationException>> Handle(UpdateVideoCommand command,
+    public async ValueTask<Result<bool, ValueObjectValidationException>> Handle(UpdateVideoCommand command,
         CancellationToken cancellationToken)
     {
         try
         {
-            await _dbContext.Set<Video>().Where(x => x.Id == command.Id)
+            var rows = await _dbContext.Set<Video>().Where(x => x.Id == command.Id)
                 .ExecuteUpdateAsync(calls => calls
                         .SetProperty(x => x.VideoTitle, (VideoTitle)command.VideoTitle)
                         .SetProperty(x => x.VideoThumbnail, (VideoThumbnail)command.VideoThumbnail)
                         .SetProperty(x => x.VideoDescription, (VideoDescription)command.VideoDescription),
                     cancellationToken);
-            return new Success();
+            return rows > 0;
         }
         catch (ValueObjectValidationException e)
         {
@@ -56,8 +56,13 @@ public class Endpoint : Endpoint<Request>
     public override async Task HandleAsync(Request req, CancellationToken ct)
     {
         var result = await _mediator.Send(req.MapToCommand(), ct);
-        if (result.TryPickT0(out var video, out var error))
+        if (result.TryPickT0(out var isUpdated, out var error))
         {
+            if (!isUpdated)
+            {
+                await SendNotFoundAsync(ct);
+                return;
+            }
             await SendOkAsync(ct);
             return;
         }

@@ -28,7 +28,7 @@ public class Validator : Validator<Request>
     }
 }
 
-public class UpdateVideoCommand : Mediator.ICommand<Result<Success, ValueObjectValidationException>>
+public class UpdateVideoCommand : Mediator.ICommand<Result<bool, ValueObjectValidationException>>
 {
     public required Guid Id { get; init; }
     public required string VideoTitle { get; init; }
