@@ -38,7 +38,7 @@ public class UploadVideoCommandHandler : Mediator.ICommandHandler<UploadVideoCom
         }, cancellationToken);
         return new UploadResponse
         {
-            VideoUrl = _s3Options.Value.BaseUrl + $"videos/{guid}",
+            VideoUrl = _s3Options.Value.BaseUrl + $"/videos/{guid}",
             PutResponse = response
         };
     }
