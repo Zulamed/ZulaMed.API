@@ -6,7 +6,7 @@ using ZulaMed.API.Endpoints.VideoRestApi.Get.GetByTitle;
 
 namespace ZulaMed.API.Endpoints.VideoRestApi.Get;
 
-public class Endpoint : EndpointWithoutRequest<Response>
+public class Endpoint : Endpoint<Request,Response>
 {
     private readonly IMediator _mediator;
 
@@ -21,14 +21,12 @@ public class Endpoint : EndpointWithoutRequest<Response>
         AllowAnonymous();
     }
 
-    public override async Task HandleAsync(CancellationToken ct)
+    public override async Task HandleAsync(Request req,CancellationToken ct)
     {
         Video[]? videos;
 
-        var queryParam = Query<string>("title", false);
-
-        if (queryParam is not null)
-            videos = await _mediator.Send(new GetByTitleQuery { Title = queryParam}, ct);
+        if (req.Title is not null)
+            videos = await _mediator.Send(new GetByTitleQuery { Title = req.Title}, ct);
         else
             videos = await _mediator.Send(new GetAllVideosQuery(), ct);
 
