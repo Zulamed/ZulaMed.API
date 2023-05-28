@@ -1,26 +1,10 @@
 using FastEndpoints;
 using Mediator;
-using Microsoft.EntityFrameworkCore;
-using ZulaMed.API.Data;
 using ZulaMed.API.Domain.Video;
+using ZulaMed.API.Endpoints.VideoRestApi.Get.GetAll;
+using ZulaMed.API.Endpoints.VideoRestApi.Get.GetByTitle;
 
 namespace ZulaMed.API.Endpoints.VideoRestApi.Get;
-
-
-public class GetAllVideosQueryHandler : IQueryHandler<GetAllVideosQuery, Video[]>
-{
-    private readonly ZulaMedDbContext _context;
-
-    public GetAllVideosQueryHandler(ZulaMedDbContext context)
-    {
-        _context = context;
-    }
-    public async ValueTask<Video[]> Handle(GetAllVideosQuery query, CancellationToken cancellationToken)
-    {
-        var videos = await _context.Set<Video>().ToArrayAsync(cancellationToken: cancellationToken);
-        return videos;
-    }
-}
 
 public class Endpoint : EndpointWithoutRequest<Response>
 {
@@ -39,7 +23,14 @@ public class Endpoint : EndpointWithoutRequest<Response>
 
     public override async Task HandleAsync(CancellationToken ct)
     {
-        var videos = await _mediator.Send(new GetAllVideosQuery(), ct);
+        Video[]? videos;
+
+        var queryParam = Query<string>("title", false);
+
+        if (queryParam is not null)
+            videos = await _mediator.Send(new GetByTitleQuery { Title = queryParam}, ct);
+        else
+            videos = await _mediator.Send(new GetAllVideosQuery(), ct);
 
         await SendAsync(new Response
         {

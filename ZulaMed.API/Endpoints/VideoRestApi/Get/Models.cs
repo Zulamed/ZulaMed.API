@@ -8,6 +8,3 @@ public class Response
     public required VideoDTO[] Videos { get; init; }
 }
 
-public class GetAllVideosQuery : IQuery<Video[]>
-{
-}
