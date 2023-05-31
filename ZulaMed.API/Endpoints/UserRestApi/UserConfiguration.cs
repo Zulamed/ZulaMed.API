@@ -17,33 +17,33 @@ public class UserConfiguration :IEntityTypeConfiguration<User>
             .IsRequired();
 
         builder.Property(x => x.Email)
-            .HasConversion<UserEmail>()
+            .HasConversion<UserEmail.EfCoreValueConverter>()
             .IsRequired();
 
-        builder.HasOne(x => x.Group)
-            .WithMany();
+        // builder.HasOne(x => x.Group)
+        //     .WithMany();
         
         builder.Property(x => x.Name)
-            .HasConversion<UserName>()
+            .HasConversion<UserName.EfCoreValueConverter>()
             .IsRequired();
 
         builder.Property(x => x.Surname)
-            .HasConversion<UserSurname>()
+            .HasConversion<UserSurname.EfCoreValueConverter>()
             .IsRequired();
         
         builder.Property(x => x.Country)
-            .HasConversion<UserCountry>()
+            .HasConversion<UserCountry.EfCoreValueConverter>()
             .IsRequired();
 
         builder.Property(x => x.City)
-            .HasConversion<UserCity>()
+            .HasConversion<UserCity.EfCoreValueConverter>()
             .IsRequired();
 
         builder.Property(x => x.University)
-            .HasConversion<UserUniversity>();
+            .HasConversion<UserUniversity.EfCoreValueConverter>();
 
         builder.Property(x => x.WorkPlace)
-            .HasConversion<UserWorkPlace>();
+            .HasConversion<UserWorkPlace.EfCoreValueConverter>();
     }
 }
 
