@@ -1,13 +1,17 @@
 using Vogen;
+using System.Text.RegularExpressions;
 
 namespace ZulaMed.API.Domain.Video;
 
 [ValueObject<string>(Conversions.EfCoreValueConverter)]
 public readonly partial struct VideoUrl
 {
+    [GeneratedRegex(@"\/videos\/[a-fA-F0-9]{8}-(?:[a-fA-F0-9]{4}-){3}[a-fA-F0-9]{12}", 
+        RegexOptions.IgnoreCase | RegexOptions.Compiled, "en-US")]
+    private static partial Regex UrlValidationRegex();
+
     private static Validation Validate(string input)
     {
-        string pattern = @"\/videos\/[a-fA-F0-9]{8}-(?:[a-fA-F0-9]{4}-){3}[a-fA-F0-9]{12}";
-        return System.Text.RegularExpressions.Regex.IsMatch(input, pattern) ? Validation.Ok : Validation.Invalid("URL must be in the format '/videos/GUID'");
+        return UrlValidationRegex().IsMatch(input) ? Validation.Ok : Validation.Invalid("URL must be in the format '/videos/GUID'");
     }
 }
