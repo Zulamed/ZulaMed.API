@@ -24,7 +24,8 @@ public class Endpoint : IEndpoint
     }
 
 
-    private async Task<Results<Ok<string>, BadRequest>> Handle([FromBody(EmptyBodyBehavior = EmptyBodyBehavior.Disallow)] RequestBody requestBody)
+    // I'm allowing empty body because, it's already being handled in the endpoint filter
+    private async Task<Results<Ok<string>, BadRequest>> Handle([FromBody(EmptyBodyBehavior = EmptyBodyBehavior.Allow)] RequestBody requestBody)
     {
         return await Task.FromResult(Ok("string"));
     }
