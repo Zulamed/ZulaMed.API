@@ -8,7 +8,11 @@
     </PropertyGroup>
 
     <ItemGroup>
+      <PackageReference Include="AWSSDK.S3" Version="3.7.104.27" />
       <PackageReference Include="FFMpegCore" Version="5.1.0" />
+      <PackageReference Include="FluentValidation" Version="11.5.2" />
+      <PackageReference Include="NSwag.AspNetCore" Version="13.19.0" />
+      <PackageReference Include="Scrutor" Version="4.2.2" />
     </ItemGroup>
 
 </Project>
