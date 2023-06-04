@@ -6,12 +6,16 @@ var builder = WebApplication.CreateBuilder(args);
 
 builder.Services.AddEndpoints();
 builder.Services.AddValidators();
+builder.Services.AddCqrs();
 
 builder.Services.AddOpenApiDocument();
-
 builder.Services.AddEndpointsApiExplorer();
 
+
 builder.Services.AddSingleton<IAmazonS3, AmazonS3Client>();
+builder.Services.AddOptions<S3BucketOptions>()
+    .BindConfiguration("S3BucketOptions")
+    .ValidateDataAnnotations();
 
 var app = builder.Build();
 

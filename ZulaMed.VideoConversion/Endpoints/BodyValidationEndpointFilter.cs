@@ -13,10 +13,11 @@ public class BodyValidationEndpointFilter<T> : IEndpointFilter
 
     public async ValueTask<object?> InvokeAsync(EndpointFilterInvocationContext context, EndpointFilterDelegate next)
     {
-        if (context.Arguments.SingleOrDefault(x => x is T) is not T request)
+        var request = (T?)context.Arguments.SingleOrDefault(x => x is T);
+        if (request is null)
             return Results.BadRequest(new
             {
-                Error = "Invalid request body"
+                Error = "Request body is missing"
             });
         var validationResult = await _validator.ValidateAsync(request);
         if (!validationResult.IsValid)

@@ -1,11 +1,13 @@
 using FluentValidation;
 using ZulaMed.VideoConversion.Endpoints;
+using ZulaMed.VideoConversion.Infrastructure;
 
 namespace ZulaMed.VideoConversion;
 
+// the scanning can be replaced with source generators or manual registration. For the ease of use, scanning is used 
 public static class Extensions
 {
-    // this could be source generated instead of using reflection
+    
     public static IServiceCollection AddEndpoints(this IServiceCollection services)
     {
         services.Scan(scan => scan
@@ -27,8 +29,27 @@ public static class Extensions
             .AsImplementedInterfaces()
             .WithTransientLifetime()
         );
-        
-        
+
+
+        return services;
+    }
+
+    public static IServiceCollection AddCqrs(this IServiceCollection services)
+    {
+        services.Scan(scan => scan
+            .FromAssemblyOf<Program>()
+            .AddClasses(c => c.AssignableTo(typeof(IQueryHandler<,>)))
+            .AsImplementedInterfaces()
+            .WithTransientLifetime()
+        );
+
+        services.Scan(scan => scan
+            .FromAssemblyOf<Program>()
+            .AddClasses(c => c.AssignableTo(typeof(ICommandHandler<,>)))
+            .AsImplementedInterfaces()
+            .WithTransientLifetime()
+        );
+
         return services;
     }
 
