@@ -3,7 +3,7 @@ using Amazon.S3.Model;
 using Microsoft.Extensions.Options;
 using ZulaMed.VideoConversion.Infrastructure;
 
-namespace ZulaMed.VideoConversion.Endpoints.Transcode;
+namespace ZulaMed.VideoConversion.Endpoints.Transcode.Queries;
 
 public class GetVideoFromS3Query : IQuery<GetObjectResponse>
 {
