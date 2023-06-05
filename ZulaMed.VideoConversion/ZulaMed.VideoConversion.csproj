@@ -12,6 +12,8 @@
       <PackageReference Include="FFMpegCore" Version="5.1.0" />
       <PackageReference Include="FluentValidation" Version="11.5.2" />
       <PackageReference Include="NSwag.AspNetCore" Version="13.19.0" />
+      <PackageReference Include="OneOf" Version="3.0.243" />
+      <PackageReference Include="OneOf.SourceGenerator" Version="3.0.243" />
       <PackageReference Include="Scrutor" Version="4.2.2" />
     </ItemGroup>
 

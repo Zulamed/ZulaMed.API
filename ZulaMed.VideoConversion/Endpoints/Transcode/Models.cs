@@ -4,6 +4,12 @@ using FluentValidation;
 namespace ZulaMed.VideoConversion.Endpoints.Transcode;
 
 
+public struct Resolution
+{
+    public required int Width { get; init; }
+    public required int Height { get; init; }
+}
+
 public class RequestBody
 {
     public required string S3Path { get; set; }
