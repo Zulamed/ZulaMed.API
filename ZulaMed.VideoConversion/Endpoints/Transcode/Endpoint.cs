@@ -2,6 +2,8 @@ using Amazon.S3.Model;
 using Microsoft.AspNetCore.Http.HttpResults;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.ModelBinding;
+using OneOf;
+using OneOf.Types;
 using ZulaMed.VideoConversion.Endpoints.Transcode.Commands;
 using ZulaMed.VideoConversion.Endpoints.Transcode.Queries;
 using ZulaMed.VideoConversion.Infrastructure;
@@ -15,7 +17,7 @@ public class Endpoint : IEndpoint
     private readonly IQueryHandler<GetVideoResolutionFromVideoQuery, Result<Resolution, InvalidOperationException>>
         _resolutionHandler;
 
-    private readonly ICommandHandler<TranscodeVideoCommand, string[]> _transcodeHandler;
+    private readonly ICommandHandler<TranscodeVideoCommand, OneOf<Success<string>, Error>> _transcodeHandler;
 
 
     private readonly Resolution[] _supportedResolutions = {
@@ -33,7 +35,7 @@ public class Endpoint : IEndpoint
     public Endpoint(IQueryHandler<GetVideoFromS3Query, GetObjectResponse> s3Handler,
         IQueryHandler<GetVideoResolutionFromVideoQuery, Result<Resolution, InvalidOperationException>>
             resolutionHandler,
-        ICommandHandler<TranscodeVideoCommand, string[]> transcodeHandler)
+        ICommandHandler<TranscodeVideoCommand, OneOf<Success<string>, Error>> transcodeHandler)
     {
         _s3Handler = s3Handler;
         _resolutionHandler = resolutionHandler;
@@ -49,7 +51,7 @@ public class Endpoint : IEndpoint
 
 
     // I'm allowing empty body because, it's already being handled in the endpoint filter
-    private async Task<Results<Ok<string>, BadRequest<Error>>>
+    private async Task<Results<Ok<string>, BadRequest<ErrorMessage>>>
         Handle([FromBody(EmptyBodyBehavior = EmptyBodyBehavior.Allow)] RequestBody requestBody, CancellationToken token)
     {
         var objectResponse = await _s3Handler.HandleAsync(new GetVideoFromS3Query
@@ -62,17 +64,15 @@ public class Endpoint : IEndpoint
             PathToFile = "test.mp4"
         }, token);
         if (!resolutionResponse.TryPickT0(out var resolution, out var error))
-            return BadRequest(new Error
+            return BadRequest(new ErrorMessage
             {
-                ErrorMessage = error.Value.Message,
+                Message = error.Value.Message,
                 StatusCode = 400
             });
         await _transcodeHandler.HandleAsync(new TranscodeVideoCommand
         {
             VideoPath = "test.mp4",
-            Resolutions = _supportedResolutions
-                .SkipWhile(x => x.Height > resolution.Height && x.Width > resolution.Width)
-                .ToArray() 
+            Resolution = new Resolution {Width = 1920, Height = 1080}
         }, token);
         return Ok("test.mp4");
     }
