@@ -31,7 +31,8 @@ public class Endpoint : IEndpoint
 
     public void ConfigureRoute(IEndpointRouteBuilder builder)
     {
-        builder.MapPost("test", Handle);
+        builder.MapPost("test", Handle)
+            .AddEndpointFilter<BodyValidationEndpointFilter<RequestBody>>();
     }
 
 
