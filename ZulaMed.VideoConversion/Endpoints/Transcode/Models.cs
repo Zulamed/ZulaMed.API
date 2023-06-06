@@ -17,7 +17,7 @@ public class RequestBody
 
 public partial class Validator : AbstractValidator<RequestBody>
 {
-    [GeneratedRegex(@"\/videos\/[a-fA-F-1-9]{8}-(?:[a-fA-F0-9]{4}-){3}[a-fA-F0-9]{12}", 
+    [GeneratedRegex(@"videos\/[a-fA-F0-9]{8}-(?:[a-fA-F0-9]{4}-){3}[a-fA-F0-9]{12}", 
             RegexOptions.IgnoreCase | RegexOptions.Compiled, "en-US")]
         private static partial Regex FormatValidationRegex();
     
