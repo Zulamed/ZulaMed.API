@@ -45,7 +45,11 @@ public static class Extensions
 
         services.Scan(scan => scan
             .FromAssemblyOf<Program>()
-            .AddClasses(c => c.AssignableTo(typeof(ICommandHandler<,>)))
+            .AddClasses(c =>
+            {
+                c.AssignableTo(typeof(ICommandHandler<,>));
+                c.Where(x => !x.Name.Contains("Decorator"));
+            })
             .AsImplementedInterfaces()
             .WithTransientLifetime()
         );

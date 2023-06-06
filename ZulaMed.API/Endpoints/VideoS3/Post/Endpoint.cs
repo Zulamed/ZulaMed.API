@@ -34,7 +34,7 @@ public class UploadVideoCommandHandler : Mediator.ICommandHandler<UploadVideoCom
             {
                 ["x-amz-meta-originalname"] = command.Video.FileName,
                 ["x-amz-meta-extension"] = fileExtension
-            }
+            },
         }, cancellationToken);
         return new UploadResponse
         {
