@@ -57,6 +57,15 @@ public static class Extensions
         return services;
     }
 
+    public static IServiceCollection DecorateCommandHandler<TCommand,TReturnType, TDecorator>
+        (this IServiceCollection services)
+    where TCommand : ICommand<TReturnType>
+    where TDecorator : ICommandHandler<TCommand, TReturnType>
+    {
+        services.Decorate<ICommandHandler<TCommand, TReturnType>, TDecorator>();
+        return services;
+    }
+
     public static WebApplication MapEndpoints(this WebApplication app)
     {
         using var scope = app.Services.CreateScope();
