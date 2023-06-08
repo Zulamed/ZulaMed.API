@@ -12,7 +12,7 @@ builder.Services.AddEndpoints();
 builder.Services.AddValidators();
 builder.Services.AddCqrs();
 builder.Services
-    .Decorate<ICommandHandler<TranscodeVideoCommand, OneOf<Success<string>, Error>>,
+    .DecorateCommandHandler<TranscodeVideoCommand, OneOf<Success<string>, Error>,
         TranscodeVideoCommandHandlerDecorator>();
 
 builder.Services.AddOpenApiDocument();
