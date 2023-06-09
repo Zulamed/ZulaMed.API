@@ -1,9 +1,9 @@
 using Amazon.S3;
 using Amazon.S3.Model;
+using Mediator;
 using Microsoft.Extensions.Options;
-using ZulaMed.VideoConversion.Infrastructure;
 
-namespace ZulaMed.VideoConversion.Endpoints.Transcode.Queries;
+namespace ZulaMed.VideoConversion.Features.Transcode.Queries;
 
 public class GetVideoFromS3Query : IQuery<GetObjectResponse>
 {
@@ -22,7 +22,7 @@ public class GetVideoFromS3QueryHandler : IQueryHandler<GetVideoFromS3Query, Get
         _s3Options = s3Options;
     }
 
-    public async Task<GetObjectResponse> HandleAsync(GetVideoFromS3Query query, CancellationToken cancellationToken)
+    public async ValueTask<GetObjectResponse> Handle(GetVideoFromS3Query query, CancellationToken cancellationToken)
     {
         var request = new GetObjectRequest
         {

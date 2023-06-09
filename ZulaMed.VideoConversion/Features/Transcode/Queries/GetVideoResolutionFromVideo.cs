@@ -1,8 +1,8 @@
 using FFMpegCore;
+using Mediator;
 using OneOf.Types;
-using ZulaMed.VideoConversion.Infrastructure;
 
-namespace ZulaMed.VideoConversion.Endpoints.Transcode.Queries;
+namespace ZulaMed.VideoConversion.Features.Transcode.Queries;
 
 
 
@@ -14,7 +14,7 @@ public class GetVideoResolutionFromVideoQuery : IQuery<Result<Resolution, Invali
 public class GetVideoResolutionFromVideoQueryHandler : IQueryHandler<GetVideoResolutionFromVideoQuery,
     Result<Resolution, InvalidOperationException>>
 {
-    public async Task<Result<Resolution, InvalidOperationException>> HandleAsync(GetVideoResolutionFromVideoQuery query,
+    public async ValueTask<Result<Resolution, InvalidOperationException>> Handle(GetVideoResolutionFromVideoQuery query,
         CancellationToken cancellationToken)
     {
         var mediaAnalysis = await FFProbe.AnalyseAsync(query.PathToFile, cancellationToken: cancellationToken);
