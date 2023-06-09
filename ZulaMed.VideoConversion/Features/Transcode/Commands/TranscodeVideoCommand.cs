@@ -2,12 +2,12 @@ using Amazon.S3;
 using Amazon.S3.Model;
 using FFMpegCore;
 using FFMpegCore.Enums;
+using Mediator;
 using Microsoft.Extensions.Options;
-using OneOf.Types;
-using ZulaMed.VideoConversion.Infrastructure;
 using OneOf;
+using OneOf.Types;
 
-namespace ZulaMed.VideoConversion.Endpoints.Transcode.Commands;
+namespace ZulaMed.VideoConversion.Features.Transcode.Commands;
 
 public class TranscodeVideoCommand : ICommand<OneOf<Success<string>, Error>>
 {
@@ -16,22 +16,39 @@ public class TranscodeVideoCommand : ICommand<OneOf<Success<string>, Error>>
     public required Resolution Resolution { get; init; }
 }
 
+public class VideoTranscodedEvent : INotification
+{
+    public required string VideoPath { get; init; }
+
+    public required string VideoKey { get; init; }
+}
+
 public class TranscodeVideoCommandHandler : ICommandHandler<TranscodeVideoCommand, OneOf<Success<string>, Error>>
 {
-    public async Task<OneOf<Success<string>, Error>> HandleAsync(TranscodeVideoCommand command, CancellationToken token)
+    private readonly IPublisher _publisher;
+
+    public TranscodeVideoCommandHandler(IPublisher publisher)
     {
-        // var tasks = command.Resolution
-        //     .Select(resolution => Task.Run(() => ProcessArguments(command, resolution), token))
-        // await Task.WhenAll(tasks);
+        _publisher = publisher;
+    }
+
+    public async ValueTask<OneOf<Success<string>, Error>> Handle(TranscodeVideoCommand command, CancellationToken token)
+    {
         try
         {
             await ProcessArguments(command, command.Resolution);
+            var key = $"output-{command.Resolution.Width}x{command.Resolution.Height}.mp4";
+            await _publisher.Publish(new VideoTranscodedEvent()
+            {
+                VideoKey = key,
+                VideoPath = key
+            }, token);
+            return new Success<string>(key);
         }
         catch (Exception)
         {
             return new Error();
         }
-        return new Success<string>($"output-{command.Resolution.Width}x{command.Resolution.Height}.mp4");
     }
 
 
@@ -51,35 +68,25 @@ public class TranscodeVideoCommandHandler : ICommandHandler<TranscodeVideoComman
 }
 
 // upload to S3
-public class TranscodeVideoCommandHandlerDecorator : ICommandHandler<TranscodeVideoCommand, OneOf<Success<string>, Error>>
+public class VideoTranscodedEventHandler : INotificationHandler<VideoTranscodedEvent>
 {
-    private readonly ICommandHandler<TranscodeVideoCommand, OneOf<Success<string>, Error>> _decorated;
     private readonly IAmazonS3 _s3;
     private readonly IOptions<S3BucketOptions> _s3Options;
 
-    public TranscodeVideoCommandHandlerDecorator(ICommandHandler<TranscodeVideoCommand, OneOf<Success<string>, Error>> decorated,
-        IAmazonS3 s3, IOptions<S3BucketOptions> s3Options)
+    public VideoTranscodedEventHandler(IAmazonS3 s3, IOptions<S3BucketOptions> s3Options)
     {
-        _decorated = decorated;
         _s3 = s3;
         _s3Options = s3Options;
     }
-    
-    
-    public async Task<OneOf<Success<string>, Error>> HandleAsync(TranscodeVideoCommand command, CancellationToken token)
+
+    public async ValueTask Handle(VideoTranscodedEvent notification, CancellationToken cancellationToken)
     {
-        var result = await _decorated.HandleAsync(command, token);
-        if (result.TryPickT1(out var error, out var success))
-        {
-            return error;
-        }
         var request = new PutObjectRequest
         {
             BucketName = _s3Options.Value.BucketNameConverted,
-            Key = success.Value,
-            FilePath = success.Value
+            Key = notification.VideoKey,
+            FilePath = notification.VideoPath
         };
-        var response = await _s3.PutObjectAsync(request, token);
-        return new Success<string>(success.Value);
+        await _s3.PutObjectAsync(request, cancellationToken);
     }
 }
