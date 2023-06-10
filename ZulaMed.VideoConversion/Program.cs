@@ -12,10 +12,7 @@ builder.Services.AddOptions<S3BucketOptions>()
 builder.Services.AddOptions<SqsQueueOptions>()
     .BindConfiguration("SQSQueueOptions");
 
-builder.Services.AddMediator(options =>
-{
-    options.ServiceLifetime = ServiceLifetime.Scoped;
-});
+builder.Services.AddMediator();
 
 
 builder.Services.AddHostedService<Worker>();
