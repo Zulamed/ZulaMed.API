@@ -1,6 +1,8 @@
+using System.Diagnostics;
 using System.Text.Json;
 using Mediator;
 using ZulaMed.VideoConversion.Features.Transcode.Commands;
+using ZulaMed.VideoConversion.Features.Transcode.Events;
 using ZulaMed.VideoConversion.Features.Transcode.Queries;
 
 namespace ZulaMed.VideoConversion.Features.Transcode;
@@ -29,37 +31,45 @@ public class Worker : BackgroundService
                 var messageBody = JsonSerializer.Deserialize<VideoTranscodeRequest>(message.Body);
                 if (messageBody is null)
                     continue;
+                _logger.Log(LogLevel.Information, "Received video transcoding request. " +
+                                                  "Key: {MessageId}", message.MessageId);
                 var video = await _mediator.Send(new GetVideoFromS3Query
                 {
                     Key = messageBody.VideoS3Path
                 }, stoppingToken);
-                await video.WriteResponseStreamToFileAsync("test.mp4", true, stoppingToken);
+                var key = Path.GetFileNameWithoutExtension(video.Key);
+                Directory.CreateDirectory(key);
+                var pathToFile = $"{key}/{key}{video.Metadata["x-amz-meta-extension"]}";
+                await video.WriteResponseStreamToFileAsync(pathToFile, 
+                    false, stoppingToken);
                 var resolution = await _mediator.Send(new GetVideoResolutionFromVideoQuery
                 {
-                    PathToFile = "test.mp4"
+                    PathToFile = pathToFile 
                 }, stoppingToken);
                 if (!resolution.TryPickT0(out var videoResolution, out var exception))
                 {
-                    _logger.Log(LogLevel.Warning, "Couldn't get video resolution. Key: {MessageId}, Exception: {Message}",
+                    _logger.Log(LogLevel.Warning,
+                        "Couldn't get video resolution. Key: {MessageId}, Exception: {Message}",
                         message.MessageId, exception.Value.Message);
                     continue;
                 }
+
                 var videoTranscodedResult = await _mediator.Send(new TranscodeVideoCommand
                 {
-                    VideoPath = "test.mp4",
-                    Resolution = new Resolution() { Width = 1280, Height = 720 }
+                    VideoPath = pathToFile,
+                    VideoResolution = videoResolution
                 }, stoppingToken);
                 if (videoTranscodedResult.IsT1)
                 {
-                    _logger.Log(LogLevel.Warning, "Couldn't transcode video. Key: {MessageId}",
-                        message.MessageId);
+                    _logger.Log(LogLevel.Warning, "Couldn't transcode video. Key: {MessageId}, Exception: {Message}",
+                        message.MessageId, videoTranscodedResult.AsT1.Value.Message);
                     continue;
                 }
                 _logger.Log(LogLevel.Information, "Video transcoded successfully. Key: {MessageId}",
                     message.MessageId);
                 await _mediator.Send(new DeleteMessageFromSqsCommand()
                 {
-                   ReceiptHandle = message.ReceiptHandle
+                    ReceiptHandle = message.ReceiptHandle
                 }, stoppingToken);
             }
 
