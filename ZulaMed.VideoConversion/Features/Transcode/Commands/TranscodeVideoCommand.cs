@@ -1,92 +1,103 @@
-using Amazon.S3;
-using Amazon.S3.Model;
 using FFMpegCore;
 using FFMpegCore.Enums;
 using Mediator;
 using Microsoft.Extensions.Options;
 using OneOf;
 using OneOf.Types;
+using ZulaMed.VideoConversion.Features.Transcode.Events;
 
 namespace ZulaMed.VideoConversion.Features.Transcode.Commands;
 
-public class TranscodeVideoCommand : ICommand<OneOf<Success<string>, Error>>
+public class TranscodeVideoCommand : ICommand<OneOf<Success, Error<Exception>>>
 {
     public required string VideoPath { get; init; }
 
-    public required Resolution Resolution { get; init; }
+    public required Resolution VideoResolution { get; init; }
 }
 
-public class VideoTranscodedEvent : INotification
-{
-    public required string VideoPath { get; init; }
-
-    public required string VideoKey { get; init; }
-}
-
-public class TranscodeVideoCommandHandler : ICommandHandler<TranscodeVideoCommand, OneOf<Success<string>, Error>>
+public class
+    TranscodeVideoCommandHandler : ICommandHandler<TranscodeVideoCommand, OneOf<Success, Error<Exception>>>
 {
     private readonly IPublisher _publisher;
+    private readonly IOptions<ResolutionOptions> _resolutions;
 
-    public TranscodeVideoCommandHandler(IPublisher publisher)
+    public TranscodeVideoCommandHandler(IPublisher publisher, IOptions<ResolutionOptions> resolutions)
     {
         _publisher = publisher;
+        _resolutions = resolutions;
     }
 
-    public async ValueTask<OneOf<Success<string>, Error>> Handle(TranscodeVideoCommand command, CancellationToken token)
+    public async ValueTask<OneOf<Success, Error<Exception>>> Handle(TranscodeVideoCommand command,
+        CancellationToken token)
     {
         try
         {
-            await ProcessArguments(command, command.Resolution);
-            var key = $"output-{command.Resolution.Width}x{command.Resolution.Height}.mp4";
-            await _publisher.Publish(new VideoTranscodedEvent()
-            {
-                VideoKey = key,
-                VideoPath = key
-            }, token);
-            return new Success<string>(key);
+            var resolutions = _resolutions.Value.Resolutions;
+            var scaledResolutions =
+                resolutions.SkipWhile(x =>
+                        x.Height > command.VideoResolution.Height && x.Width > command.VideoResolution.Width)
+                    .ToArray();
+            var tasks = scaledResolutions.Select(scaledResolution =>
+                    ProcessArguments(command, scaledResolution, token))
+                .ToList();
+            await Task.WhenAll(tasks);
+            await GenerateMasterFile(command, scaledResolutions);
+            return new Success();
         }
-        catch (Exception)
+        catch (Exception e)
         {
-            return new Error();
+            return new Error<Exception>(e);
         }
     }
 
 
-    private static async Task ProcessArguments(TranscodeVideoCommand command, Resolution resolution)
+    // because this handlers are registered as singleton, i don't put stuff into fields and just pass the objects as arguments into private methods
+    // but putting them into fields would be DRYer. I don't do it bcs i'll have initialization problems(basically need to initialize them each time in the handle method)
+    private async Task GenerateMasterFile(TranscodeVideoCommand command, Resolution[] supportedResolutions)
     {
-        await FFMpegArguments
+        var directoryName = Path.GetDirectoryName($"{command.VideoPath}");
+        var filesArray = supportedResolutions
+            .Select(x => $"{directoryName}/{x.Height}p/transcoded-video.m3u8")
+            .ToArray();
+        var arguments = FFMpegArguments
+            .FromConcatInput(filesArray)
+            .OutputToFile($"{directoryName}/master.m3u8",
+                addArguments: options => { options.WithCustomArgument("-c copy"); });
+        await arguments.ProcessAsynchronously();
+        
+        await _publisher.Publish(new MasterFileGeneratedEvent()
+        {
+            VideoKey = command.VideoPath,
+            MasterFilePath = $"{command.VideoPath}/master.m3u8"
+        });
+    }
+
+
+    private async Task ProcessArguments(TranscodeVideoCommand command, Resolution resolution, CancellationToken token)
+    {
+        var directoryName = Path.GetDirectoryName($"{command.VideoPath}");
+        Directory.CreateDirectory($"{directoryName}/{resolution.Height}p");
+        var arguments = FFMpegArguments
             .FromFileInput($"{command.VideoPath}")
-            .OutputToFile($"output-{resolution.Width}x{resolution.Height}.mp4",
+            .OutputToFile($"{directoryName}/{resolution.Height}p/transcoded-video.m3u8",
                 addArguments: options => options
                     .WithVideoCodec(VideoCodec.LibX264)
                     .WithVideoFilters(filters => { filters.Scale(resolution.Width, -1); })
                     .WithConstantRateFactor(21)
                     .WithAudioCodec(AudioCodec.Aac)
                     .WithFastStart()
-            ).ProcessAsynchronously();
-    }
-}
-
-// upload to S3
-public class VideoTranscodedEventHandler : INotificationHandler<VideoTranscodedEvent>
-{
-    private readonly IAmazonS3 _s3;
-    private readonly IOptions<S3BucketOptions> _s3Options;
-
-    public VideoTranscodedEventHandler(IAmazonS3 s3, IOptions<S3BucketOptions> s3Options)
-    {
-        _s3 = s3;
-        _s3Options = s3Options;
-    }
-
-    public async ValueTask Handle(VideoTranscodedEvent notification, CancellationToken cancellationToken)
-    {
-        var request = new PutObjectRequest
+                    .WithCustomArgument("-f hls")
+                    .WithCustomArgument("-hls_time 5")
+                    .WithCustomArgument("-hls_list_size 0")
+                    .WithCustomArgument($"-hls_segment_filename {directoryName}/{resolution.Height}p/%v_%03d.ts")
+                    .WithCustomArgument("-hls_playlist_type vod")
+            );
+        await arguments.ProcessAsynchronously();
+        var key = Path.GetFileNameWithoutExtension(command.VideoPath);
+        await _publisher.Publish(new VideoTranscodedEvent
         {
-            BucketName = _s3Options.Value.BucketNameConverted,
-            Key = notification.VideoKey,
-            FilePath = notification.VideoPath
-        };
-        await _s3.PutObjectAsync(request, cancellationToken);
+            VideoKey = key,
+            VideoDirectoryPath = $"{directoryName}/{resolution.Height}p/"
+        }, token);
     }
 }
