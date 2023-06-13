@@ -82,7 +82,7 @@ public class
             .OutputToFile($"{directoryName}/{resolution.Height}p/transcoded-video.m3u8",
                 addArguments: options => options
                     .WithVideoCodec(VideoCodec.LibX264)
-                    .WithVideoFilters(filters => { filters.Scale(resolution.Width, -1); })
+                    .WithVideoFilters(filters => { filters.Scale(-2, resolution.Height); })
                     .WithConstantRateFactor(21)
                     .WithAudioCodec(AudioCodec.Aac)
                     .WithFastStart()
