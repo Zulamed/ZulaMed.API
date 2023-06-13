@@ -7,6 +7,8 @@ public struct Resolution
 {
     public required int Width { get; init; }
     public required int Height { get; init; }
+    
+    public required double BitrateMbps { get; init; }
 }
 
 public class VideoTranscodeRequest
