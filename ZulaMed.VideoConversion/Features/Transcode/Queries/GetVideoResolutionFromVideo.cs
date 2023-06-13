@@ -26,7 +26,8 @@ public class GetVideoResolutionFromVideoQueryHandler : IQueryHandler<GetVideoRes
         return new Resolution
         {
             Width = mediaAnalysis.PrimaryVideoStream.Width,
-            Height = mediaAnalysis.PrimaryVideoStream.Height
+            Height = mediaAnalysis.PrimaryVideoStream.Height,
+            BitrateMbps = 0,
         };
     }
 }

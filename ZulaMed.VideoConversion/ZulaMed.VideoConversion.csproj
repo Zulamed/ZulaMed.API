@@ -10,6 +10,7 @@
     <ItemGroup>
       <PackageReference Include="AWSSDK.S3" Version="3.7.104.27" />
       <PackageReference Include="AWSSDK.SQS" Version="3.7.103" />
+      <PackageReference Include="CliWrap" Version="3.6.3" />
       <PackageReference Include="FFMpegCore" Version="5.1.0" />
       <PackageReference Include="Mediator.Abstractions" Version="2.2.0-preview.2" />
       <PackageReference Include="Mediator.SourceGenerator" Version="2.2.0-preview.2">

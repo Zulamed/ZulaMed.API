@@ -12,7 +12,7 @@ builder.Services.AddOptions<S3BucketOptions>()
 builder.Services.AddOptions<SqsQueueOptions>()
     .BindConfiguration("SQSQueueOptions");
 builder.Services.AddOptions<ResolutionOptions>()
-    .BindConfiguration("ResolutionOptions");
+    .BindConfiguration("VideoOptions");
 
 builder.Services.AddMediator();
 
