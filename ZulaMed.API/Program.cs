@@ -1,4 +1,5 @@
 using Amazon.S3;
+using Amazon.SQS;
 using FastEndpoints;
 using FastEndpoints.Swagger;
 using Microsoft.EntityFrameworkCore;
@@ -34,6 +35,7 @@ builder.Services.AddOptions<S3BucketOptions>()
     .ValidateDataAnnotations();
 
 builder.Services.AddSingleton<IAmazonS3, AmazonS3Client>();
+builder.Services.AddSingleton<IAmazonSQS, AmazonSQSClient>();
 
 builder.Services.AddMediator(x => { x.ServiceLifetime = ServiceLifetime.Scoped; });
 
