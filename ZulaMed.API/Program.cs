@@ -2,6 +2,7 @@ using Amazon.S3;
 using Amazon.SQS;
 using FastEndpoints;
 using FastEndpoints.Swagger;
+using Microsoft.AspNetCore.Http.Features;
 using Microsoft.EntityFrameworkCore;
 using Npgsql;
 using ZulaMed.API;
@@ -11,8 +12,15 @@ var builder = WebApplication.CreateBuilder(args);
 
 builder.WebHost.ConfigureKestrel(options =>
 {
-    options.Limits.MaxRequestBodySize = long.MaxValue;
+    options.Limits.MaxRequestBodySize = int.MaxValue;
 });
+
+builder.Services.Configure<FormOptions>(options =>
+{
+    options.ValueLengthLimit = int.MaxValue;
+    options.MultipartBodyLengthLimit = int.MaxValue;
+});
+
 
 builder.Services.AddFastEndpoints(options => { options.SourceGeneratorDiscoveredTypes = DiscoveredTypes.All; });
 
@@ -32,6 +40,10 @@ builder.Services.SwaggerDocument(o =>
 
 builder.Services.AddOptions<S3BucketOptions>()
     .BindConfiguration("S3BucketOptions")
+    .ValidateDataAnnotations();
+
+builder.Services.AddOptions<SqsQueueOptions>()
+    .BindConfiguration("SQSQueueOptions")
     .ValidateDataAnnotations();
 
 builder.Services.AddSingleton<IAmazonS3, AmazonS3Client>();
