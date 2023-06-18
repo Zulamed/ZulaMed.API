@@ -1,13 +1,8 @@
+using System.Net;
 using FastEndpoints;
 using FluentValidation;
-using Mediator;
 
-namespace ZulaMed.API.Endpoints.UserRestApi.Get.GetPhoto;
-
-public class Response
-{
-    public required string PhotoUrl { get; init; }
-}
+namespace ZulaMed.API.Endpoints.UserS3.DeletePhoto;
 
 public class Request
 {
@@ -24,8 +19,12 @@ public class RequestValidator : Validator<Request>
     }
 }
 
-public class GetUserPhotoQuery : IQuery<Response>
+public class DeleteResponse
 {
-    public required Guid UserId { get; init; }
+    public required HttpStatusCode StatusCode { get; init; }
 }
 
+public class DeletePhotoCommand : Mediator.ICommand<DeleteResponse>
+{
+    public required Guid FileId { get; init; }
+}
