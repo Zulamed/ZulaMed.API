@@ -35,7 +35,7 @@ public class Endpoint : Endpoint<Request, Response>
 
     public override void Configure()
     {
-        Put("/user/{id}/photo");
+        Get("/user/{id}/photo");
         AllowAnonymous();
     }
 
