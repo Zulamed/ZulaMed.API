@@ -17,7 +17,7 @@ public class DeleteVideoCommandHandler : Mediator.ICommandHandler<DeleteVideoCom
 
     public async ValueTask<bool> Handle(DeleteVideoCommand command, CancellationToken cancellationToken)
     {
-        var rows = await _dbContext.Set<Video>().Where(x => command.Id == x.Id)
+        var rows = await _dbContext.Set<Video>().Where(x => command.Id == (Guid)x.Id)
             .ExecuteDeleteAsync(cancellationToken: cancellationToken);
         return rows > 0;
     }

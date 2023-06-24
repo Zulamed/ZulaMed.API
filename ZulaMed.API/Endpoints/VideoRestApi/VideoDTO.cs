@@ -1,6 +1,6 @@
 namespace ZulaMed.API.Endpoints.VideoRestApi;
 
-public class VideoDTO
+public record VideoDTO
 {
     public required Guid Id { get; init; }
     public required string VideoTitle { get; init; }

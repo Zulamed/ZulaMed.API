@@ -6,7 +6,7 @@ namespace ZulaMed.API.Domain.Video;
 [ValueObject<string>(Conversions.EfCoreValueConverter)]
 public readonly partial struct VideoUrl
 {
-    [GeneratedRegex(@"\/videos\/[a-fA-F0-9]{8}-(?:[a-fA-F0-9]{4}-){3}[a-fA-F0-9]{12}", 
+    [GeneratedRegex(@"^\/[a-fA-F0-9]{8}-(?:[a-fA-F0-9]{4}-){3}[a-fA-F0-9]{12}$", 
         RegexOptions.IgnoreCase | RegexOptions.Compiled, "en-US")]
     private static partial Regex UrlValidationRegex();
 

@@ -28,11 +28,12 @@ public class CreateVideoCommandHandler
             {
                 Id = (VideoId)Guid.NewGuid(),
                 VideoDescription = (VideoDescription)command.VideoDescription,
-                VideoPublishedDate = (VideoPublishedDate)DateTime.Now,
+                VideoPublishedDate = (VideoPublishedDate)DateTime.UtcNow,
                 VideoThumbnail = (VideoThumbnail)command.VideoThumbnail,
                 VideoTitle = (VideoTitle)command.VideoTitle,
                 VideoUrl = (VideoUrl)command.VideoUrl 
             }, cancellationToken);
+            await _dbContext.SaveChangesAsync(cancellationToken);
             return entity.Entity;
         }
         catch (VoException e)
