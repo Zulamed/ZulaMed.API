@@ -21,6 +21,8 @@ builder.Services.Configure<FormOptions>(options =>
     options.MultipartBodyLengthLimit = int.MaxValue;
 });
 
+builder.Services.AddCors();
+
 
 builder.Services.AddFastEndpoints(options => { options.SourceGeneratorDiscoveredTypes = DiscoveredTypes.All; });
 
@@ -61,6 +63,12 @@ builder.Services.AddDbContext<ZulaMedDbContext>(options =>
 });
 
 var app = builder.Build();
+
+app.UseCors(c =>
+{
+    c.AllowAnyMethod();
+    c.AllowAnyOrigin();
+});
 
 app.UseAuthorization();
 app.UseFastEndpoints();
