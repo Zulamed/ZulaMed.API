@@ -7,7 +7,7 @@ public readonly partial struct VideoPublishedDate
 {
     private static Validation Validate(DateTime input)
     {
-        return DateTime.Compare(input, DateTime.Today.ToUniversalTime()) >= 0
+        return input < DateTime.UtcNow
             ? Validation.Ok
             : Validation.Invalid("published date can't be in the past");
     }
