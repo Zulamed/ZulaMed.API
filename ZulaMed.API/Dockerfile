@@ -17,4 +17,6 @@ RUN dotnet publish "ZulaMed.API.csproj" -c Release -o /app/publish /p:UseAppHost
 FROM base AS final
 WORKDIR /app
 COPY --from=publish /app/publish .
+ARG CONNECTION_STRING
+ENV DATABASE_CONNECTION_STRING=$CONNECTION_STRING
 ENTRYPOINT ["dotnet", "ZulaMed.API.dll"]

@@ -53,7 +53,11 @@ builder.Services.AddSingleton<IAmazonSQS, AmazonSQSClient>();
 
 builder.Services.AddMediator(x => { x.ServiceLifetime = ServiceLifetime.Scoped; });
 
-var dataSourceBuilder = new NpgsqlDataSourceBuilder(builder.Configuration["Database:ConnectionString"]);
+var connectionString = string.IsNullOrEmpty(builder.Configuration["DATABASE_CONNECTION_STRING"]) 
+    ? builder.Configuration["Database:ConnectionString"] 
+    : builder.Configuration["DATABASE_CONNECTION_STRING"];
+
+var dataSourceBuilder = new NpgsqlDataSourceBuilder(connectionString);
 var dataSource = dataSourceBuilder.Build();
 
 
