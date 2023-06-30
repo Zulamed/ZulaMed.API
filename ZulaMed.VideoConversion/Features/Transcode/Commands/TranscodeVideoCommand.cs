@@ -121,10 +121,10 @@ public class
         var result = await ffMpegCommand.ExecuteBufferedAsync(token);
         if (result.ExitCode != 0)
             return new Error<Exception>(new Exception(result.StandardError));
-        var key = Path.GetFileNameWithoutExtension(command.VideoPath);
+        var fileName = Path.GetFileName(command.VideoPath);
         await _publisher.Publish(new VideoTranscodedEvent
         {
-            VideoKey = key,
+            VideoNameWithExtension = fileName,
             VideoDirectoryPath = $"{directoryName}"
         }, token);
         return new Success();
