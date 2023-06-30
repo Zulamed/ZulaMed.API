@@ -9,7 +9,7 @@ public class VideoTranscodedEvent : INotification
 {
     public required string VideoDirectoryPath { get; init; }
 
-    public required string VideoKey { get; init; }
+    public required string VideoNameWithExtension { get; init; }
 }
 
 // upload to S3
@@ -27,7 +27,7 @@ public class VideoTranscodedEventHandler : INotificationHandler<VideoTranscodedE
 
     public async ValueTask Handle(VideoTranscodedEvent notification, CancellationToken cancellationToken)
     {
-        File.Delete($"{notification.VideoDirectoryPath}/{notification.VideoKey}.mp4");
+        File.Delete($"{notification.VideoDirectoryPath}/{notification.VideoNameWithExtension}");
         var directory = Directory.GetFiles(notification.VideoDirectoryPath,
             "*", SearchOption.AllDirectories);
         var tasks = (
