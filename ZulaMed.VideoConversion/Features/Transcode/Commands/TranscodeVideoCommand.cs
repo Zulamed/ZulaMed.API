@@ -125,8 +125,9 @@ public class
         await _publisher.Publish(new VideoTranscodedEvent
         {
             VideoNameWithExtension = fileName,
-            VideoDirectoryPath = $"{directoryName}"
+            VideoDirectoryPath = directoryName!
         }, token);
+        File.Delete($"{directoryName}/{fileName}");
         return new Success();
     }
 }
