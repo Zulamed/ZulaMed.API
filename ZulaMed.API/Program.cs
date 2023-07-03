@@ -1,3 +1,4 @@
+using Amazon;
 using Amazon.S3;
 using Amazon.SQS;
 using FastEndpoints;
@@ -48,6 +49,7 @@ builder.Services.AddOptions<SqsQueueOptions>()
     .BindConfiguration("SQSQueueOptions")
     .ValidateDataAnnotations();
 
+AWSConfigsS3.EnableUnicodeEncodingForObjectMetadata = true;
 builder.Services.AddSingleton<IAmazonS3, AmazonS3Client>();
 builder.Services.AddSingleton<IAmazonSQS, AmazonSQSClient>();
 
