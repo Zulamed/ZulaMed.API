@@ -7,12 +7,12 @@ namespace ZulaMed.API.Domain.Video;
 public readonly partial struct VideoThumbnail
 {
     
-    [GeneratedRegex(@"\/thumbnails\/[^\/]+\.[a-zA-Z]{3,4}", 
+    [GeneratedRegex(@"^\/[a-fA-F0-9]{8}-(?:[a-fA-F0-9]{4}-){3}[a-fA-F0-9]{12}\/[^\/]+\.[a-zA-Z]{3,4}$", 
         RegexOptions.IgnoreCase | RegexOptions.Compiled, "en-US")]
     private static partial Regex ThumbnailValidationRegex();
     
     private static Validation Validate(string input)
     {
-        return ThumbnailValidationRegex().IsMatch(input) ? Validation.Ok : Validation.Invalid("Thumbnail URL must be in the format '/thumbnails/filename.jpg'.");
+        return ThumbnailValidationRegex().IsMatch(input) ? Validation.Ok : Validation.Invalid("Thumbnail URL must be in the format '/GUID/filename.***'.");
     }
 }

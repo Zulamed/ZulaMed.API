@@ -12,6 +12,6 @@ public readonly partial struct VideoUrl
 
     private static Validation Validate(string input)
     {
-        return UrlValidationRegex().IsMatch(input) ? Validation.Ok : Validation.Invalid("URL must be in the format '/videos/GUID'");
+        return UrlValidationRegex().IsMatch(input) ? Validation.Ok : Validation.Invalid("URL must be in the format '/GUID'");
     }
 }
