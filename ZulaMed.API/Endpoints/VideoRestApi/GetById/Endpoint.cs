@@ -61,7 +61,8 @@ public class Endpoint : Endpoint<Request, VideoDTO>
         }
         response.Video = response.Video with
         {
-            VideoUrl = $"{_s3Configuration.Value.BaseUrl}{response.Video.VideoUrl}"
+            VideoUrl = $"{_s3Configuration.Value.BaseUrl}{response.Video.VideoUrl}",
+            VideoThumbnail = $"{_s3Configuration.Value.BaseUrl}{response.Video.VideoThumbnail}"
         };
         await SendAsync(response.Video, cancellation: ct);
     }
