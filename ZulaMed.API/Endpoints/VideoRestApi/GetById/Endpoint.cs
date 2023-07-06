@@ -15,19 +15,11 @@ public class GetVideoByIdQueryHandler : IQueryHandler<GetVideoByIdQuery, Respons
     {
         _context = context;
     }
-    
+
     public async ValueTask<Response> Handle(GetVideoByIdQuery query, CancellationToken cancellationToken)
     {
-        try
-        {
-            var video = await _context.Set<Video>().FirstOrDefaultAsync(x => (Guid)x.Id == query.Id, cancellationToken);
-            return new Response { Video = video?.ToResponse() };
-        }
-        catch (InvalidCastException e)
-        {
-            Console.WriteLine(e.Message);
-            throw;
-        }
+        var video = await _context.Set<Video>().FirstOrDefaultAsync(x => (Guid)x.Id == query.Id, cancellationToken);
+        return new Response { Video = video?.ToResponse() };
     }
 }
 
@@ -59,6 +51,7 @@ public class Endpoint : Endpoint<Request, VideoDTO>
             await SendNotFoundAsync(ct);
             return;
         }
+
         response.Video = response.Video with
         {
             VideoUrl = $"{_s3Configuration.Value.BaseUrl}{response.Video.VideoUrl}",
