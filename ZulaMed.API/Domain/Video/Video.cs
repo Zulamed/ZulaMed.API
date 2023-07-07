@@ -10,4 +10,6 @@ public class Video
     public required VideoPublishedDate VideoPublishedDate { get; init; }
     
     public VideoLike VideoLike { get; init; } = VideoLike.Zero; 
+    
+    public VideoDislike VideoDislike { get; init; } = VideoDislike.Zero;
 }
