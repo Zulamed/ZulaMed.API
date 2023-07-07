@@ -4,7 +4,6 @@ using Microsoft.EntityFrameworkCore;
 using OneOf;
 using OneOf.Types;
 using ZulaMed.API.Data;
-using ZulaMed.API.Domain.Video;
 
 namespace ZulaMed.API.Endpoints.VideoRestApi.Like;
 
@@ -29,8 +28,8 @@ public class
     {
         try
         {
-            var rows = await _dbContext.Set<Video>().ExecuteUpdateAsync(calls =>
-                    calls.SetProperty(x => x.VideoLike, x => VideoLike.From(x.VideoLike.Value + 1)),
+            var rows = await _dbContext.Database.ExecuteSqlAsync(
+                $"""UPDATE "Video" SET "VideoLike" = "VideoLike" + 1 WHERE "Id" = {command.VideoId}""", 
                 cancellationToken: cancellationToken);
             return rows > 0 ? new Success() : new NotFound();
         }
@@ -52,14 +51,16 @@ public class Endpoint : Endpoint<Request>
 
     public override void Configure()
     {
-        Post("/video/{id}/like");
+        Post("video/{id}/like");
         AllowAnonymous();
+        // for some reason FastEndpoints was sending 415, this clears the defaults so that it wouldn't send it 
+        Description(b => { }, clearDefaults: true); 
     }
 
 
     public override async Task HandleAsync(Request req, CancellationToken ct)
     {
-        var result = await _mediator.Send(new LikeVideoCommand { VideoId = req.VideoId }, ct);
+        var result = await _mediator.Send(new LikeVideoCommand { VideoId = req.Id }, ct);
         await result.Match(
             s => SendOkAsync(ct),
             e => SendAsync(new
