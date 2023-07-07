@@ -28,5 +28,8 @@ public class VideoConfiguration : IEntityTypeConfiguration<Video>
         builder.Property(x => x.VideoTitle)
             .HasConversion<VideoTitle.EfCoreValueConverter>()
             .IsRequired();
+        builder.Property(x => x.VideoLike)
+            .HasConversion<VideoLike.EfCoreValueConverter>()
+            .HasDefaultValue(VideoLike.Zero);
     }
 }

@@ -93,6 +93,11 @@ namespace ZulaMed.API.Data.Migrations
                         .IsRequired()
                         .HasColumnType("text");
 
+                    b.Property<int>("VideoLike")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("integer")
+                        .HasDefaultValue(0);
+
                     b.Property<DateTime>("VideoPublishedDate")
                         .HasColumnType("timestamp with time zone");
 
