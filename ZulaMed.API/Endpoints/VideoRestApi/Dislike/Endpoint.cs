@@ -46,6 +46,13 @@ public class Endpoint : Endpoint<Request>
         _mediator = mediator;
     }
 
+    public override void Configure()
+    {
+        Post("/video/{id}/dislike");
+        AllowAnonymous();
+        Description(b => {}, clearDefaults: true);
+    }
+
 
     public override async Task HandleAsync(Request req, CancellationToken ct)
     {
