@@ -34,8 +34,4 @@
       <PackageReference Include="Vogen" Version="3.0.16" />
     </ItemGroup>
 
-    <ItemGroup>
-      <Folder Include="Endpoints\UserRestApi\Delete" />
-    </ItemGroup>
-
 </Project>
