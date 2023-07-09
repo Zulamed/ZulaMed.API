@@ -4,7 +4,7 @@ namespace ZulaMed.API.Endpoints.Auth;
 
 public record SignInRequest(string Email, string Password);
 
-public record SignInResponse(string IdToken, string RefreshToken, string Email, string ExpiresIn);
+public record SignInResponse(string IdToken, string RefreshToken, string Email, string ExpiresIn, string LocalId);
 
 public record SignInErrorResponse(Error Error);
 

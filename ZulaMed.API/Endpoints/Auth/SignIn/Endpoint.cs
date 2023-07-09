@@ -1,14 +1,14 @@
 using FastEndpoints;
 using FirebaseAdmin.Auth;
 using Mediator;
-using Microsoft.EntityFrameworkCore; using OneOf;
+using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.Options;
+using OneOf;
 using OneOf.Types;
 using ZulaMed.API.Data;
 using ZulaMed.API.Domain.User;
 
 namespace ZulaMed.API.Endpoints.Auth.SignIn;
-
-
 
 public class GetUserByEmailQuery : IQuery<OneOf<User, NotFound>>
 {
@@ -39,12 +39,18 @@ public class Endpoint : Endpoint<Request>
     private readonly FirebaseAuth _auth;
     private readonly IMediator _mediator;
     private readonly IFirebaseApiClient _firebaseClient;
+    private readonly IOptions<FirebaseOptions> _options;
 
-    public Endpoint(FirebaseAuth auth, IMediator mediator, IFirebaseApiClient firebaseClient)
+    public Endpoint(
+        FirebaseAuth auth,
+        IMediator mediator,
+        IFirebaseApiClient firebaseClient,
+        IOptions<FirebaseOptions> options)
     {
         _auth = auth;
         _mediator = mediator;
         _firebaseClient = firebaseClient;
+        _options = options;
     }
 
     public override void Configure()
@@ -67,7 +73,7 @@ public class Endpoint : Endpoint<Request>
         }
 
         var userData = await _firebaseClient
-            .SignInWithPasswordAsync("AIzaSyBOFNloS0TMfrooAhlvUbLz1e_abg3hwcM",
+            .SignInWithPasswordAsync(_options.Value.ApiKey,
                 new SignInRequest(req.Email, req.Password));
 
         if (!userData.IsSuccessStatusCode)
