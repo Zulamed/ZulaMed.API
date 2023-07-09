@@ -53,6 +53,10 @@ builder.Services.AddOptions<SqsQueueOptions>()
     .BindConfiguration("SQSQueueOptions")
     .ValidateDataAnnotations();
 
+builder.Services.AddOptions<FirebaseOptions>()
+    .BindConfiguration("FirebaseOptions")
+    .ValidateDataAnnotations();
+
 AWSConfigsS3.EnableUnicodeEncodingForObjectMetadata = true;
 builder.Services.AddSingleton<IAmazonS3, AmazonS3Client>();
 builder.Services.AddSingleton<IAmazonSQS, AmazonSQSClient>();
