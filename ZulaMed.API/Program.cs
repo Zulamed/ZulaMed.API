@@ -3,8 +3,13 @@ using Amazon.S3;
 using Amazon.SQS;
 using FastEndpoints;
 using FastEndpoints.Swagger;
+using FirebaseAdmin;
+using FirebaseAdmin.Auth;
+using Google.Apis.Auth.OAuth2;
+using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Http.Features;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.IdentityModel.Tokens;
 using Npgsql;
 using ZulaMed.API;
 using ZulaMed.API.Data;
@@ -67,6 +72,33 @@ builder.Services.AddDbContext<ZulaMedDbContext>(options =>
 {
     options.UseNpgsql(dataSource);
 });
+
+builder.Services.AddSingleton(FirebaseApp.Create(new AppOptions
+{
+    Credential = GoogleCredential.FromJson(builder.Configuration["FirebaseAdminConfig"])
+}));
+
+builder.Services.AddSingleton<FirebaseAuth>(provider =>
+{
+    var app = provider.GetRequiredService<FirebaseApp>();
+    return FirebaseAuth.GetAuth(app);
+});
+
+builder.Services
+    .AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
+    .AddJwtBearer(options =>
+    {
+        options.Authority = builder.Configuration["AuthSettings:Authority"];
+        options.TokenValidationParameters = new TokenValidationParameters
+        {
+            ValidateIssuer = true,
+            ValidateAudience = true,
+            ValidateLifetime = true,
+            ValidateIssuerSigningKey = true,
+            ValidIssuer = builder.Configuration["AuthSettings:Authority"],
+            ValidAudience = builder.Configuration["AuthSettings:Audience"],
+        };
+    });
 
 var app = builder.Build();
 
