@@ -11,15 +11,14 @@ using Microsoft.AspNetCore.Http.Features;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.IdentityModel.Tokens;
 using Npgsql;
+using Refit;
 using ZulaMed.API;
 using ZulaMed.API.Data;
+using ZulaMed.API.Endpoints.Auth;
 
 var builder = WebApplication.CreateBuilder(args);
 
-builder.WebHost.ConfigureKestrel(options =>
-{
-    options.Limits.MaxRequestBodySize = int.MaxValue;
-});
+builder.WebHost.ConfigureKestrel(options => { options.Limits.MaxRequestBodySize = int.MaxValue; });
 
 builder.Services.Configure<FormOptions>(options =>
 {
@@ -60,22 +59,20 @@ builder.Services.AddSingleton<IAmazonSQS, AmazonSQSClient>();
 
 builder.Services.AddMediator(x => { x.ServiceLifetime = ServiceLifetime.Scoped; });
 
-var connectionString = string.IsNullOrEmpty(builder.Configuration["DATABASE_CONNECTION_STRING"]) 
-    ? builder.Configuration["Database:ConnectionString"] 
+var connectionString = string.IsNullOrEmpty(builder.Configuration["DATABASE_CONNECTION_STRING"])
+    ? builder.Configuration["Database:ConnectionString"]
     : builder.Configuration["DATABASE_CONNECTION_STRING"];
 
 var dataSourceBuilder = new NpgsqlDataSourceBuilder(connectionString);
 var dataSource = dataSourceBuilder.Build();
 
 
-builder.Services.AddDbContext<ZulaMedDbContext>(options =>
-{
-    options.UseNpgsql(dataSource);
-});
+builder.Services.AddDbContext<ZulaMedDbContext>(options => { options.UseNpgsql(dataSource); });
+
 
 builder.Services.AddSingleton(FirebaseApp.Create(new AppOptions
 {
-    Credential = GoogleCredential.FromJson(builder.Configuration["FirebaseAdminConfig"])
+    Credential = await GoogleCredential.FromFileAsync("firebase-adminsdk-configuration.json", CancellationToken.None)
 }));
 
 builder.Services.AddSingleton<FirebaseAuth>(provider =>
@@ -83,6 +80,10 @@ builder.Services.AddSingleton<FirebaseAuth>(provider =>
     var app = provider.GetRequiredService<FirebaseApp>();
     return FirebaseAuth.GetAuth(app);
 });
+
+builder.Services.AddRefitClient<IFirebaseApiClient>()
+    .ConfigureHttpClient(c => { c.BaseAddress = new Uri("https://identitytoolkit.googleapis.com/"); });
+
 
 builder.Services
     .AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
