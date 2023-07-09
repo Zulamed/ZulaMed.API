@@ -108,6 +108,7 @@ app.UseCors(c =>
     c.AllowAnyOrigin();
 });
 
+app.UseAuthentication();
 app.UseAuthorization();
 app.UseFastEndpoints();
 
