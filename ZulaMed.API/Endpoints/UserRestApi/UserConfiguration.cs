@@ -5,11 +5,14 @@ using ZulaMed.API.Domain.User;
 
 namespace ZulaMed.API.Endpoints.UserRestApi;
 
-public class UserConfiguration :IEntityTypeConfiguration<User>
+public class UserConfiguration : IEntityTypeConfiguration<User>
 {
     public void Configure(EntityTypeBuilder<User> builder)
     {
         builder.HasKey(x => x.Id);
+        builder
+            .HasIndex(x => x.Email)
+            .IsUnique();
 
         builder.Property(x => x.Id)
             .HasConversion<UserId.EfCoreValueConverter>()
@@ -22,7 +25,7 @@ public class UserConfiguration :IEntityTypeConfiguration<User>
 
         // builder.HasOne(x => x.Group)
         //     .WithMany();
-        
+
         builder.Property(x => x.Name)
             .HasConversion<UserName.EfCoreValueConverter>()
             .IsRequired();
@@ -30,7 +33,7 @@ public class UserConfiguration :IEntityTypeConfiguration<User>
         builder.Property(x => x.Surname)
             .HasConversion<UserSurname.EfCoreValueConverter>()
             .IsRequired();
-        
+
         builder.Property(x => x.Country)
             .HasConversion<UserCountry.EfCoreValueConverter>()
             .IsRequired();
@@ -41,12 +44,10 @@ public class UserConfiguration :IEntityTypeConfiguration<User>
 
         builder.Property(x => x.University)
             .HasConversion<UserUniversity.EfCoreValueConverter>();
-
         builder.Property(x => x.WorkPlace)
             .HasConversion<UserWorkPlace.EfCoreValueConverter>();
     }
 }
-
 
 public class SpecialtyGroupConfiguration : IEntityTypeConfiguration<SpecialtyGroup>
 {
