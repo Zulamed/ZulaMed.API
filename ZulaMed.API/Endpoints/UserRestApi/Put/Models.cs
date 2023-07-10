@@ -1,13 +1,12 @@
 using FastEndpoints;
 using FluentValidation;
 using Vogen;
-using ZulaMed.API.Domain.User;
 
 namespace ZulaMed.API.Endpoints.UserRestApi.Put;
 
 public class Request
 {
-    public required Guid Id { get; init; }
+    public Guid Id { get; init; }
     public required string Email { get; init; }
     public required int GroupId  { get; init; }
     public required string Name  { get; init; }

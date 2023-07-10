@@ -12,7 +12,7 @@ public static class Mapper
             City = user.City.Value,
             Country = user.Country.Value,
             Email = user.Email.Value,
-            GroupId = user.Group.Id.Value,
+            Group = user.Group.Name.Value,
             Name = user.Name.Value,
             Surname = user.Surname.Value,
             University = user.University.Value,

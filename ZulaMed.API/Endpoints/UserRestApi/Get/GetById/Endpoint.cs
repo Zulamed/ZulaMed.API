@@ -17,7 +17,9 @@ public class GetUserByIdQueryHandler : IQueryHandler<GetUserByIdQuery, Response>
     
     public async ValueTask<Response> Handle(GetUserByIdQuery query, CancellationToken cancellationToken)
     {
-        var user = await _context.Set<User>().FirstOrDefaultAsync(x => x.Id == query.Id, cancellationToken);
+        var user = await _context.Set<User>()
+            .Include(x => x.Group)
+            .FirstOrDefaultAsync(x => (Guid)x.Id == query.Id, cancellationToken);
         return new Response { User = user?.ToResponse() };
     }
 }

@@ -9,6 +9,6 @@ public readonly partial struct UserName
 {
     private static Validation Validate(string input)
     {
-        return string.IsNullOrWhiteSpace(input) ? Validation.Ok : Validation.Invalid("name can't be empty");
+        return !string.IsNullOrWhiteSpace(input) ? Validation.Ok : Validation.Invalid("User name can't be empty");
     }
 }

@@ -7,6 +7,6 @@ public readonly partial struct SpecialtyGroupName
 {
     private static Validation Validate(string input)
     {
-        return string.IsNullOrWhiteSpace(input) ? Validation.Ok : Validation.Invalid("Name can't be empty");
+        return !string.IsNullOrWhiteSpace(input) ? Validation.Ok : Validation.Invalid("Specialty group name can't be empty");
     }
 }

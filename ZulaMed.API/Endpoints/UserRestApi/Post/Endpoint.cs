@@ -28,7 +28,7 @@ public class CreateVideoCommandHandler : Mediator.ICommandHandler<CreateUserComm
             {
                 Id = (UserId)Guid.NewGuid(),
                 Email = (UserEmail)command.Email,
-                Group = (await _dbContext.Set<SpecialtyGroup>().FirstOrDefaultAsync(x => x.Id == command.GroupId, cancellationToken))!,
+                Group = (await _dbContext.Set<SpecialtyGroup>().FirstOrDefaultAsync(x => (int)x.Id == command.GroupId, cancellationToken))!,
                 Name = (UserName)command.Name,
                 Surname = (UserSurname)command.Surname,
                 Country = (UserCountry)command.Country,

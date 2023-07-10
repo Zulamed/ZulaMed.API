@@ -26,7 +26,7 @@ public static class Mapper
         {
             Id = user.Id.Value,
             Email = user.Email.Value,
-            GroupId = user.Group.Id.Value,
+            Group = user.Group.Name.Value,
             Name = user.Name.Value,
             Surname = user.Surname.Value,
             Country = user.Country.Value,
