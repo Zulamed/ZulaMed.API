@@ -1,6 +1,6 @@
 using ZulaMed.API.Domain.User;
 
-namespace ZulaMed.API.Endpoints.UserRestApi.Get.GetAll;
+namespace ZulaMed.API.Endpoints.UserRestApi.Get;
 
 public static class Mapper
 {
