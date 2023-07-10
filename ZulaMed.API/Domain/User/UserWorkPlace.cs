@@ -7,6 +7,6 @@ public readonly partial struct UserWorkPlace
 {
     private static Validation Validate(string input)
     {
-        return !String.IsNullOrEmpty(input) ? Validation.Ok : Validation.Invalid("workplace can't be empty");
+        return !string.IsNullOrEmpty(input) ? Validation.Ok : Validation.Invalid("workplace can't be empty");
     }
 }

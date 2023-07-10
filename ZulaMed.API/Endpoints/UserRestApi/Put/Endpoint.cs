@@ -21,17 +21,18 @@ public class UpdateUserCommandHandler : Mediator.ICommandHandler<UpdateUserComma
     {
         try
         {
+            // make group changeable as well
             var group = await _dbContext.Set<SpecialtyGroup>()
-                .FirstOrDefaultAsync(x => x.Id == command.GroupId, cancellationToken);
-            var rows = await _dbContext.Set<User>().Where(x => x.Id == command.Id)
+                .FirstOrDefaultAsync(x => (int)x.Id == command.GroupId, cancellationToken);
+            var rows = await _dbContext.Set<User>()
+                .Where(x => (Guid)x.Id == command.Id)
                 .ExecuteUpdateAsync(calls => calls
                     .SetProperty(x => x.Name, (UserName)command.Name)
                     .SetProperty(x => x.Surname, (UserSurname)command.Surname)
                     .SetProperty(x => x.WorkPlace, (UserWorkPlace)command.WorkPlace)
                     .SetProperty(x => x.Country, (UserCountry)command.Country)
                     .SetProperty(x => x.City, (UserCity)command.City)
-                    .SetProperty(x => x.Email, (UserEmail)command.Email)
-                    .SetProperty(x => x.Group, group),
+                    .SetProperty(x => x.Email, (UserEmail)command.Email),
                     cancellationToken);
             return rows > 0;
 
