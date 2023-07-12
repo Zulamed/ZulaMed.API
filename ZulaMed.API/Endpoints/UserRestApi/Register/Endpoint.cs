@@ -1,4 +1,5 @@
 using FastEndpoints;
+using FirebaseAdmin.Auth;
 using Mediator;
 using Microsoft.EntityFrameworkCore;
 using OneOf.Types;
@@ -8,7 +9,7 @@ using ZulaMed.API.Domain.SpecialtyGroup;
 using ZulaMed.API.Domain.User;
 using VoException = Vogen.ValueObjectValidationException;
 
-namespace ZulaMed.API.Endpoints.UserRestApi.Post;
+namespace ZulaMed.API.Endpoints.UserRestApi.Register;
 
 public class CreateVideoCommandHandler : Mediator.ICommandHandler<CreateUserCommand, Result<User, VoException>>
 {
@@ -50,10 +51,12 @@ public class CreateVideoCommandHandler : Mediator.ICommandHandler<CreateUserComm
 public class Endpoint : Endpoint<Request, UserDTO>
 {
     private readonly IMediator _mediator;
+    private readonly FirebaseAuth _auth;
 
-    public Endpoint(IMediator mediator)
+    public Endpoint(IMediator mediator, FirebaseAuth auth)
     {
         _mediator = mediator;
+        _auth = auth;
     }
 
     public override void Configure()
@@ -67,6 +70,11 @@ public class Endpoint : Endpoint<Request, UserDTO>
         var result = await _mediator.Send(request.MapToCommand(), ct);
         if (result.TryPickT0(out var value, out var error))
         {
+            await _auth.CreateUserAsync(new UserRecordArgs()
+            {
+                Email = request.Email,
+                Password = request.Password
+            }, ct);
             await SendOkAsync(value.MapToResponse(), ct);
             return;
         }

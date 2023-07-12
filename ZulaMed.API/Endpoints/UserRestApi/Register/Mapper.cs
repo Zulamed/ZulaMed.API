@@ -1,6 +1,6 @@
 using ZulaMed.API.Domain.User;
 
-namespace ZulaMed.API.Endpoints.UserRestApi.Post;
+namespace ZulaMed.API.Endpoints.UserRestApi.Register;
 
 public static class Mapper
 {
