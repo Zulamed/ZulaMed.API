@@ -11,10 +11,8 @@ using Microsoft.AspNetCore.Http.Features;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.IdentityModel.Tokens;
 using Npgsql;
-using Refit;
 using ZulaMed.API;
 using ZulaMed.API.Data;
-using ZulaMed.API.Endpoints.Auth;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -53,9 +51,6 @@ builder.Services.AddOptions<SqsQueueOptions>()
     .BindConfiguration("SQSQueueOptions")
     .ValidateDataAnnotations();
 
-builder.Services.AddOptions<FirebaseOptions>()
-    .BindConfiguration("FirebaseOptions")
-    .ValidateDataAnnotations();
 
 AWSConfigsS3.EnableUnicodeEncodingForObjectMetadata = true;
 builder.Services.AddSingleton<IAmazonS3, AmazonS3Client>();
@@ -85,8 +80,6 @@ builder.Services.AddSingleton<FirebaseAuth>(provider =>
     return FirebaseAuth.GetAuth(app);
 });
 
-builder.Services.AddRefitClient<IFirebaseApiClient>()
-    .ConfigureHttpClient(c => { c.BaseAddress = new Uri("https://identitytoolkit.googleapis.com/"); });
 
 
 builder.Services
