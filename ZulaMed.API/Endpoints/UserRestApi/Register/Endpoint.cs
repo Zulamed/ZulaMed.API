@@ -41,10 +41,15 @@ public class CreateVideoCommandHandler : Mediator.ICommandHandler<CreateUserComm
                 University = (UserUniversity)command.University,
                 WorkPlace = (UserWorkPlace)command.WorkPlace
             }, cancellationToken);
-            await _auth.CreateUserAsync(new UserRecordArgs()
+            var user = await _auth.CreateUserAsync(new UserRecordArgs()
             {
                 Email = command.Email,
                 Password = command.Password
+            }, cancellationToken);
+            await _auth.SetCustomUserClaimsAsync(user.Uid, new Dictionary<string, object>()
+            {
+                ["IsAdmin"] = false,
+                ["UserId"] = entity.Entity.Id.Value
             }, cancellationToken);
             await _dbContext.SaveChangesAsync(cancellationToken);
             return entity.Entity;
