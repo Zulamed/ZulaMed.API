@@ -36,7 +36,7 @@ public class Validator : Validator<Request>
     }
 }
 
-public class CreateUserCommand : Mediator.ICommand<Result<User, ValueObjectValidationException>>
+public class CreateUserCommand : Mediator.ICommand<Result<User, Exception>>
 {
     public required string Email { get; init; }
     public required int GroupId  { get; init; }
@@ -46,4 +46,6 @@ public class CreateUserCommand : Mediator.ICommand<Result<User, ValueObjectValid
     public required string City  { get; init; }
     public required string University  { get; init; }
     public required string WorkPlace  { get; init; }
+    
+    public required string Password { get; init; }
 }

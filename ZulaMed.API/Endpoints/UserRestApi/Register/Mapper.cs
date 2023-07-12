@@ -16,6 +16,7 @@ public static class Mapper
             City = request.City,
             University = request.University,
             WorkPlace = request.WorkPlace,
+            Password = request.Password,
 
         };
     }
