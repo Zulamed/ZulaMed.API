@@ -3,7 +3,6 @@ using FirebaseAdmin.Auth;
 using Mediator;
 using Microsoft.EntityFrameworkCore;
 using OneOf.Types;
-using Vogen;
 using ZulaMed.API.Data;
 using ZulaMed.API.Domain.SpecialtyGroup;
 using ZulaMed.API.Domain.User;
@@ -44,6 +43,11 @@ public class CreateVideoCommandHandler : Mediator.ICommandHandler<CreateUserComm
             await _dbContext.SaveChangesAsync(cancellationToken);
             await AddUserToFirebase(command.Email, command.Password, entity.Entity.Id.Value, cancellationToken);
             return entity.Entity;
+        }
+        catch (DbUpdateException e)
+        {
+            // needs better error message
+            return new Error<Exception>(e.InnerException!);
         }
         catch (Exception e)
         {
