@@ -41,23 +41,28 @@ public class CreateVideoCommandHandler : Mediator.ICommandHandler<CreateUserComm
                 University = (UserUniversity)command.University,
                 WorkPlace = (UserWorkPlace)command.WorkPlace
             }, cancellationToken);
-            var user = await _auth.CreateUserAsync(new UserRecordArgs()
-            {
-                Email = command.Email,
-                Password = command.Password
-            }, cancellationToken);
-            await _auth.SetCustomUserClaimsAsync(user.Uid, new Dictionary<string, object>()
-            {
-                ["IsAdmin"] = false,
-                ["UserId"] = entity.Entity.Id.Value
-            }, cancellationToken);
             await _dbContext.SaveChangesAsync(cancellationToken);
+            await AddUserToFirebase(command.Email, command.Password, entity.Entity.Id.Value, cancellationToken);
             return entity.Entity;
         }
         catch (Exception e)
         {
             return new Error<Exception>(e);
         }
+    }
+
+    private async Task AddUserToFirebase(string email, string password,Guid userId, CancellationToken token)
+    {
+        var user = await _auth.CreateUserAsync(new UserRecordArgs()
+        {
+            Email = email,
+            Password = password 
+        }, token);
+        await _auth.SetCustomUserClaimsAsync(user.Uid, new Dictionary<string, object>()
+        {
+            ["IsAdmin"] = false,
+            ["UserId"] = userId 
+        }, token);
     }
 }
 
