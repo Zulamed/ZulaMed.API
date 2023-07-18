@@ -87,6 +87,8 @@ public class
                 .WithConstantRateFactor(21)
                 .WithAudioCodec(AudioCodec.Aac)
                 .WithCustomArgument("-sc_threshold 0")
+                .WithCustomArgument("-g 48")
+                .WithCustomArgument("-keyint_min 48")
                 .WithCustomArgument(maps.ToString())
                 .WithCustomArgument(outputArguments.ToString())
                 .WithCustomArgument($"-var_stream_map \"{varStreamMaps}\"")
