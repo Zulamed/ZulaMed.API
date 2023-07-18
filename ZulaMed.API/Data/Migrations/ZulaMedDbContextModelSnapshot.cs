@@ -22,6 +22,21 @@ namespace ZulaMed.API.Data.Migrations
 
             NpgsqlModelBuilderExtensions.UseIdentityByDefaultColumns(modelBuilder);
 
+            modelBuilder.Entity("UserUser", b =>
+                {
+                    b.Property<Guid>("SubscribersId")
+                        .HasColumnType("uuid");
+
+                    b.Property<Guid>("SubscriptionsId")
+                        .HasColumnType("uuid");
+
+                    b.HasKey("SubscribersId", "SubscriptionsId");
+
+                    b.HasIndex("SubscriptionsId");
+
+                    b.ToTable("UserUser");
+                });
+
             modelBuilder.Entity("ZulaMed.API.Domain.SpecialtyGroup.SpecialtyGroup", b =>
                 {
                     b.Property<int>("Id")
@@ -124,6 +139,21 @@ namespace ZulaMed.API.Data.Migrations
                     b.HasKey("Id");
 
                     b.ToTable("Video");
+                });
+
+            modelBuilder.Entity("UserUser", b =>
+                {
+                    b.HasOne("ZulaMed.API.Domain.User.User", null)
+                        .WithMany()
+                        .HasForeignKey("SubscribersId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.HasOne("ZulaMed.API.Domain.User.User", null)
+                        .WithMany()
+                        .HasForeignKey("SubscriptionsId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
                 });
 
             modelBuilder.Entity("ZulaMed.API.Domain.User.User", b =>
