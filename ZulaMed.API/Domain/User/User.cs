@@ -19,6 +19,6 @@ public class User
     public required UserUniversity University { get; init; }
     
     public required UserWorkPlace WorkPlace { get; init; }
-    public required List<User> Subscriptions { get; init; }
-    public required List<User> Subscribers { get; init; }
+    public List<User> Subscriptions { get; init; } = new();
+    public List<User> Subscribers { get; init; } = new();
 }
