@@ -14,7 +14,8 @@ public class Request
 
 public class Response
 {
-    public required List<Comment>? Comments { get; init; }
+    // public required List<Comment>? Comments { get; init; }
+    public required List<CommentDTO>? Comments { get; init; }
 }
 
 public class RequestValidator : Validator<Request>
@@ -27,7 +28,7 @@ public class RequestValidator : Validator<Request>
     }
 }
 
-public class GetCommentsForAVideoQuery : IQuery<Response>
+public class GetCommentsForAVideoQuery : IQuery<Response?>
 {
     public required Guid VideoId { get; init; }
 }
