@@ -4,7 +4,7 @@ namespace ZulaMed.API.Endpoints.Comments.SendACommentToVideo;
 
 public static class Mapper
 {
-   public static Response ToDomain(this Comment comment)
+   public static Response ToResponse(this Comment comment)
    {
        return new Response
        {

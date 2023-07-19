@@ -33,8 +33,10 @@ public class
     public async ValueTask<OneOf<Comment, NotFound>> Handle(SendCommentToVideoCommand command,
         CancellationToken cancellationToken)
     {
-        var user = await _dbContext.Set<User>().FirstOrDefaultAsync(x => x.Id == command.SentById, cancellationToken: cancellationToken);
-        var video = await _dbContext.Set<Video>().FirstOrDefaultAsync(x => x.Id == command.VideoId, cancellationToken: cancellationToken);
+        var user = await _dbContext.Set<User>()
+            .FirstOrDefaultAsync(x => (Guid)x.Id == command.SentById, cancellationToken: cancellationToken);
+        var video = await _dbContext.Set<Video>()
+            .FirstOrDefaultAsync(x => (Guid)x.Id == command.VideoId, cancellationToken: cancellationToken);
         if (user is null || video is null)
         {
             return new NotFound();
@@ -49,9 +51,9 @@ public class
             RelatedVideo = video
         };
         var entry = await _dbContext.Set<Comment>().AddAsync(comment, cancellationToken);
-        
+
         video.Comments.Add(comment);
-        
+
         await _dbContext.SaveChangesAsync(cancellationToken);
         return entry.Entity;
     }
@@ -82,7 +84,7 @@ public class Endpoint : Endpoint<Request, Response>
         }, ct);
 
         await result.Match(
-            s => SendOkAsync(s.ToDomain(), ct),
+            s => SendOkAsync(s.ToResponse(), ct),
             nf => SendNotFoundAsync(ct)
         );
     }

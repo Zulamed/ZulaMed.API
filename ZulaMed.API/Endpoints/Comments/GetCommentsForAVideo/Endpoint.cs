@@ -9,7 +9,7 @@ using ZulaMed.API.Domain.Video;
 
 namespace ZulaMed.API.Endpoints.Comments.GetCommentsForAVideo;
 
-public class GetCommentsForAVideoQueryHandler : IQueryHandler<GetCommentsForAVideoQuery, Response>
+public class GetCommentsForAVideoQueryHandler : IQueryHandler<GetCommentsForAVideoQuery, Response?>
 {
     private readonly ZulaMedDbContext _dbContext;
 
@@ -18,18 +18,22 @@ public class GetCommentsForAVideoQueryHandler : IQueryHandler<GetCommentsForAVid
         _dbContext = dbContext;
     }
 
-    public async ValueTask<Response> Handle(GetCommentsForAVideoQuery query, CancellationToken cancellationToken)
+    public async ValueTask<Response?> Handle(GetCommentsForAVideoQuery query, CancellationToken cancellationToken)
     {
         var video = await _dbContext.Set<Video>()
-            .FirstOrDefaultAsync(x => x.Id == query.VideoId, cancellationToken: cancellationToken);
+            .Include(x => x.Comments)
+            .ThenInclude(x => x.SentBy)
+            .FirstOrDefaultAsync(x => (Guid)x.Id == query.VideoId, cancellationToken: cancellationToken);
+        if (video is null)
+            return null;
         return new Response
         {
-            Comments = video?.Comments
+            Comments = video.Comments.Select(x => x.ToDTO()).ToList()
         };
     }
 }
 
-public class Endpoint : Endpoint<Request>
+public class Endpoint : Endpoint<Request, Response>
 {
     private readonly IMediator _mediator;
 
@@ -50,10 +54,12 @@ public class Endpoint : Endpoint<Request>
         {
             VideoId = req.VideoId,
         }, ct);
-        if (response.Comments is null)
+        if (response is null)
         {
             await SendNotFoundAsync(ct);
+            return;
         }
+
         await SendAsync(response, cancellation: ct);
     }
 }
