@@ -33,22 +33,25 @@ public class
     public async ValueTask<OneOf<Comment, NotFound>> Handle(SendCommentToVideoCommand command,
         CancellationToken cancellationToken)
     {
-        var user = await _dbContext.Set<User>().FirstOrDefaultAsync(cancellationToken: cancellationToken);
-        var video = await _dbContext.Set<Video>().FirstOrDefaultAsync(cancellationToken: cancellationToken);
+        var user = await _dbContext.Set<User>().FirstOrDefaultAsync(x => x.Id == command.SentById, cancellationToken: cancellationToken);
+        var video = await _dbContext.Set<Video>().FirstOrDefaultAsync(x => x.Id == command.VideoId, cancellationToken: cancellationToken);
         if (user is null || video is null)
         {
             return new NotFound();
         }
 
-        var entry = await _dbContext.Set<Comment>().AddAsync(new Comment
+        var comment = new Comment
         {
             Id = (CommentId)Guid.NewGuid(),
             SentAt = (CommentSentDate)DateTime.UtcNow,
             Content = (CommentContent)command.Content,
             SentBy = user,
             RelatedVideo = video
-        }, cancellationToken);
-
+        };
+        var entry = await _dbContext.Set<Comment>().AddAsync(comment, cancellationToken);
+        
+        video.Comments.Add(comment);
+        
         await _dbContext.SaveChangesAsync(cancellationToken);
         return entry.Entity;
     }
