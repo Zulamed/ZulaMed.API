@@ -1,3 +1,5 @@
+using ZulaMed.API.Domain.Comments;
+
 namespace ZulaMed.API.Domain.Video;
 
 public class Video
@@ -12,5 +14,8 @@ public class Video
     public VideoLike VideoLike { get; init; } = VideoLike.Zero; 
     
     public VideoDislike VideoDislike { get; init; } = VideoDislike.Zero;
+  
     public VideoView VideoView { get; init; } = VideoView.Zero;
+  
+    public List<Comment> Comments { get; init; } = new();
 }
