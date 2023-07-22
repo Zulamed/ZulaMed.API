@@ -34,5 +34,8 @@ public class VideoConfiguration : IEntityTypeConfiguration<Video>
         builder.Property(x => x.VideoDislike)
             .HasConversion<VideoDislike.EfCoreValueConverter>()
             .HasDefaultValue(VideoDislike.Zero);
+        builder.Property(x => x.VideoView)
+            .HasConversion<VideoView.EfCoreValueConverter>()
+            .HasDefaultValue(VideoView.Zero);
     }
 }

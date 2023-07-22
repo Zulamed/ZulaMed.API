@@ -14,6 +14,8 @@ public class Video
     public VideoLike VideoLike { get; init; } = VideoLike.Zero; 
     
     public VideoDislike VideoDislike { get; init; } = VideoDislike.Zero;
-
+  
+    public VideoView VideoView { get; init; } = VideoView.Zero;
+  
     public List<Comment> Comments { get; init; } = new();
 }

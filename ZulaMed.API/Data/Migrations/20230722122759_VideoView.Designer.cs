@@ -2,6 +2,7 @@
 using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 using ZulaMed.API.Data;
@@ -11,9 +12,11 @@ using ZulaMed.API.Data;
 namespace ZulaMed.API.Data.Migrations
 {
     [DbContext(typeof(ZulaMedDbContext))]
-    partial class ZulaMedDbContextModelSnapshot : ModelSnapshot
+    [Migration("20230722122759_VideoView")]
+    partial class VideoView
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -35,43 +38,6 @@ namespace ZulaMed.API.Data.Migrations
                     b.HasIndex("SubscriptionsId");
 
                     b.ToTable("UserUser");
-                });
-
-            modelBuilder.Entity("ZulaMed.API.Domain.Comments.Comment", b =>
-                {
-                    b.Property<Guid>("Id")
-                        .HasColumnType("uuid");
-
-                    b.Property<string>("Content")
-                        .IsRequired()
-                        .HasColumnType("text");
-
-                    b.Property<int>("Dislike")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("integer")
-                        .HasDefaultValue(0);
-
-                    b.Property<int>("Like")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("integer")
-                        .HasDefaultValue(0);
-
-                    b.Property<Guid>("RelatedVideoId")
-                        .HasColumnType("uuid");
-
-                    b.Property<DateTime>("SentAt")
-                        .HasColumnType("timestamp with time zone");
-
-                    b.Property<Guid>("SentById")
-                        .HasColumnType("uuid");
-
-                    b.HasKey("Id");
-
-                    b.HasIndex("RelatedVideoId");
-
-                    b.HasIndex("SentById");
-
-                    b.ToTable("Comment");
                 });
 
             modelBuilder.Entity("ZulaMed.API.Domain.SpecialtyGroup.SpecialtyGroup", b =>
@@ -198,25 +164,6 @@ namespace ZulaMed.API.Data.Migrations
                         .IsRequired();
                 });
 
-            modelBuilder.Entity("ZulaMed.API.Domain.Comments.Comment", b =>
-                {
-                    b.HasOne("ZulaMed.API.Domain.Video.Video", "RelatedVideo")
-                        .WithMany("Comments")
-                        .HasForeignKey("RelatedVideoId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
-                    b.HasOne("ZulaMed.API.Domain.User.User", "SentBy")
-                        .WithMany()
-                        .HasForeignKey("SentById")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
-                    b.Navigation("RelatedVideo");
-
-                    b.Navigation("SentBy");
-                });
-
             modelBuilder.Entity("ZulaMed.API.Domain.User.User", b =>
                 {
                     b.HasOne("ZulaMed.API.Domain.SpecialtyGroup.SpecialtyGroup", "Group")
@@ -226,11 +173,6 @@ namespace ZulaMed.API.Data.Migrations
                         .IsRequired();
 
                     b.Navigation("Group");
-                });
-
-            modelBuilder.Entity("ZulaMed.API.Domain.Video.Video", b =>
-                {
-                    b.Navigation("Comments");
                 });
 #pragma warning restore 612, 618
         }
