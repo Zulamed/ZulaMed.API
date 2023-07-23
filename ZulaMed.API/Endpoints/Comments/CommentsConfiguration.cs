@@ -35,10 +35,16 @@ public class ReplyConfiguration : IEntityTypeConfiguration<Reply>
 {
     public void Configure(EntityTypeBuilder<Reply> builder)
     {
-        builder.HasKey(x => x.Id);
+        builder.HasKey("ParentCommentId", "ReplyCommentId");
+        
+        builder.HasOne(x => x.ParentComment)
+            .WithMany()
+            .HasForeignKey("ParentCommentId")
+            .IsRequired();
 
-        builder.Property(x => x.Id)
-            .HasConversion<ReplyId.EfCoreValueConverter>()
+        builder.HasOne(x => x.ReplyComment)
+            .WithMany()
+            .HasForeignKey("ReplyCommentId")
             .IsRequired();
     }
 }

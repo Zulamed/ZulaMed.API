@@ -14,8 +14,6 @@ public readonly partial struct ReplyId
 
 public class Reply
 {
-    public required ReplyId Id { get; init; }
-    
     public required Comment ParentComment { get; init; }
     
     public required Comment ReplyComment { get; init; }
