@@ -80,6 +80,8 @@ builder.Services.AddSingleton<FirebaseAuth>(provider =>
     return FirebaseAuth.GetAuth(app);
 });
 
+builder.Services.AddTransient<VogenValidationMiddleware>();
+
 
 
 builder.Services
@@ -106,6 +108,7 @@ app.UseCors(c =>
     c.AllowAnyOrigin();
 });
 
+app.UseMiddleware<VogenValidationMiddleware>();
 app.UseAuthentication();
 app.UseAuthorization();
 app.UseFastEndpoints();
