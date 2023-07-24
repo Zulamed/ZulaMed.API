@@ -17,14 +17,6 @@ public class CommentsConfiguration : IEntityTypeConfiguration<Comment>
         builder.Property(x => x.Content)
             .HasConversion<CommentContent.EfCoreValueConverter>();
 
-        builder.Property(x => x.Dislike)
-            .HasConversion<Dislike.EfCoreValueConverter>()
-            .HasDefaultValue(Dislike.Zero);
-
-        builder.Property(x => x.Like)
-            .HasConversion<Like.EfCoreValueConverter>()
-            .HasDefaultValue(Like.Zero);
-
         builder.Property(x => x.SentAt)
             .HasConversion<CommentSentDate.EfCoreValueConverter>()
             .IsRequired();
