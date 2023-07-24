@@ -11,6 +11,10 @@ public class LikeVideoCommand : Mediator.ICommand<OneOf<Success, Error<string>, 
 {
     public required Guid VideoId { get; init; }
 }
+public class UnLikeVideoCommand : Mediator.ICommand<OneOf<Success, Error<string>, NotFound>>
+{
+    public required Guid VideoId { get; init; }
+}
 
 public class
     LikeVideoCommandHandler : Mediator.ICommandHandler<LikeVideoCommand, OneOf<Success, Error<string>, NotFound>>
@@ -40,6 +44,33 @@ public class
     }
 }
 
+public class
+    UnLikeVideoCommandHandler : Mediator.ICommandHandler<UnLikeVideoCommand, OneOf<Success, Error<string>, NotFound>>
+{
+    private readonly ZulaMedDbContext _dbContext;
+
+    public UnLikeVideoCommandHandler(ZulaMedDbContext dbContext)
+    {
+        _dbContext = dbContext;
+    }
+    
+    public async ValueTask<OneOf<Success, Error<string>, NotFound>> Handle(UnLikeVideoCommand command,
+        CancellationToken cancellationToken)
+    {
+        try
+        {
+            var rows = await _dbContext.Database.ExecuteSqlAsync(
+                $"""UPDATE "Video" SET "VideoLike" = GREATEST("VideoLike" - 1, 0) WHERE "Id" = {command.VideoId}""", 
+                cancellationToken: cancellationToken);
+            return rows > 0 ? new Success() : new NotFound();
+        }
+        catch (Exception e)
+        {
+            return new Error<string>(e.Message);
+        }
+    }
+}
+
 public class Endpoint : Endpoint<Request>
 {
     private readonly IMediator _mediator;
@@ -51,7 +82,8 @@ public class Endpoint : Endpoint<Request>
 
     public override void Configure()
     {
-        Post("video/{id}/like");
+        Verbs(Http.POST, Http.DELETE);
+        Routes("/video/{id}/like", "/video/{id}/unlike");
         AllowAnonymous();
         // for some reason FastEndpoints was sending 415, this clears the defaults so that it wouldn't send it 
         Description(b => { }, clearDefaults: true); 
@@ -60,15 +92,31 @@ public class Endpoint : Endpoint<Request>
 
     public override async Task HandleAsync(Request req, CancellationToken ct)
     {
-        var result = await _mediator.Send(new LikeVideoCommand { VideoId = req.Id }, ct);
-        await result.Match(
-            s => SendOkAsync(ct),
-            e => SendAsync(new
-            {
-                StatusCode = 500,
-                Message = e.Value
-            }, 500, ct),
-            n => SendNotFoundAsync(ct)
-        );
+        if (HttpContext.Request.Method == Http.POST.ToString())
+        {
+            var result = await _mediator.Send(new LikeVideoCommand { VideoId = req.Id }, ct);
+            await result.Match(
+                s => SendOkAsync(ct),
+                e => SendAsync(new
+                {
+                    StatusCode = 500,
+                    Message = e.Value
+                }, 500, ct),
+                n => SendNotFoundAsync(ct)
+            );
+        }
+        else if (HttpContext.Request.Method == Http.DELETE.ToString())
+        {
+            var result = await _mediator.Send(new UnLikeVideoCommand { VideoId = req.Id }, ct);
+            await result.Match(
+                s => SendOkAsync(ct),
+                e => SendAsync(new
+                {
+                    StatusCode = 500,
+                    Message = e.Value
+                }, 500, ct),
+                n => SendNotFoundAsync(ct)
+            );
+        }
     }
 }
