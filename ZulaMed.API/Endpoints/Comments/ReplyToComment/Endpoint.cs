@@ -18,7 +18,7 @@ public struct ReplyCannotBeParent
 }
 
 public class ReplyToCommentCommand : Mediator.ICommand<
-    OneOf<Success, NotFound, ReplyCannotBeParent, ValueObjectValidationException>>
+    OneOf<Success, NotFound, ReplyCannotBeParent>>
 {
     public required Guid ParentCommentId { get; init; }
 
@@ -30,7 +30,7 @@ public class ReplyToCommentCommand : Mediator.ICommand<
 }
 
 public class ReplyToCommentCommandHandler : Mediator.ICommandHandler<ReplyToCommentCommand,
-    OneOf<Success, NotFound, ReplyCannotBeParent, ValueObjectValidationException>>
+    OneOf<Success, NotFound, ReplyCannotBeParent>>
 {
     private readonly ZulaMedDbContext _dbContext;
 
@@ -39,51 +39,44 @@ public class ReplyToCommentCommandHandler : Mediator.ICommandHandler<ReplyToComm
         _dbContext = dbContext;
     }
 
-    public async ValueTask<OneOf<Success, NotFound, ReplyCannotBeParent, ValueObjectValidationException>> Handle(
+    public async ValueTask<OneOf<Success, NotFound, ReplyCannotBeParent>> Handle(
         ReplyToCommentCommand command,
         CancellationToken cancellationToken)
     {
-        try
+        var video = await _dbContext.Set<Video>().SingleOrDefaultAsync(x => (Guid)x.Id == command.VideoId,
+            cancellationToken: cancellationToken);
+        var parentComment = await _dbContext.Set<Comment>()
+            .SingleOrDefaultAsync(x => (Guid)x.Id == command.ParentCommentId, cancellationToken: cancellationToken);
+        var user = await _dbContext.Set<User>()
+            .SingleOrDefaultAsync(x => (Guid)x.Id == command.SentBy, cancellationToken: cancellationToken);
+
+        if (video is null || parentComment is null || user is null)
+            return new NotFound();
+
+        var entity = await _dbContext.Set<Comment>().AddAsync(new Comment
         {
-            var video = await _dbContext.Set<Video>().SingleOrDefaultAsync(x => (Guid)x.Id == command.VideoId,
-                cancellationToken: cancellationToken);
-            var parentComment = await _dbContext.Set<Comment>()
-                .SingleOrDefaultAsync(x => (Guid)x.Id == command.ParentCommentId, cancellationToken: cancellationToken);
-            var user = await _dbContext.Set<User>()
-                .SingleOrDefaultAsync(x => (Guid)x.Id == command.SentBy, cancellationToken: cancellationToken);
+            Id = (CommentId)Guid.NewGuid(),
+            Content = (CommentContent)command.Content,
+            SentBy = user,
+            SentAt = (CommentSentDate)DateTime.UtcNow,
+            RelatedVideo = video
+        }, cancellationToken);
 
-            if (video is null || parentComment is null || user is null)
-                return new NotFound();
-
-            var entity = await _dbContext.Set<Comment>().AddAsync(new Comment
-            {
-                Id = (CommentId)Guid.NewGuid(),
-                Content = (CommentContent)command.Content,
-                SentBy = user,
-                SentAt = (CommentSentDate)DateTime.UtcNow,
-                RelatedVideo = video
-            }, cancellationToken);
-
-            if (await _dbContext
-                    .Set<Reply>()
-                    .AnyAsync(x => (Guid)x.ReplyComment.Id == command.ParentCommentId,
-                        cancellationToken: cancellationToken))
-            {
-                return new ReplyCannotBeParent();
-            }
-
-            await _dbContext.Set<Reply>().AddAsync(new Reply
-            {
-                ParentComment = parentComment,
-                ReplyComment = entity.Entity
-            }, cancellationToken);
-            await _dbContext.SaveChangesAsync(cancellationToken);
-            return new Success();
-        }
-        catch (ValueObjectValidationException e)
+        if (await _dbContext
+                .Set<Reply>()
+                .AnyAsync(x => (Guid)x.ReplyComment.Id == command.ParentCommentId,
+                    cancellationToken: cancellationToken))
         {
-            return e;
+            return new ReplyCannotBeParent();
         }
+
+        await _dbContext.Set<Reply>().AddAsync(new Reply
+        {
+            ParentComment = parentComment,
+            ReplyComment = entity.Entity
+        }, cancellationToken);
+        await _dbContext.SaveChangesAsync(cancellationToken);
+        return new Success();
     }
 }
 
@@ -118,11 +111,6 @@ public class Endpoint : Endpoint<Request>
             rpc =>
             {
                 AddError("Reply cannot be parent");
-                return SendErrorsAsync(cancellation: ct);
-            },
-            ve =>
-            {
-                AddError(ve.Message);
                 return SendErrorsAsync(cancellation: ct);
             }
         );
