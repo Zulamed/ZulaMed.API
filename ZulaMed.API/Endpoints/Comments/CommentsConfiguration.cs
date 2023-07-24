@@ -24,9 +24,27 @@ public class CommentsConfiguration : IEntityTypeConfiguration<Comment>
         builder.Property(x => x.Like)
             .HasConversion<Like.EfCoreValueConverter>()
             .HasDefaultValue(Like.Zero);
-        
+
         builder.Property(x => x.SentAt)
             .HasConversion<CommentSentDate.EfCoreValueConverter>()
+            .IsRequired();
+    }
+}
+
+public class ReplyConfiguration : IEntityTypeConfiguration<Reply>
+{
+    public void Configure(EntityTypeBuilder<Reply> builder)
+    {
+        builder.HasKey("ParentCommentId", "ReplyCommentId");
+        
+        builder.HasOne(x => x.ParentComment)
+            .WithMany()
+            .HasForeignKey("ParentCommentId")
+            .IsRequired();
+
+        builder.HasOne(x => x.ReplyComment)
+            .WithMany()
+            .HasForeignKey("ReplyCommentId")
             .IsRequired();
     }
 }
