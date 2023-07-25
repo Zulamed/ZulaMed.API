@@ -109,6 +109,7 @@ app.UseCors(c =>
 });
 
 app.UseMiddleware<VogenValidationMiddleware>();
+app.UseDefaultExceptionHandler();
 app.UseAuthentication();
 app.UseAuthorization();
 app.UseFastEndpoints();
