@@ -42,6 +42,9 @@ public class UserConfiguration : IEntityTypeConfiguration<User>
             .HasConversion<UserCity.EfCoreValueConverter>()
             .IsRequired();
 
+        builder.Property(x => x.PhotoUrl)
+            .HasConversion<PhotoUrl.EfCoreValueConverter>();
+
         builder.Property(x => x.University)
             .HasConversion<UserUniversity.EfCoreValueConverter>();
         builder.Property(x => x.WorkPlace)

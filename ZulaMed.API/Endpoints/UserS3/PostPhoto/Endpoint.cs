@@ -43,7 +43,7 @@ public class UploadPhotoCommandHandler : Mediator.ICommandHandler<UploadPhotoCom
         var user = await _dbContext.Set<User>().FirstOrDefaultAsync(x => command.UserId == (Guid)x.Id);
         if (user is not null)
         {
-            user.PhotoUrl = (PhotoUrl)_s3Options.Value.BaseUrl + $"users/images/{guid}";
+            user.PhotoUrl = (PhotoUrl)(_s3Options.Value.BaseUrl + $"users/images/{guid}");
             await _dbContext.SaveChangesAsync(cancellationToken);
         }
         return new UploadResponse
