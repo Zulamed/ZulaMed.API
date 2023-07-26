@@ -3,7 +3,10 @@ using Amazon.S3;
 using Amazon.S3.Model;
 using FastEndpoints;
 using Mediator;
+using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Options;
+using ZulaMed.API.Data;
+using ZulaMed.API.Domain.User;
 
 namespace ZulaMed.API.Endpoints.UserS3.PostPhoto;
 
@@ -11,10 +14,13 @@ public class UploadPhotoCommandHandler : Mediator.ICommandHandler<UploadPhotoCom
 {
     private readonly IAmazonS3 _s3Client;
     private readonly IOptions<S3BucketOptions> _s3Options;
-    public UploadPhotoCommandHandler(IAmazonS3 s3Client, IOptions<S3BucketOptions> s3Options)
+    private readonly ZulaMedDbContext _dbContext;
+
+    public UploadPhotoCommandHandler(IAmazonS3 s3Client, IOptions<S3BucketOptions> s3Options, ZulaMedDbContext dbContext)
     {
         _s3Client = s3Client;
         _s3Options = s3Options;
+        _dbContext = dbContext;
     }
 
     public async ValueTask<UploadResponse> Handle(UploadPhotoCommand command, CancellationToken cancellationToken)
@@ -34,6 +40,12 @@ public class UploadPhotoCommandHandler : Mediator.ICommandHandler<UploadPhotoCom
                 ["x-amz-meta-extension"] = fileExtension
             }
         }, cancellationToken);
+        var user = await _dbContext.Set<User>().FirstOrDefaultAsync(x => command.UserId == (Guid)x.Id);
+        if (user is not null)
+        {
+            user.PhotoUrl = (PhotoUrl)(_s3Options.Value.BaseUrl + $"users/images/{guid}");
+            await _dbContext.SaveChangesAsync(cancellationToken);
+        }
         return new UploadResponse
         {
             PhotoUrl = _s3Options.Value.BaseUrl + $"users/images/{guid}",
@@ -77,7 +89,7 @@ public class UploadPhotoEndpoint : Endpoint<Request, Response>
                 break;
             }
             default:
-                ThrowError("Encountered an error while uploading the video");
+                ThrowError("Encountered an error while uploading the photo");
                 break;
         }
     }
