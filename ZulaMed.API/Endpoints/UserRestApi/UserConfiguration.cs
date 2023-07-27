@@ -22,7 +22,14 @@ public class UserConfiguration : IEntityTypeConfiguration<User>
         builder.Property(x => x.Email)
             .HasConversion<UserEmail.EfCoreValueConverter>()
             .IsRequired();
-
+        
+        builder.Property(x => x.Login)
+            .HasConversion<UserLogin.EfCoreValueConverter>()
+            .IsRequired();
+        
+        builder
+            .HasIndex(x => x.Login)
+            .IsUnique();
         // builder.HasOne(x => x.Group)
         //     .WithMany();
 

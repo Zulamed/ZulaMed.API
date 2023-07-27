@@ -30,6 +30,7 @@ public class CreateVideoCommandHandler : Mediator.ICommandHandler<CreateUserComm
             var entity = await dbSet.AddAsync(new User
             {
                 Id = (UserId)Guid.NewGuid(),
+                Login = (UserLogin)command.Login,
                 Email = (UserEmail)command.Email,
                 Group = (await _dbContext.Set<SpecialtyGroup>()
                     .FirstOrDefaultAsync(x => (int)x.Id == command.GroupId, cancellationToken))!,

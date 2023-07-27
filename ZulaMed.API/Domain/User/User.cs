@@ -4,6 +4,7 @@ public class User
 {
     public required UserId Id { get; init; }
     
+    public required UserLogin Login { get; init; }
     public required UserEmail Email { get; init; }
     
     public required SpecialtyGroup.SpecialtyGroup Group { get; init; }
