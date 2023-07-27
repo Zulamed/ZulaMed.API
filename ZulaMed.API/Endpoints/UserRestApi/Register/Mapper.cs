@@ -9,6 +9,7 @@ public static class Mapper
         return new CreateUserCommand
         {
             Email = request.Email,
+            Login = request.Login,
             GroupId = request.GroupId,
             Name = request.Name,
             Surname = request.Surname,
@@ -26,6 +27,7 @@ public static class Mapper
         return new UserDTO
         {
             Id = user.Id.Value,
+            Login = user.Login.Value,
             Email = user.Email.Value,
             Group = user.Group.Name.Value,
             Name = user.Name.Value,

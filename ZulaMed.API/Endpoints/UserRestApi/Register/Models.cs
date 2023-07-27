@@ -8,6 +8,7 @@ namespace ZulaMed.API.Endpoints.UserRestApi.Register;
 public class Request
 {
     public required string Email { get; init; }
+    public required string Login { get; init; }
     
     public required string Password { get; init; }
     
@@ -25,6 +26,7 @@ public class Validator : Validator<Request>
     public Validator()
     {
         RuleFor(x => x.Email).NotEmpty();
+        RuleFor(x => x.Login).NotEmpty();
         RuleFor(x => x.Password).NotEmpty();
         RuleFor(x => x.GroupId).NotEmpty();
         RuleFor(x => x.Name).NotEmpty();
@@ -39,6 +41,7 @@ public class Validator : Validator<Request>
 public class CreateUserCommand : Mediator.ICommand<Result<User, Exception>>
 {
     public required string Email { get; init; }
+    public required string Login { get; init; }
     public required int GroupId  { get; init; }
     public required string Name  { get; init; }
     public required string Surname  { get; init; }
