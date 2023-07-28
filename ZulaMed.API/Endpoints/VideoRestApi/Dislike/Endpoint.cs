@@ -75,7 +75,7 @@ public class Endpoint : Endpoint<Request>
     public override void Configure()
     {
         Verbs(Http.POST, Http.DELETE);
-        Routes("/video/{id}/dislike", "/video/{id}/undislike");
+        Routes("/video/{id}/dislike");
         AllowAnonymous();
         Description(b => {}, clearDefaults: true);
     }
