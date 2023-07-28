@@ -83,7 +83,7 @@ public class Endpoint : Endpoint<Request>
     public override void Configure()
     {
         Verbs(Http.POST, Http.DELETE);
-        Routes("/video/{id}/like", "/video/{id}/unlike");
+        Routes("/video/{id}/like");
         AllowAnonymous();
         // for some reason FastEndpoints was sending 415, this clears the defaults so that it wouldn't send it 
         Description(b => { }, clearDefaults: true); 
