@@ -38,7 +38,7 @@ public class VideoConfiguration : IEntityTypeConfiguration<Video>
             .HasConversion<VideoView.EfCoreValueConverter>()
             .HasDefaultValue(VideoView.Zero);
         builder.Property(x => x.VideoPublisherId)
-            .HasConversion<VideoPublisherId.EfCoreValueConverter>()
-            .HasDefaultValue(VideoPublisherId.Unspecified);
+            .IsRequired()
+            .HasConversion<VideoPublisherId.EfCoreValueConverter>();
     }
 }

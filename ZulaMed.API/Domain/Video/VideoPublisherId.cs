@@ -3,7 +3,6 @@ using Vogen;
 namespace ZulaMed.API.Domain.Video;
 
 [ValueObject<Guid>(Conversions.EfCoreValueConverter)]
-[Instance("Unspecified", "Guid.Empty")]
 public readonly partial struct VideoPublisherId
 {
     private static Validation Validate(Guid input)
