@@ -6,14 +6,15 @@ public static class Mapper
 {
     public static VideoDTO ToResponse(this Video video)
     {
-        return new VideoDTO()
+        return new VideoDTO
         {
             Id = video.Id.Value,
-                VideoDescription = video.VideoDescription.Value,
-                VideoThumbnail = video.VideoThumbnail.Value,
-                VideoUrl = video.VideoUrl.Value,
-                VideoTitle = video.VideoTitle.Value,
-                VideoPublishedDate = video.VideoPublishedDate.Value
+            VideoDescription = video.VideoDescription.Value,
+            VideoThumbnail = video.VideoThumbnail.Value,
+            VideoUrl = video.VideoUrl.Value,
+            VideoTitle = video.VideoTitle.Value,
+            VideoPublishedDate = video.VideoPublishedDate.Value,
+            VideoPublisherId = video.VideoPublisherId.Value
         };
     }
 }

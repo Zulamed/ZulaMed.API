@@ -1,8 +1,10 @@
 using FastEndpoints;
 using Mediator;
+using Microsoft.EntityFrameworkCore;
 using OneOf.Types;
 using Vogen;
 using ZulaMed.API.Data;
+using ZulaMed.API.Domain.User;
 using ZulaMed.API.Domain.Video;
 using VoException = Vogen.ValueObjectValidationException;
 
@@ -24,14 +26,21 @@ public class CreateVideoCommandHandler
         var dbSet = _dbContext.Set<Video>();
         try
         {
-            var entity = await dbSet.AddAsync(new Video()
+            var user = await _dbContext.Set<User>().FirstOrDefaultAsync(x => (Guid)x.Id == command.VideoPublisherId, cancellationToken: cancellationToken);
+            if (user is null)
+            {
+                throw new VoException("User not Found");
+            }
+            var entity = await dbSet.AddAsync(new Video
             {
                 Id = (VideoId)Guid.NewGuid(),
+                VideoPublisherId = (VideoPublisherId)command.VideoPublisherId,
                 VideoDescription = (VideoDescription)command.VideoDescription,
                 VideoPublishedDate = (VideoPublishedDate)DateTime.UtcNow,
                 VideoThumbnail = (VideoThumbnail)command.VideoThumbnail,
                 VideoTitle = (VideoTitle)command.VideoTitle,
-                VideoUrl = (VideoUrl)command.VideoUrl 
+                VideoUrl = (VideoUrl)command.VideoUrl
+                
             }, cancellationToken);
             await _dbContext.SaveChangesAsync(cancellationToken);
             return entity.Entity;

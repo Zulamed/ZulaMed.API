@@ -10,6 +10,7 @@ public class Video
     public required VideoThumbnail VideoThumbnail { get; init; }
     public required VideoDescription VideoDescription { get; init; }
     public required VideoPublishedDate VideoPublishedDate { get; init; }
+    public required VideoPublisherId VideoPublisherId { get; init; }
     
     public VideoLike VideoLike { get; init; } = VideoLike.Zero; 
     
