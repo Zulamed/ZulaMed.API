@@ -10,6 +10,7 @@ public static class Mapper
         return new CreateVideoCommand
         {
             VideoTitle = request.VideoTitle,
+            VideoPublisherId = request.VideoPublisherId,
             VideoUrl = request.VideoUrl,
             VideoThumbnail = request.VideoThumbnail,
             VideoDescription = request.VideoDescription,
@@ -21,6 +22,7 @@ public static class Mapper
         return new VideoDTO
         {
             Id = video.Id.Value,
+            VideoPublisherId = video.VideoPublisherId.Value,
             VideoDescription = video.VideoDescription.Value,
             VideoThumbnail = video.VideoThumbnail.Value,
             VideoUrl = video.VideoUrl.Value,
