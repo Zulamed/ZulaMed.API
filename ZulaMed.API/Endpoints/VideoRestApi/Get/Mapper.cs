@@ -14,7 +14,7 @@ public static class Mapper
             VideoUrl = video.VideoUrl.Value,
             VideoTitle = video.VideoTitle.Value,
             VideoPublishedDate = video.VideoPublishedDate.Value,
-            VideoPublisherId = video.VideoPublisherId.Value
+            VideoPublisherId = video.Publisher.Id.Value
         };
     }
 } 
