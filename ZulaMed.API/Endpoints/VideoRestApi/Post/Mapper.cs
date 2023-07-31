@@ -22,7 +22,7 @@ public static class Mapper
         return new VideoDTO
         {
             Id = video.Id.Value,
-            VideoPublisherId = video.VideoPublisherId.Value,
+            VideoPublisherId = video.Publisher.Id.Value,
             VideoDescription = video.VideoDescription.Value,
             VideoThumbnail = video.VideoThumbnail.Value,
             VideoUrl = video.VideoUrl.Value,

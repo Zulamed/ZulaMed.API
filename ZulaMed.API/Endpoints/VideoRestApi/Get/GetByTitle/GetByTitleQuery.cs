@@ -23,7 +23,9 @@ public class GetByTitleQueryHandler : IQueryHandler<GetByTitleQuery, Video[]>
     
     public async ValueTask<Video[]> Handle(GetByTitleQuery query, CancellationToken cancellationToken)
     {
-        var videos = await _context.Set<Video>().Where(x => x.VideoTitle.Value.Contains(query.Title)).ToArrayAsync(cancellationToken: cancellationToken);
+        var videos = await _context.Set<Video>()
+            .Include(x => x.Publisher)
+            .Where(x => x.VideoTitle.Value.Contains(query.Title)).ToArrayAsync(cancellationToken: cancellationToken);
         return videos;
     }
 }

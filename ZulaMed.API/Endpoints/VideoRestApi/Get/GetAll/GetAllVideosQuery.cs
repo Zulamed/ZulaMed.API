@@ -19,7 +19,8 @@ public class GetAllVideosQueryHandler : IQueryHandler<GetAllVideosQuery, Video[]
     }
     public async ValueTask<Video[]> Handle(GetAllVideosQuery query, CancellationToken cancellationToken)
     {
-        var videos = await _context.Set<Video>().ToArrayAsync(cancellationToken: cancellationToken);
+        var videos = await _context.Set<Video>().Include(x => x.Publisher)
+            .ToArrayAsync(cancellationToken: cancellationToken);
         return videos;
     }
 }

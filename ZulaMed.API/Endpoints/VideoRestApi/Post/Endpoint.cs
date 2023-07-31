@@ -34,13 +34,12 @@ public class CreateVideoCommandHandler
             var entity = await dbSet.AddAsync(new Video
             {
                 Id = (VideoId)Guid.NewGuid(),
-                VideoPublisherId = (VideoPublisherId)command.VideoPublisherId,
                 VideoDescription = (VideoDescription)command.VideoDescription,
                 VideoPublishedDate = (VideoPublishedDate)DateTime.UtcNow,
                 VideoThumbnail = (VideoThumbnail)command.VideoThumbnail,
                 VideoTitle = (VideoTitle)command.VideoTitle,
-                VideoUrl = (VideoUrl)command.VideoUrl
-                
+                VideoUrl = (VideoUrl)command.VideoUrl,
+                Publisher = user
             }, cancellationToken);
             await _dbContext.SaveChangesAsync(cancellationToken);
             return entity.Entity;
