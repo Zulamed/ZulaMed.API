@@ -1,12 +1,28 @@
 using FastEndpoints;
 using FluentValidation;
 using Mediator;
+using OneOf;
+using OneOf.Types;
 
 namespace ZulaMed.API.Endpoints.VideoRestApi.GetById;
 
+public class UserDTO
+{
+    public required Guid Id { get; set; }
+    
+    public required string Username { get; set; }
+    
+    public required string? ProfilePictureUrl { get; set; }
+    
+    public required int Subscribers { get; set; }
+}
+
+
 public class Response
 {
-    public required VideoDTO? Video { get; set; }
+    public required VideoDTO Video { get; set; }
+    
+    public required UserDTO User { get; set; }
 }
 
 public class Request
@@ -24,7 +40,7 @@ public class RequestValidator : Validator<Request>
     }
 }
 
-public class GetVideoByIdQuery : IQuery<Response>
+public class GetVideoByIdQuery : IQuery<OneOf<Response, NotFound>>
 {
     public required Guid Id { get; init; }
 }

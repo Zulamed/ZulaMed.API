@@ -3,7 +3,7 @@ using Vogen;
 namespace ZulaMed.API.Domain.User;
 
 [ValueObject<string>(Conversions.EfCoreValueConverter)]
-[Instance("Empty", "null")]
+[Instance("Empty", "")]
 public readonly partial struct PhotoUrl
 {
     private static Validation Validate(string input)
