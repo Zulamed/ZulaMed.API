@@ -11,9 +11,9 @@ public static class Mapper
         {
             VideoTitle = request.VideoTitle,
             VideoPublisherId = request.VideoPublisherId,
-            VideoUrl = request.VideoUrl,
             VideoThumbnail = request.VideoThumbnail,
             VideoDescription = request.VideoDescription,
+            Video = request.Video,
         };
     }
 
