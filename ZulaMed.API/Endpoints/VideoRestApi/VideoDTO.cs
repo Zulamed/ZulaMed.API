@@ -11,4 +11,6 @@ public record VideoDTO
     public required string VideoThumbnail { get; init; }
     public required string VideoDescription { get; init; }
     public required DateTime VideoPublishedDate { get; init; }
+    
+    public required long VideoViews { get; init; }
 }
