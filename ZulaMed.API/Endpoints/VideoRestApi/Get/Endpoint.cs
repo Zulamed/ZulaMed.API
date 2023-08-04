@@ -1,4 +1,3 @@
-using System.Text.Json;
 using FastEndpoints;
 using Mediator;
 using Microsoft.Extensions.Options;
