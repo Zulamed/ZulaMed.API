@@ -116,6 +116,7 @@ public class Endpoint : Endpoint<Request, VideoDTO>
     {
         Post("/video");
         AllowAnonymous();
+        AllowFileUploads();
     }
 
     public override async Task HandleAsync(Request request, CancellationToken ct)
