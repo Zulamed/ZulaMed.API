@@ -74,7 +74,7 @@ public class VideoTranscodedUploadToS3Handler : INotificationHandler<VideoTransc
             return;
         await Policy.HandleResult<HttpStatusCode>(r => HttpStatusCode.OK != r)
             .WaitAndRetryAsync(3, retryAttempt => TimeSpan.FromSeconds(Math.Pow(2, retryAttempt)))
-            .ExecuteAsync(() => UploadToS3(notification, file, cancellationToken));
+            .ExecuteAsync(async () => await UploadToS3(notification, file, cancellationToken));
     }
 
 
