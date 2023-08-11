@@ -12,18 +12,25 @@ namespace ZulaMed.API.Data.Migrations
         protected override void Up(MigrationBuilder migrationBuilder)
         {
             migrationBuilder.CreateTable(
-                name: "LikeVideo",
+                name: "Like<Video>",
                 columns: table => new
                 {
                     Id = table.Column<Guid>(type: "uuid", nullable: false),
-                    LikedAt = table.Column<DateTime>(type: "timestamp with time zone", nullable: false),
-                    ParentId = table.Column<Guid>(type: "uuid", nullable: false)
+                    ParentId = table.Column<Guid>(type: "uuid", nullable: false),
+                    LikedById = table.Column<Guid>(type: "uuid", nullable: false),
+                    LikedAt = table.Column<DateTime>(type: "timestamp with time zone", nullable: false)
                 },
                 constraints: table =>
                 {
-                    table.PrimaryKey("PK_LikeVideo", x => new { x.Id, x.ParentId, x.LikedAt });
+                    table.PrimaryKey("PK_Like<Video>", x => new { x.Id, x.ParentId, x.LikedById });
                     table.ForeignKey(
-                        name: "FK_LikeVideo_Video_ParentId",
+                        name: "FK_Like<Video>_User_LikedById",
+                        column: x => x.LikedById,
+                        principalTable: "User",
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.Cascade);
+                    table.ForeignKey(
+                        name: "FK_Like<Video>_Video_ParentId",
                         column: x => x.ParentId,
                         principalTable: "Video",
                         principalColumn: "Id",
@@ -31,8 +38,13 @@ namespace ZulaMed.API.Data.Migrations
                 });
 
             migrationBuilder.CreateIndex(
-                name: "IX_LikeVideo_ParentId",
-                table: "LikeVideo",
+                name: "IX_Like<Video>_LikedById",
+                table: "Like<Video>",
+                column: "LikedById");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_Like<Video>_ParentId",
+                table: "Like<Video>",
                 column: "ParentId");
         }
 
@@ -40,7 +52,7 @@ namespace ZulaMed.API.Data.Migrations
         protected override void Down(MigrationBuilder migrationBuilder)
         {
             migrationBuilder.DropTable(
-                name: "LikeVideo");
+                name: "Like<Video>");
         }
     }
 }

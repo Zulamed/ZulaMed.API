@@ -12,7 +12,7 @@ using ZulaMed.API.Data;
 namespace ZulaMed.API.Data.Migrations
 {
     [DbContext(typeof(ZulaMedDbContext))]
-    [Migration("20230810171427_AddLikeTable")]
+    [Migration("20230811113522_AddLikeTable")]
     partial class AddLikeTable
     {
         /// <inheritdoc />
@@ -91,10 +91,15 @@ namespace ZulaMed.API.Data.Migrations
                     b.Property<Guid>("ParentId")
                         .HasColumnType("uuid");
 
+                    b.Property<Guid>("LikedById")
+                        .HasColumnType("uuid");
+
                     b.Property<DateTime>("LikedAt")
                         .HasColumnType("timestamp with time zone");
 
-                    b.HasKey("Id", "ParentId", "LikedAt");
+                    b.HasKey("Id", "ParentId", "LikedById");
+
+                    b.HasIndex("LikedById");
 
                     b.HasIndex("ParentId");
 
@@ -281,11 +286,19 @@ namespace ZulaMed.API.Data.Migrations
 
             modelBuilder.Entity("ZulaMed.API.Domain.Like.Like<ZulaMed.API.Domain.Video.Video>", b =>
                 {
+                    b.HasOne("ZulaMed.API.Domain.User.User", "LikedBy")
+                        .WithMany()
+                        .HasForeignKey("LikedById")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
                     b.HasOne("ZulaMed.API.Domain.Video.Video", "Parent")
                         .WithMany("Likes")
                         .HasForeignKey("ParentId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
+
+                    b.Navigation("LikedBy");
 
                     b.Navigation("Parent");
                 });

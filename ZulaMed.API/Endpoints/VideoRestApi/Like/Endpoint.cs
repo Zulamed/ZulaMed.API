@@ -64,7 +64,7 @@ public class
                 $"""UPDATE "Video" SET "VideoLike" = "VideoLike" + 1 WHERE "Id" = {command.VideoId}""",
                 cancellationToken: cancellationToken);
             await _dbContext.Database.ExecuteSqlAsync
-            ($"""INSERT INTO "LikeVideo" VALUES ({Guid.NewGuid()}, {DateTime.UtcNow}, {command.VideoId}, {command.UserId})""",
+            ($"""INSERT INTO "Like<Video>" VALUES ({Guid.NewGuid()}, {command.VideoId}, {command.UserId}, {DateTime.UtcNow})""",
                 cancellationToken: cancellationToken);
             await transaction.CommitAsync(cancellationToken);
             return rows > 0 ? new Success() : new NotFound();
@@ -106,7 +106,7 @@ public class
                 $"""UPDATE "Video" SET "VideoLike" = GREATEST("VideoLike" - 1, 0) WHERE "Id" = {command.VideoId}""",
                 cancellationToken: cancellationToken);
             await _dbContext.Database.ExecuteSqlAsync(
-                $"""DELETE FROM "LikeVideo" WHERE "ParentId" = {command.VideoId} AND "UserId" = {command.UserId}""",
+                $"""DELETE FROM "Like<Video>" WHERE "ParentId" = {command.VideoId} AND "UserId" = {command.UserId}""",
                 cancellationToken: cancellationToken);
             await transaction.CommitAsync(cancellationToken);
             return rows > 0 ? new Success() : new NotFound();
@@ -133,8 +133,6 @@ public class Endpoint : Endpoint<Request>
         Routes("/video/{id}/like");
         Verbs(Http.POST, Http.DELETE);
         AllowAnonymous();
-        // for some reason FastEndpoints was sending 415, this clears the defaults so that it wouldn't send it 
-        Description(b => { }, clearDefaults: true);
     }
 
 
