@@ -2,6 +2,7 @@
 using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 using ZulaMed.API.Data;
@@ -11,9 +12,11 @@ using ZulaMed.API.Data;
 namespace ZulaMed.API.Data.Migrations
 {
     [DbContext(typeof(ZulaMedDbContext))]
-    partial class ZulaMedDbContextModelSnapshot : ModelSnapshot
+    [Migration("20230811094519_AddUserToLikeTable")]
+    partial class AddUserToLikeTable
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder

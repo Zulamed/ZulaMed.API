@@ -7,4 +7,6 @@ public class Like<TParent>
     public required LikedAt LikedAt { get; init; } 
     
     public required TParent Parent { get; init; }
+    
+    public required User.User LikedBy { get; init; }
 }

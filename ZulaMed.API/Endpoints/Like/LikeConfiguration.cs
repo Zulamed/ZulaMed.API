@@ -8,7 +8,7 @@ public class LikeConfiguration<T> : IEntityTypeConfiguration<Like<T>>
 {
     public void Configure(EntityTypeBuilder<Like<T>> builder)
     {
-        builder.HasKey("Id", "ParentId", "LikedAt");
+        builder.HasKey("Id", "ParentId", "LikedById");
         builder.Property(x => x.LikedAt)
             .HasConversion<LikedAt.EfCoreValueConverter>()
             .IsRequired();
