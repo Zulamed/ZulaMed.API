@@ -1,5 +1,6 @@
 using ZulaMed.API.Domain.Comments;
 using ZulaMed.API.Domain.Like;
+using ZulaMed.API.Domain.Dislike;
 
 namespace ZulaMed.API.Domain.Video;
 
@@ -24,4 +25,5 @@ public class Video
     public List<Comment> Comments { get; init; } = new();
     
     public List<Like<Video>> Likes { get; init; } = new();
+    public List<Dislike<Video>> Dislikes { get; init; } = new();
 }
