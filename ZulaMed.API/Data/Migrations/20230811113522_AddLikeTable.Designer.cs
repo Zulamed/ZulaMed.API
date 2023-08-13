@@ -2,6 +2,7 @@
 using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 using ZulaMed.API.Data;
@@ -11,9 +12,11 @@ using ZulaMed.API.Data;
 namespace ZulaMed.API.Data.Migrations
 {
     [DbContext(typeof(ZulaMedDbContext))]
-    partial class ZulaMedDbContextModelSnapshot : ModelSnapshot
+    [Migration("20230811113522_AddLikeTable")]
+    partial class AddLikeTable
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -77,30 +80,6 @@ namespace ZulaMed.API.Data.Migrations
                     b.HasIndex("ReplyCommentId");
 
                     b.ToTable("Reply");
-                });
-
-            modelBuilder.Entity("ZulaMed.API.Domain.Dislike.Dislike<ZulaMed.API.Domain.Video.Video>", b =>
-                {
-                    b.Property<Guid>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("uuid");
-
-                    b.Property<Guid>("ParentId")
-                        .HasColumnType("uuid");
-
-                    b.Property<Guid>("DislikedById")
-                        .HasColumnType("uuid");
-
-                    b.Property<DateTime>("DislikedAt")
-                        .HasColumnType("timestamp with time zone");
-
-                    b.HasKey("Id", "ParentId", "DislikedById");
-
-                    b.HasIndex("DislikedById");
-
-                    b.HasIndex("ParentId");
-
-                    b.ToTable("Dislike<Video>");
                 });
 
             modelBuilder.Entity("ZulaMed.API.Domain.Like.Like<ZulaMed.API.Domain.Video.Video>", b =>
@@ -305,25 +284,6 @@ namespace ZulaMed.API.Data.Migrations
                     b.Navigation("ReplyComment");
                 });
 
-            modelBuilder.Entity("ZulaMed.API.Domain.Dislike.Dislike<ZulaMed.API.Domain.Video.Video>", b =>
-                {
-                    b.HasOne("ZulaMed.API.Domain.User.User", "DislikedBy")
-                        .WithMany()
-                        .HasForeignKey("DislikedById")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
-                    b.HasOne("ZulaMed.API.Domain.Video.Video", "Parent")
-                        .WithMany("Dislikes")
-                        .HasForeignKey("ParentId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
-                    b.Navigation("DislikedBy");
-
-                    b.Navigation("Parent");
-                });
-
             modelBuilder.Entity("ZulaMed.API.Domain.Like.Like<ZulaMed.API.Domain.Video.Video>", b =>
                 {
                     b.HasOne("ZulaMed.API.Domain.User.User", "LikedBy")
@@ -368,8 +328,6 @@ namespace ZulaMed.API.Data.Migrations
             modelBuilder.Entity("ZulaMed.API.Domain.Video.Video", b =>
                 {
                     b.Navigation("Comments");
-
-                    b.Navigation("Dislikes");
 
                     b.Navigation("Likes");
                 });
