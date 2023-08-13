@@ -132,15 +132,16 @@ public class Endpoint : Endpoint<Request>
     {
         Routes("/video/{id}/like");
         Verbs(Http.POST, Http.DELETE);
-        AllowAnonymous();
     }
 
 
     public override async Task HandleAsync(Request req, CancellationToken ct)
     {
+        // getting authenticated user id
+        var userId = Guid.Parse(HttpContext.User.Claims.FirstOrDefault(x => x.Type == "UserId")!.Value);
         if (HttpContext.Request.Method == Http.POST.ToString())
         {
-            var result = await _mediator.Send(new LikeVideoCommand { VideoId = req.Id, UserId = req.UserId }, ct);
+            var result = await _mediator.Send(new LikeVideoCommand { VideoId = req.Id, UserId = userId }, ct);
             await result.Match(
                 s => SendOkAsync(ct),
                 ua =>
@@ -158,7 +159,7 @@ public class Endpoint : Endpoint<Request>
         }
         else if (HttpContext.Request.Method == Http.DELETE.ToString())
         {
-            var result = await _mediator.Send(new UnLikeVideoCommand { VideoId = req.Id, UserId = req.Id }, ct);
+            var result = await _mediator.Send(new UnLikeVideoCommand { VideoId = req.Id, UserId = userId }, ct);
             await result.Match(
                 s => SendOkAsync(ct),
                 ue =>
