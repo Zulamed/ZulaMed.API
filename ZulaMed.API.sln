@@ -6,6 +6,8 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ZulaMed.VideoConversion", "
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "VideoConversion", "VideoConversion", "{94F0EDF6-1F80-442D-A18C-48D4544162F9}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Zulamed.CloudInfrastructure", "Zulamed.CloudInfrastructure\Zulamed.CloudInfrastructure.csproj", "{D36D393E-51D1-44F7-9551-B348DACE3573}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -20,6 +22,10 @@ Global
 		{D5DFED74-3E1B-4329-871B-00A47532EBA6}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{D5DFED74-3E1B-4329-871B-00A47532EBA6}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{D5DFED74-3E1B-4329-871B-00A47532EBA6}.Release|Any CPU.Build.0 = Release|Any CPU
+		{D36D393E-51D1-44F7-9551-B348DACE3573}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{D36D393E-51D1-44F7-9551-B348DACE3573}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{D36D393E-51D1-44F7-9551-B348DACE3573}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{D36D393E-51D1-44F7-9551-B348DACE3573}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(NestedProjects) = preSolution
 		{D5DFED74-3E1B-4329-871B-00A47532EBA6} = {94F0EDF6-1F80-442D-A18C-48D4544162F9}
