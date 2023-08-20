@@ -37,4 +37,9 @@
       <PackageReference Include="Vogen" Version="3.0.16" />
     </ItemGroup>
 
+    <ItemGroup>
+      <Folder Include="Domain\HospitalUser" />
+      <Folder Include="Domain\PersonalUser" />
+    </ItemGroup>
+
 </Project>
