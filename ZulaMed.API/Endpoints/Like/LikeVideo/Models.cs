@@ -1,7 +1,7 @@
 using FastEndpoints;
 using FluentValidation;
 
-namespace ZulaMed.API.Endpoints.VideoRestApi.Like;
+namespace ZulaMed.API.Endpoints.Like.LikeVideo;
 
 
 public class Request

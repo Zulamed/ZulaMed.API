@@ -1,7 +1,7 @@
 using FastEndpoints;
 using FluentValidation;
 
-namespace ZulaMed.API.Endpoints.VideoRestApi.Dislike;
+namespace ZulaMed.API.Endpoints.Dislike.DislikeVideo;
 
 public class Request
 {
