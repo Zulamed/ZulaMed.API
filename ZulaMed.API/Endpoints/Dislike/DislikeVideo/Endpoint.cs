@@ -5,12 +5,12 @@ using Microsoft.EntityFrameworkCore;
 using OneOf;
 using OneOf.Types;
 using ZulaMed.API.Data;
-using ZulaMed.API.Domain.Like;
+using ZulaMed.API.Domain.Dislike;
 using ZulaMed.API.Domain.Video;
 
-namespace ZulaMed.API.Endpoints.VideoRestApi.Like;
+namespace ZulaMed.API.Endpoints.Dislike.DislikeVideo;
 
-public class LikeVideoCommand : Mediator.ICommand<OneOf<Success, UserAlreadyLiked, Error<string>, NotFound>>
+public class DislikeVideoCommand : Mediator.ICommand<OneOf<Success, UserAlreadyDisliked, Error<string>, NotFound>>
 {
     public required Guid VideoId { get; init; }
 
@@ -18,53 +18,51 @@ public class LikeVideoCommand : Mediator.ICommand<OneOf<Success, UserAlreadyLike
 }
 
 [StructLayout(LayoutKind.Sequential, Size = 1)]
-public struct UserDidNotLike
+public struct UserDidNotDislike
 {
 }
-
-public class UnLikeVideoCommand : Mediator.ICommand<OneOf<Success, UserDidNotLike, Error<string>, NotFound>>
+[StructLayout(LayoutKind.Sequential, Size = 1)]
+public struct UserAlreadyDisliked
+{
+}
+public class UnDislikeVideoCommand : Mediator.ICommand<OneOf<Success, UserDidNotDislike, Error<string>, NotFound>>
 {
     public required Guid VideoId { get; init; }
 
     public required Guid UserId { get; init; }
-}
-
-[StructLayout(LayoutKind.Sequential, Size = 1)]
-public struct UserAlreadyLiked
-{
 }
 
 public class
-    LikeVideoCommandHandler : Mediator.ICommandHandler<LikeVideoCommand,
-        OneOf<Success, UserAlreadyLiked, Error<string>, NotFound>>
+    DislikeVideoCommandHandler : Mediator.ICommandHandler<DislikeVideoCommand,
+        OneOf<Success, UserAlreadyDisliked, Error<string>, NotFound>>
 {
     private readonly ZulaMedDbContext _dbContext;
 
-    public LikeVideoCommandHandler(ZulaMedDbContext dbContext)
+    public DislikeVideoCommandHandler(ZulaMedDbContext dbContext)
     {
         _dbContext = dbContext;
     }
 
 
-    public async ValueTask<OneOf<Success, UserAlreadyLiked, Error<string>, NotFound>> Handle(LikeVideoCommand command,
+    public async ValueTask<OneOf<Success, UserAlreadyDisliked, Error<string>, NotFound>> Handle(DislikeVideoCommand command,
         CancellationToken cancellationToken)
     {
         await using var transaction = await _dbContext.Database.BeginTransactionAsync(cancellationToken);
         try
         {
-            var userAlreadyLiked = await _dbContext.Set<Like<Video>>()
-                .AnyAsync(x => (Guid)x.LikedBy.Id == command.UserId && (Guid)x.Parent.Id == command.VideoId,
+            var userAlreadyDisliked = await _dbContext.Set<Dislike<Video>>()
+                .AnyAsync(x => (Guid)x.DislikedBy.Id == command.UserId && (Guid)x.Parent.Id == command.VideoId,
                     cancellationToken: cancellationToken);
-            if (userAlreadyLiked)
+            if (userAlreadyDisliked)
             {
-                return new UserAlreadyLiked();
+                return new UserAlreadyDisliked();
             }
 
             var rows = await _dbContext.Database.ExecuteSqlAsync(
-                $"""UPDATE "Video" SET "VideoLike" = "VideoLike" + 1 WHERE "Id" = {command.VideoId}""",
+                $"""UPDATE "Video" SET "VideoDislike" = "VideoDislike" + 1 WHERE "Id" = {command.VideoId}""",
                 cancellationToken: cancellationToken);
             await _dbContext.Database.ExecuteSqlAsync
-            ($"""INSERT INTO "Like<Video>" VALUES ({Guid.NewGuid()}, {command.VideoId}, {command.UserId}, {DateTime.UtcNow})""",
+            ($"""INSERT INTO "Dislike<Video>" VALUES ({Guid.NewGuid()}, {command.VideoId}, {command.UserId}, {DateTime.UtcNow})""",
                 cancellationToken: cancellationToken);
             await transaction.CommitAsync(cancellationToken);
             return rows > 0 ? new Success() : new NotFound();
@@ -78,35 +76,35 @@ public class
 }
 
 public class
-    UnLikeVideoCommandHandler : Mediator.ICommandHandler<UnLikeVideoCommand,
-        OneOf<Success, UserDidNotLike, Error<string>, NotFound>>
+    UnDislikeVideoCommandHandler : Mediator.ICommandHandler<UnDislikeVideoCommand,
+        OneOf<Success, UserDidNotDislike, Error<string>, NotFound>>
 {
     private readonly ZulaMedDbContext _dbContext;
 
-    public UnLikeVideoCommandHandler(ZulaMedDbContext dbContext)
+    public UnDislikeVideoCommandHandler(ZulaMedDbContext dbContext)
     {
         _dbContext = dbContext;
     }
 
-    public async ValueTask<OneOf<Success, UserDidNotLike, Error<string>, NotFound>> Handle(UnLikeVideoCommand command,
+    public async ValueTask<OneOf<Success, UserDidNotDislike, Error<string>, NotFound>> Handle(UnDislikeVideoCommand command,
         CancellationToken cancellationToken)
     {
         await using var transaction = await _dbContext.Database.BeginTransactionAsync(cancellationToken);
         try
         {
-            var didUserLike = await _dbContext.Set<Like<Video>>()
-                .AnyAsync(x => (Guid)x.LikedBy.Id == command.UserId && (Guid)x.Parent.Id == command.VideoId,
+            var didUserDislike = await _dbContext.Set<Dislike<Video>>()
+                .AnyAsync(x => (Guid)x.DislikedBy.Id == command.UserId && (Guid)x.Parent.Id == command.VideoId,
                     cancellationToken: cancellationToken);
-            if (!didUserLike)
+            if (!didUserDislike)
             {
-                return new UserDidNotLike();
+                return new UserDidNotDislike();
             }
 
             var rows = await _dbContext.Database.ExecuteSqlAsync(
-                $"""UPDATE "Video" SET "VideoLike" = GREATEST("VideoLike" - 1, 0) WHERE "Id" = {command.VideoId}""",
+                $"""UPDATE "Video" SET "VideoDislike" = GREATEST("VideoDislike" - 1, 0) WHERE "Id" = {command.VideoId}""",
                 cancellationToken: cancellationToken);
             await _dbContext.Database.ExecuteSqlAsync(
-                $"""DELETE FROM "Like<Video>" WHERE "ParentId" = {command.VideoId} AND "UserId" = {command.UserId}""",
+                $"""DELETE FROM "Dislike<Video>" WHERE "ParentId" = {command.VideoId} AND "DislikedById" = {command.UserId}""",
                 cancellationToken: cancellationToken);
             await transaction.CommitAsync(cancellationToken);
             return rows > 0 ? new Success() : new NotFound();
@@ -118,7 +116,6 @@ public class
         }
     }
 }
-
 public class Endpoint : Endpoint<Request>
 {
     private readonly IMediator _mediator;
@@ -130,7 +127,7 @@ public class Endpoint : Endpoint<Request>
 
     public override void Configure()
     {
-        Routes("/video/{id}/like");
+        Routes("/video/{id}/dislike");
         Verbs(Http.POST, Http.DELETE);
     }
 
@@ -141,12 +138,12 @@ public class Endpoint : Endpoint<Request>
         var userId = Guid.Parse(HttpContext.User.Claims.FirstOrDefault(x => x.Type == "UserId")!.Value);
         if (HttpContext.Request.Method == Http.POST.ToString())
         {
-            var result = await _mediator.Send(new LikeVideoCommand { VideoId = req.Id, UserId = userId }, ct);
+            var result = await _mediator.Send(new DislikeVideoCommand { VideoId = req.Id, UserId = userId }, ct);
             await result.Match(
                 s => SendOkAsync(ct),
                 ua =>
                 {
-                    AddError("User already liked this video");
+                    AddError("User already disliked this video");
                     return SendErrorsAsync(cancellation: ct);
                 },
                 e => SendAsync(new
@@ -159,12 +156,12 @@ public class Endpoint : Endpoint<Request>
         }
         else if (HttpContext.Request.Method == Http.DELETE.ToString())
         {
-            var result = await _mediator.Send(new UnLikeVideoCommand { VideoId = req.Id, UserId = userId }, ct);
+            var result = await _mediator.Send(new UnDislikeVideoCommand { VideoId = req.Id, UserId = userId }, ct);
             await result.Match(
                 s => SendOkAsync(ct),
                 ue =>
                 {
-                    AddError("User did not like this video");
+                    AddError("User did not dislike this video");
                     return SendErrorsAsync(cancellation: ct);
                 },
                 e => SendAsync(new
