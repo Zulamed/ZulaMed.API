@@ -48,7 +48,7 @@ public class GetVideoByIdQueryHandler : IQueryHandler<GetVideoByIdQuery, OneOf<R
                 Subscribers = subscriberCount,
                 Username = video.Publisher.Login.Value,
             },
-            NumberOfLikes = video.Likes.Count
+            NumberOfLikes = video.VideoLike.Value
         };
     }
 }
