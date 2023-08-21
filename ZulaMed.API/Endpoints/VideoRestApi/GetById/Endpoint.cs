@@ -47,7 +47,8 @@ public class GetVideoByIdQueryHandler : IQueryHandler<GetVideoByIdQuery, OneOf<R
                 ProfilePictureUrl = video.Publisher.PhotoUrl.Value == "null" ? null : video.Publisher.PhotoUrl.Value,
                 Subscribers = subscriberCount,
                 Username = video.Publisher.Login.Value,
-            }
+            },
+            NumberOfLikes = video.Likes.Count
         };
     }
 }
