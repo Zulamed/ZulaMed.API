@@ -1,13 +1,13 @@
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
 using ZulaMed.API.Domain.ExtendedUsers;
-using ZulaMed.API.Domain.ExtendedUsers.UniversityUser;
+using ZulaMed.API.Domain.ExtendedUsers.HospitalUser;
 
 namespace ZulaMed.API.Endpoints.UserRestApi;
 
-public class UniversityUserConfiguration : IEntityTypeConfiguration<UniversityUser>
+public class HospitalUserConfiguration : IEntityTypeConfiguration<HospitalUser>
 {
-    public void Configure(EntityTypeBuilder<UniversityUser> builder)
+    public void Configure(EntityTypeBuilder<HospitalUser> builder)
     {
         builder.HasKey(x => x.User);
         builder.Property(x => x.UserAddress)
@@ -18,6 +18,9 @@ public class UniversityUserConfiguration : IEntityTypeConfiguration<UniversityUs
             .IsRequired();
         builder.Property(x => x.UserPhone)
             .HasConversion<UserPhone.EfCoreValueConverter>()
+            .IsRequired(); 
+        builder.Property(x => x.UserHospital)
+            .HasConversion<UserHospital.EfCoreValueConverter>()
             .IsRequired();
         
         

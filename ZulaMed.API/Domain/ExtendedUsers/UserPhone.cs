@@ -1,6 +1,6 @@
 using Vogen;
 
-namespace ZulaMed.API.Domain.UniversityUser;
+namespace ZulaMed.API.Domain.ExtendedUsers;
 
 [ValueObject<string>(Conversions.EfCoreValueConverter)]
 public readonly partial struct UserPhone

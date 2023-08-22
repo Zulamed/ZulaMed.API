@@ -38,8 +38,7 @@
     </ItemGroup>
 
     <ItemGroup>
-      <Folder Include="Domain\HospitalUser" />
-      <Folder Include="Domain\PersonalUser" />
+      <Folder Include="Domain\ExtendedUsers\PersonalUser" />
     </ItemGroup>
 
 </Project>
