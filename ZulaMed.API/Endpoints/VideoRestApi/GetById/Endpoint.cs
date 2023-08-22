@@ -43,8 +43,7 @@ public class GetVideoByIdQueryHandler : IQueryHandler<GetVideoByIdQuery, OneOf<R
             Video = video.ToResponse(), User = new UserDTO
             {
                 Id = video.Publisher.Id.Value,
-                // vogen converts null to "null" string, so we need to check for that
-                ProfilePictureUrl = video.Publisher.PhotoUrl.Value == "null" ? null : video.Publisher.PhotoUrl.Value,
+                ProfilePictureUrl = video.Publisher.PhotoUrl?.Value,
                 Subscribers = subscriberCount,
                 Username = video.Publisher.Login.Value,
             },

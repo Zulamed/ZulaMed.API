@@ -71,16 +71,16 @@ public class Endpoint : Endpoint<Request, Response>
     public override void Configure()
     {
         Post("/video/{videoId}/comment");
-        AllowAnonymous();
     }
 
     public override async Task HandleAsync(Request req, CancellationToken ct)
     {
+        var userId = Guid.Parse(HttpContext.User.Claims.FirstOrDefault(x => x.Type == "UserId")!.Value);
         var result = await _mediator.Send(new SendCommentToVideoCommand
         {
             VideoId = req.VideoId,
             Content = req.Content,
-            SentById = req.SentBy
+            SentById = userId
         }, ct);
 
         await result.Match(
