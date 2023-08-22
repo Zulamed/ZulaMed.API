@@ -1,4 +1,4 @@
-namespace ZulaMed.API.Domain.UniversityUser;
+namespace ZulaMed.API.Domain.ExtendedUsers.UniversityUser;
 
 public class UniversityUser
 {
