@@ -7,6 +7,7 @@ using ZulaMed.API.Data;
 using ZulaMed.API.Domain.Comments;
 using ZulaMed.API.Domain.User;
 using ZulaMed.API.Domain.Video;
+using ZulaMed.API.Endpoints.Comments.GetCommentsForAVideo;
 
 namespace ZulaMed.API.Endpoints.Comments.SendACommentToVideo;
 
@@ -59,7 +60,7 @@ public class
     }
 }
 
-public class Endpoint : Endpoint<Request, Response>
+public class Endpoint : Endpoint<Request, CommentDTO>
 {
     private readonly IMediator _mediator;
 
@@ -84,7 +85,7 @@ public class Endpoint : Endpoint<Request, Response>
         }, ct);
 
         await result.Match(
-            s => SendOkAsync(s.ToResponse(), ct),
+            s => SendOkAsync(s.ToDTO(), ct),
             nf => SendNotFoundAsync(ct)
         );
     }

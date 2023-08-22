@@ -1,10 +1,7 @@
 using FastEndpoints;
 using Mediator;
 using Microsoft.EntityFrameworkCore;
-using OneOf;
-using OneOf.Types;
 using ZulaMed.API.Data;
-using ZulaMed.API.Domain.User;
 using ZulaMed.API.Domain.Video;
 
 namespace ZulaMed.API.Endpoints.Comments.GetCommentsForAVideo;

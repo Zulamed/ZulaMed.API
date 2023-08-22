@@ -17,13 +17,3 @@ public class RequestValidator : Validator<Request>
         RuleFor(x => x.Content).NotEmpty();
     }
 }
-
-
-public class Response
-{
-    public required Guid Id { get; init; }
-    public required string Content { get; init; }
-    public required Guid SentBy { get; init; }
-    public required DateTime SentAt { get; init; }
-    public required Guid RelatedVideo { get; init; }
-}
