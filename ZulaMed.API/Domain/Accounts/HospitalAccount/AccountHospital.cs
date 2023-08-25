@@ -1,9 +1,9 @@
 using Vogen;
 
-namespace ZulaMed.API.Domain.ExtendedUsers.HospitalUser;
+namespace ZulaMed.API.Domain.Accounts.HospitalAccount;
 
 [ValueObject<string>(Conversions.EfCoreValueConverter)]
-public readonly partial struct UserHospital
+public readonly partial struct AccountHospital
 {
     private static Validation Validate(string input)
     {

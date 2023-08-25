@@ -38,7 +38,7 @@
     </ItemGroup>
 
     <ItemGroup>
-      <Folder Include="Domain\ExtendedUsers\PersonalUser" />
+      <Folder Include="Domain\Accounts\PersonalAccount\" />
     </ItemGroup>
 
 </Project>
