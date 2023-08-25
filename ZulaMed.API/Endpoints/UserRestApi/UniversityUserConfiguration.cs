@@ -1,23 +1,23 @@
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
-using ZulaMed.API.Domain.ExtendedUsers;
-using ZulaMed.API.Domain.ExtendedUsers.UniversityUser;
+using ZulaMed.API.Domain.Accounts;
+using ZulaMed.API.Domain.Accounts.UniversityAccount;
 
 namespace ZulaMed.API.Endpoints.UserRestApi;
 
-public class UniversityUserConfiguration : IEntityTypeConfiguration<UniversityUser>
+public class UniversityUserConfiguration : IEntityTypeConfiguration<UniversityAccount>
 {
-    public void Configure(EntityTypeBuilder<UniversityUser> builder)
+    public void Configure(EntityTypeBuilder<UniversityAccount> builder)
     {
         builder.HasKey(x => x.User);
-        builder.Property(x => x.UserAddress)
-            .HasConversion<UserAddress.EfCoreValueConverter>()
+        builder.Property(x => x.AccountAddress)
+            .HasConversion<AccountAddress.EfCoreValueConverter>()
             .IsRequired();
-        builder.Property(x => x.UserPostCode)
-            .HasConversion<UserPostCode.EfCoreValueConverter>()
+        builder.Property(x => x.AccountPostCode)
+            .HasConversion<AccountPostCode.EfCoreValueConverter>()
             .IsRequired();
-        builder.Property(x => x.UserPhone)
-            .HasConversion<UserPhone.EfCoreValueConverter>()
+        builder.Property(x => x.AccountPhone)
+            .HasConversion<AccountPhone.EfCoreValueConverter>()
             .IsRequired();
         
         
