@@ -5,7 +5,7 @@ using ZulaMed.API.Domain.Accounts.HospitalAccount;
 
 namespace ZulaMed.API.Endpoints.UserRestApi;
 
-public class HospitalUserConfiguration : IEntityTypeConfiguration<HospitalAccount>
+public class HospitalAccountConfiguration : IEntityTypeConfiguration<HospitalAccount>
 {
     public void Configure(EntityTypeBuilder<HospitalAccount> builder)
     {
