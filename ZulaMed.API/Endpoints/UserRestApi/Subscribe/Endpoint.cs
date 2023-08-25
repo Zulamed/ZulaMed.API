@@ -52,14 +52,15 @@ public class Endpoint : Endpoint<Request>
     public override void Configure()
     {
         Post("user/{subToUserId}/subscribe");
-        AllowAnonymous();
+        Description(c => c.Produces(200), clearDefaults:true);
     }
 
     public override async Task HandleAsync(Request req, CancellationToken ct)
     {
+        var userId = Guid.Parse(HttpContext.User.Claims.FirstOrDefault(x => x.Type == "UserId")!.Value);
         var result = await _mediator.Send(new SubscribeCommand
         {
-            SubscriberId = req.SubscriberId,
+            SubscriberId = userId, 
             SubToUserId = req.SubToUserId
         }, ct);
         await result.Match(
