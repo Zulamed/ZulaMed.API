@@ -37,8 +37,5 @@
       <PackageReference Include="Vogen" Version="3.0.16" />
     </ItemGroup>
 
-    <ItemGroup>
-      <Folder Include="Domain\Accounts\PersonalAccount\" />
-    </ItemGroup>
 
 </Project>

@@ -5,7 +5,7 @@ using ZulaMed.API.Domain.Accounts.UniversityAccount;
 
 namespace ZulaMed.API.Endpoints.UserRestApi;
 
-public class UniversityUserConfiguration : IEntityTypeConfiguration<UniversityAccount>
+public class UniversityAccountConfiguration : IEntityTypeConfiguration<UniversityAccount>
 {
     public void Configure(EntityTypeBuilder<UniversityAccount> builder)
     {
