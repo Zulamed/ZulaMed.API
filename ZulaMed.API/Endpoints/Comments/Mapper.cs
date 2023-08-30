@@ -13,7 +13,7 @@ public static class Mapper
          SentBy = new UserMinimalDTO
          {
             Id = (Guid)comment.SentBy.Id,
-            Username = (string)comment.SentBy.Name,
+            Username = (string)comment.SentBy.Login,
             ProfilePictureUrl = comment.SentBy.PhotoUrl?.Value
          },
          SentAt = (DateTime)comment.SentAt,
