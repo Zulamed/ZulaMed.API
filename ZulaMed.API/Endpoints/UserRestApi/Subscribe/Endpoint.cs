@@ -18,16 +18,20 @@ public class
         _dbContext = dbContext;
     }
 
-    public async ValueTask<OneOf<Success, Error<string>, NotFound>> Handle(SubscribeCommand command, CancellationToken cancellationToken)
+    public async ValueTask<OneOf<Success, Error<string>, NotFound>> Handle(SubscribeCommand command,
+        CancellationToken cancellationToken)
     {
         try
         {
-            var subscriber = await _dbContext.Set<User>().FirstOrDefaultAsync(x => (Guid)x.Id == command.SubscriberId, cancellationToken);
-            var subToUser = await _dbContext.Set<User>().FirstOrDefaultAsync(x => (Guid)x.Id == command.SubToUserId, cancellationToken);
+            var subscriber = await _dbContext.Set<User>()
+                .FirstOrDefaultAsync(x => (Guid)x.Id == command.SubscriberId, cancellationToken);
+            var subToUser = await _dbContext.Set<User>()
+                .FirstOrDefaultAsync(x => (Guid)x.Id == command.SubToUserId, cancellationToken);
             if (subscriber is null || subToUser is null)
             {
                 return new NotFound();
             }
+
             subscriber.Subscriptions.Add(subToUser);
             subToUser.Subscribers.Add(subscriber);
             await _dbContext.SaveChangesAsync(cancellationToken);
@@ -52,15 +56,22 @@ public class Endpoint : Endpoint<Request>
     public override void Configure()
     {
         Post("user/{subToUserId}/subscribe");
-        Description(c => c.Produces(200), clearDefaults:true);
+        Description(c => c.Produces(200), clearDefaults: true);
     }
 
     public override async Task HandleAsync(Request req, CancellationToken ct)
     {
         var userId = Guid.Parse(HttpContext.User.Claims.FirstOrDefault(x => x.Type == "UserId")!.Value);
+        if (userId == req.SubToUserId)
+        {
+           AddError("You can't subscribe to yourself!");
+           await SendErrorsAsync(cancellation: ct);
+           return;
+        }
+
         var result = await _mediator.Send(new SubscribeCommand
         {
-            SubscriberId = userId, 
+            SubscriberId = userId,
             SubToUserId = req.SubToUserId
         }, ct);
         await result.Match(
