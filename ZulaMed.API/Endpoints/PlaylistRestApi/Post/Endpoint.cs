@@ -7,7 +7,7 @@ using ZulaMed.API.Domain.Playlist;
 using ZulaMed.API.Domain.User;
 
 namespace ZulaMed.API.Endpoints.PlaylistRestApi.Post;
-public class CreatePlaylistCommandHandler : Mediator.ICommandHandler<CreatePlaylistCommand, Result<Domain.Playlist.Playlist, Exception>>
+public class CreatePlaylistCommandHandler : Mediator.ICommandHandler<CreatePlaylistCommand, Result<Playlist, Exception>>
 {
     private readonly ZulaMedDbContext _dbContext;
 
@@ -16,7 +16,7 @@ public class CreatePlaylistCommandHandler : Mediator.ICommandHandler<CreatePlayl
         _dbContext = dbContext;
     }
     
-    public async ValueTask<Result<Domain.Playlist.Playlist, Exception>> Handle(CreatePlaylistCommand command, CancellationToken cancellationToken)
+    public async ValueTask<Result<Playlist, Exception>> Handle(CreatePlaylistCommand command, CancellationToken cancellationToken)
     {
         var owner = await _dbContext.Set<User>().FirstOrDefaultAsync(x => x.Id == command.OwnerId, cancellationToken);
         if (owner is null)
@@ -25,8 +25,8 @@ public class CreatePlaylistCommandHandler : Mediator.ICommandHandler<CreatePlayl
         }
         try
         {
-            var dbSet = _dbContext.Set<Domain.Playlist.Playlist>();
-            var entity = await dbSet.AddAsync(new Domain.Playlist.Playlist
+            var dbSet = _dbContext.Set<Playlist>();
+            var entity = await dbSet.AddAsync(new Playlist
             {
                 Id = (PlaylistId)Guid.NewGuid(),
                 Owner = owner,
