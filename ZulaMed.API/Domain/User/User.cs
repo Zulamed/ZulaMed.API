@@ -20,7 +20,9 @@ public class User
     public required UserUniversity University { get; init; }
     
     public required UserWorkPlace WorkPlace { get; init; }
-    public PhotoUrl PhotoUrl { get; set; } = PhotoUrl.Empty;
+    public PhotoUrl? PhotoUrl { get; set; } 
     public List<User> Subscriptions { get; init; } = new();
     public List<User> Subscribers { get; init; } = new();
+    
+    public List<Video.Video> Videos { get; init; } = new();
 }

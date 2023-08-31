@@ -7,6 +7,7 @@ using ZulaMed.API.Data;
 using ZulaMed.API.Domain.Comments;
 using ZulaMed.API.Domain.User;
 using ZulaMed.API.Domain.Video;
+using ZulaMed.API.Endpoints.Comments.GetCommentsForAVideo;
 
 namespace ZulaMed.API.Endpoints.Comments.SendACommentToVideo;
 
@@ -59,7 +60,7 @@ public class
     }
 }
 
-public class Endpoint : Endpoint<Request, Response>
+public class Endpoint : Endpoint<Request, CommentDTO>
 {
     private readonly IMediator _mediator;
 
@@ -71,20 +72,20 @@ public class Endpoint : Endpoint<Request, Response>
     public override void Configure()
     {
         Post("/video/{videoId}/comment");
-        AllowAnonymous();
     }
 
     public override async Task HandleAsync(Request req, CancellationToken ct)
     {
+        var userId = Guid.Parse(HttpContext.User.Claims.FirstOrDefault(x => x.Type == "UserId")!.Value);
         var result = await _mediator.Send(new SendCommentToVideoCommand
         {
             VideoId = req.VideoId,
             Content = req.Content,
-            SentById = req.SentBy
+            SentById = userId
         }, ct);
 
         await result.Match(
-            s => SendOkAsync(s.ToResponse(), ct),
+            s => SendOkAsync(s.ToDTO(), ct),
             nf => SendNotFoundAsync(ct)
         );
     }

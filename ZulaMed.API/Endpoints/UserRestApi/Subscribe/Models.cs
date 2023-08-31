@@ -5,7 +5,6 @@ namespace ZulaMed.API.Endpoints.UserRestApi.Subscribe;
 
 public class Request
 {
-    public required Guid SubscriberId { get; init; }
     public Guid SubToUserId { get; init; }
 }
 
