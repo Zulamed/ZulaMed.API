@@ -356,12 +356,17 @@ namespace ZulaMed.API.Data.Migrations
             modelBuilder.Entity("ZulaMed.API.Domain.Video.Video", b =>
                 {
                     b.HasOne("ZulaMed.API.Domain.User.User", "Publisher")
-                        .WithMany()
+                        .WithMany("Videos")
                         .HasForeignKey("PublisherId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
                     b.Navigation("Publisher");
+                });
+
+            modelBuilder.Entity("ZulaMed.API.Domain.User.User", b =>
+                {
+                    b.Navigation("Videos");
                 });
 
             modelBuilder.Entity("ZulaMed.API.Domain.Video.Video", b =>

@@ -23,4 +23,6 @@ public class User
     public PhotoUrl? PhotoUrl { get; set; } 
     public List<User> Subscriptions { get; init; } = new();
     public List<User> Subscribers { get; init; } = new();
+    
+    public List<Video.Video> Videos { get; init; } = new();
 }
