@@ -8,7 +8,7 @@ WORKDIR /src
 COPY ["ZulaMed.API.csproj", "."]
 RUN dotnet restore "ZulaMed.API.csproj"
 COPY . .
-WORKDIR /src 
+WORKDIR /src
 RUN dotnet build "ZulaMed.API.csproj" -c Release -o /app/build
 
 FROM build AS publish

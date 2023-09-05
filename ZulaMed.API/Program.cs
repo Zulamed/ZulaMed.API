@@ -13,6 +13,7 @@ using Microsoft.IdentityModel.Tokens;
 using Npgsql;
 using ZulaMed.API;
 using ZulaMed.API.Data;
+using ZulaMed.API.Health;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -82,6 +83,9 @@ builder.Services.AddSingleton<FirebaseAuth>(provider =>
 
 builder.Services.AddTransient<VogenValidationMiddleware>();
 
+builder.Services.AddHealthChecks()
+    .AddCheck<StubHealthCheck>("Stub");
+
 
 
 builder.Services
@@ -107,6 +111,8 @@ app.UseCors(c =>
     c.AllowAnyMethod();
     c.AllowAnyOrigin();
 });
+
+app.UseHealthChecks("/_health");
 
 app.UseMiddleware<VogenValidationMiddleware>();
 app.UseDefaultExceptionHandler();
