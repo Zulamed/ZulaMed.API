@@ -22,6 +22,7 @@ public class Response
 {
     public required VideoDTO Video { get; set; }
     
+    public required int NumberOfLikes { get; set; }
     public required UserDTO User { get; set; }
 }
 

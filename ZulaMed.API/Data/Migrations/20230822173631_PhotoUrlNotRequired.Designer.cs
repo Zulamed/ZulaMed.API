@@ -2,6 +2,7 @@
 using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 using ZulaMed.API.Data;
@@ -11,9 +12,11 @@ using ZulaMed.API.Data;
 namespace ZulaMed.API.Data.Migrations
 {
     [DbContext(typeof(ZulaMedDbContext))]
-    partial class ZulaMedDbContextModelSnapshot : ModelSnapshot
+    [Migration("20230822173631_PhotoUrlNotRequired")]
+    partial class PhotoUrlNotRequired
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -127,30 +130,6 @@ namespace ZulaMed.API.Data.Migrations
                     b.ToTable("Like<Video>");
                 });
 
-            modelBuilder.Entity("ZulaMed.API.Domain.Playlist.Playlist", b =>
-                {
-                    b.Property<Guid>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("uuid");
-
-                    b.Property<Guid>("OwnerId")
-                        .HasColumnType("uuid");
-
-                    b.Property<string>("PlaylistDescription")
-                        .IsRequired()
-                        .HasColumnType("text");
-
-                    b.Property<string>("PlaylistName")
-                        .IsRequired()
-                        .HasColumnType("text");
-
-                    b.HasKey("Id");
-
-                    b.HasIndex("OwnerId");
-
-                    b.ToTable("Playlist");
-                });
-
             modelBuilder.Entity("ZulaMed.API.Domain.SpecialtyGroup.SpecialtyGroup", b =>
                 {
                     b.Property<int>("Id")
@@ -231,9 +210,6 @@ namespace ZulaMed.API.Data.Migrations
                         .ValueGeneratedOnAdd()
                         .HasColumnType("uuid");
 
-                    b.Property<Guid?>("PlaylistId")
-                        .HasColumnType("uuid");
-
                     b.Property<Guid>("PublisherId")
                         .HasColumnType("uuid");
 
@@ -272,8 +248,6 @@ namespace ZulaMed.API.Data.Migrations
                         .HasDefaultValue(0L);
 
                     b.HasKey("Id");
-
-                    b.HasIndex("PlaylistId");
 
                     b.HasIndex("PublisherId");
 
@@ -371,17 +345,6 @@ namespace ZulaMed.API.Data.Migrations
                     b.Navigation("Parent");
                 });
 
-            modelBuilder.Entity("ZulaMed.API.Domain.Playlist.Playlist", b =>
-                {
-                    b.HasOne("ZulaMed.API.Domain.User.User", "Owner")
-                        .WithMany()
-                        .HasForeignKey("OwnerId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
-                    b.Navigation("Owner");
-                });
-
             modelBuilder.Entity("ZulaMed.API.Domain.User.User", b =>
                 {
                     b.HasOne("ZulaMed.API.Domain.SpecialtyGroup.SpecialtyGroup", "Group")
@@ -395,28 +358,13 @@ namespace ZulaMed.API.Data.Migrations
 
             modelBuilder.Entity("ZulaMed.API.Domain.Video.Video", b =>
                 {
-                    b.HasOne("ZulaMed.API.Domain.Playlist.Playlist", null)
-                        .WithMany("Videos")
-                        .HasForeignKey("PlaylistId");
-
                     b.HasOne("ZulaMed.API.Domain.User.User", "Publisher")
-                        .WithMany("Videos")
+                        .WithMany()
                         .HasForeignKey("PublisherId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
                     b.Navigation("Publisher");
-                });
-
-
-            modelBuilder.Entity("ZulaMed.API.Domain.Playlist.Playlist", b =>
-             {
-                    b.Navigation("Videos");
-             });
-             
-            modelBuilder.Entity("ZulaMed.API.Domain.User.User", b =>
-                {
-                    b.Navigation("Videos");
                 });
 
             modelBuilder.Entity("ZulaMed.API.Domain.Video.Video", b =>

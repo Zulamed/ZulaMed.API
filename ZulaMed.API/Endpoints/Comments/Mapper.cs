@@ -13,8 +13,8 @@ public static class Mapper
          SentBy = new UserMinimalDTO
          {
             Id = (Guid)comment.SentBy.Id,
-            Username = (string)comment.SentBy.Name,
-            ProfilePictureUrl = null // needs to bce changed to this -> ProfilePictureUrl = comment.SentBy.ProfilePictureUrl
+            Username = (string)comment.SentBy.Login,
+            ProfilePictureUrl = comment.SentBy.PhotoUrl?.Value
          },
          SentAt = (DateTime)comment.SentAt,
          RelatedVideo = (Guid)comment.RelatedVideo.Id

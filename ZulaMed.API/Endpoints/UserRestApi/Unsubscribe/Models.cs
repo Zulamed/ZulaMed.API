@@ -5,7 +5,6 @@ namespace ZulaMed.API.Endpoints.UserRestApi.Unsubscribe;
 
 public class Request
 {
-    public required Guid SubscriberId { get; init; }
     public Guid UnsubFromUserId { get; init; }
 }
 

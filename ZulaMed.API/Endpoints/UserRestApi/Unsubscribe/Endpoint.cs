@@ -53,14 +53,15 @@ public class Endpoint : Endpoint<Request>
     public override void Configure()
     {
         Post("user/{unsubFromUserId}/unsubscribe");
-        AllowAnonymous();
+        Description(c => c.Produces(200), clearDefaults:true);
     }
 
     public override async Task HandleAsync(Request req, CancellationToken ct)
     {
+        var userId = Guid.Parse(HttpContext.User.Claims.FirstOrDefault(x => x.Type == "UserId")!.Value);
         var result = await _mediator.Send(new UnsubscribeCommand
         {
-            SubscriberId = req.SubscriberId,
+            SubscriberId = userId,
             UnsubFromUserId = req.UnsubFromUserId
         }, ct);
         await result.Match(

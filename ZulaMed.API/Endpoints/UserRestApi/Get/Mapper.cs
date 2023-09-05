@@ -17,7 +17,8 @@ public static class Mapper
             Name = user.Name.Value,
             Surname = user.Surname.Value,
             University = user.University.Value,
-            WorkPlace = user.WorkPlace.Value
+            WorkPlace = user.WorkPlace.Value,
+            ProfilePictureUrl = user.PhotoUrl?.Value
         };
     }
 }

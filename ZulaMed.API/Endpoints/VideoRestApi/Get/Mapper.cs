@@ -18,7 +18,7 @@ public static class Mapper
             VideoViews = video.VideoView.Value
         };
 
-        var profilePicture = video.Publisher.PhotoUrl.Value == "null" ? null : $"{baseUrl}{video.Publisher.PhotoUrl.Value}";
+        var profilePicture = video.Publisher.PhotoUrl?.Value == null ? null : $"{baseUrl}{video.Publisher.PhotoUrl.Value}";
         var userDto = new UserDTO
         {
             Id = video.Publisher.Id.Value,
