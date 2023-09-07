@@ -6,5 +6,5 @@ public class Playlist
     public required PlaylistName PlaylistName { get; set; }
     public required PlaylistDescription PlaylistDescription { get; set; }
     public required User.User Owner { get; set; }
-    public required List<Video.Video> Videos { get; set; } = new();
+    public List<Video.Video> Videos { get; set; } = new();
 }

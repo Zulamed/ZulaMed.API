@@ -15,33 +15,34 @@ public class GetPlaylistsByUserQueryHandler : IQueryHandler<GetPlaylistsByUserQu
     {
         _context = context;
     }
-    
+
     public async ValueTask<Playlist[]> Handle(GetPlaylistsByUserQuery query, CancellationToken cancellationToken)
     {
         var playlists = await _context.Set<Playlist>()
-            .Where(x => x.Owner.Id == query.OwnerId)
+            .Where(x => (Guid)x.Owner.Id == query.OwnerId)
             .ToArrayAsync(cancellationToken: cancellationToken);
         return playlists;
     }
 }
-public class Endpoint : EndpointWithoutRequest
+
+public class Endpoint : Endpoint<Request>
 {
     private readonly IMediator _mediator;
-    
+
     public Endpoint(IMediator mediator)
     {
         _mediator = mediator;
     }
-    
+
     public override void Configure()
     {
-        Get("/playlist/{userid}");
+        Get("/playlist/user/{ownerId}");
         AllowAnonymous();
     }
 
-    public override async Task HandleAsync(CancellationToken ct)
+    public override async Task HandleAsync(Request req, CancellationToken ct)
     {
-        var playlists = await _mediator.Send(new GetAllPlaylistsQuery(), ct);
+        var playlists = await _mediator.Send(new GetPlaylistsByUserQuery { OwnerId = req.OwnerId }, ct);
 
         await SendAsync(new Response
         {

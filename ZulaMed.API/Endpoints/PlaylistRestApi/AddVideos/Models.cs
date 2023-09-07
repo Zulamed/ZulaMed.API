@@ -6,7 +6,7 @@ namespace ZulaMed.API.Endpoints.PlaylistRestApi.AddVideos;
 
 public class Request
 {
-    public required Guid PlaylistId { get; init; }
+    public Guid PlaylistId { get; init; }
     public required List<Guid> VideosIds { get; init; }
 }
 

@@ -19,7 +19,7 @@ public class AddVideosToPlaylistCommandHandler : Mediator.ICommandHandler<AddVid
     
     public async ValueTask<Result<bool, Exception>> Handle(AddVideosToPlaylistCommand command, CancellationToken cancellationToken)
     {
-        var playlist = await _dbContext.Set<Playlist>().FirstOrDefaultAsync(x => x.Id == command.PlaylistId, cancellationToken);
+        var playlist = await _dbContext.Set<Playlist>().FirstOrDefaultAsync(x => (Guid)x.Id == command.PlaylistId, cancellationToken);
         if (playlist is null)
         {
             return new Error<Exception>(new Exception("Owner by provided id was not found"));
@@ -49,7 +49,7 @@ public class Endpoint : Endpoint<Request>
 
     public override void Configure()
     {
-        Put("/playlist/{playlistId}/addVideos");
+        Post("/playlist/{playlistId}/video");
         AllowAnonymous();
     }
 

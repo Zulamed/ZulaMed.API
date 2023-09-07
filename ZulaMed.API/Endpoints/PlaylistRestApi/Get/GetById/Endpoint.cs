@@ -18,6 +18,7 @@ public class GetPlaylistByIdQueryHandler : IQueryHandler<GetPlaylistByIdQuery, R
     public async ValueTask<Response> Handle(GetPlaylistByIdQuery query, CancellationToken cancellationToken)
     {
         var playlist = await _dbContext.Set<Playlist>()
+            .Include(x => x.Owner)
             .FirstOrDefaultAsync(x => (Guid)x.Id == query.PlaylistId, cancellationToken);
         return new Response
         {
@@ -26,7 +27,7 @@ public class GetPlaylistByIdQueryHandler : IQueryHandler<GetPlaylistByIdQuery, R
     }
 }
 
-public class Endpoint : Endpoint<Request>
+public class Endpoint : Endpoint<Request, Response>
 {
     private readonly IMediator _mediator;
 
@@ -37,7 +38,7 @@ public class Endpoint : Endpoint<Request>
     
     public override void Configure()
     {
-        Get("/playlist/{id}");
+        Get("/playlist/{playlistId}");
         AllowAnonymous();
     }
 

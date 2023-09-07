@@ -18,12 +18,15 @@ public class AddVideosToPlaylistCommandHandler : Mediator.ICommandHandler<Delete
     
     public async ValueTask<Result<bool, Exception>> Handle(DeleteVideoFromPlaylistCommand command, CancellationToken cancellationToken)
     {
-        var playlist = await _dbContext.Set<Playlist>().FirstOrDefaultAsync(x => x.Id == command.PlaylistId, cancellationToken);
+        var playlist = await _dbContext
+            .Set<Playlist>()
+            .Include(x => x.Videos)
+            .FirstOrDefaultAsync(x => (Guid)x.Id == command.PlaylistId, cancellationToken);
         if (playlist is null)
         {
             return new Error<Exception>(new Exception("Owner by provided id was not found"));
         }
-        var video = playlist.Videos.FirstOrDefault(x => command.PlaylistId == x.Id);
+        var video = playlist.Videos.FirstOrDefault(x => command.VideoId == (Guid)x.Id);
         if (video is null)
         {
             return new Error<Exception>(new Exception("Video by provided id was not found"));
@@ -52,7 +55,7 @@ public class Endpoint : Endpoint<Request>
 
     public override void Configure()
     {
-        Put("/playlist/{playlistId}/deleteVideo");
+        Delete("/playlist/{playlistId}/video");
         AllowAnonymous();
     }
 

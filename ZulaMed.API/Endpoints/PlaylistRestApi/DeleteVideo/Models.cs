@@ -5,7 +5,7 @@ namespace ZulaMed.API.Endpoints.PlaylistRestApi.DeleteVideo;
 
 public class Request
 {
-    public required Guid PlaylistId { get; init; }
+    public Guid PlaylistId { get; init; }
     public required Guid VideoId { get; init; }
 }
 
