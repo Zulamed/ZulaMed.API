@@ -2,7 +2,9 @@ using FastEndpoints;
 using Mediator;
 using Microsoft.EntityFrameworkCore;
 using ZulaMed.API.Data;
+using ZulaMed.API.Domain.Comments;
 using ZulaMed.API.Domain.Video;
+using ZulaMed.API.Extensions;
 
 namespace ZulaMed.API.Endpoints.Comments.GetCommentsForAVideo;
 
@@ -17,15 +19,16 @@ public class GetCommentsForAVideoQueryHandler : IQueryHandler<GetCommentsForAVid
 
     public async ValueTask<Response?> Handle(GetCommentsForAVideoQuery query, CancellationToken cancellationToken)
     {
-        var video = await _dbContext.Set<Video>()
-            .Include(x => x.Comments)
-            .ThenInclude(x => x.SentBy)
-            .FirstOrDefaultAsync(x => (Guid)x.Id == query.VideoId, cancellationToken: cancellationToken);
-        if (video is null)
-            return null;
+        var comments = await _dbContext
+            .Set<Comment>()
+            .Where(x => (Guid)x.RelatedVideo.Id == query.VideoId)
+            .Include(x => x.SentBy)
+            .Paginate(x => x.SentAt, query.PaginationOptions)
+            .ToArrayAsync(cancellationToken: cancellationToken);
+
         return new Response
         {
-            Comments = video.Comments.Select(x => x.ToDTO()).ToList()
+            Comments = comments.Select(x => x.ToDTO()).ToList()
         };
     }
 }
@@ -47,9 +50,10 @@ public class Endpoint : Endpoint<Request, Response>
 
     public override async Task HandleAsync(Request req, CancellationToken ct)
     {
-        var response = await _mediator.Send(new GetCommentsForAVideoQuery()
+        var response = await _mediator.Send(new GetCommentsForAVideoQuery
         {
             VideoId = req.VideoId,
+            PaginationOptions = new PaginationOptions(req.Page, req.PageSize),
         }, ct);
         if (response is null)
         {

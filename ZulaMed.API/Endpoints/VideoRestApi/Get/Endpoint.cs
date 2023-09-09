@@ -4,10 +4,11 @@ using Microsoft.Extensions.Options;
 using ZulaMed.API.Domain.Video;
 using ZulaMed.API.Endpoints.VideoRestApi.Get.GetAll;
 using ZulaMed.API.Endpoints.VideoRestApi.Get.GetByTitle;
+using ZulaMed.API.Extensions;
 
 namespace ZulaMed.API.Endpoints.VideoRestApi.Get;
 
-public class Endpoint : Endpoint<Request,Response>
+public class Endpoint : Endpoint<Request, Response>
 {
     private readonly IMediator _mediator;
     private readonly IOptions<S3BucketOptions> _s3Configuration;
@@ -24,14 +25,21 @@ public class Endpoint : Endpoint<Request,Response>
         AllowAnonymous();
     }
 
-    public override async Task HandleAsync(Request req,CancellationToken ct)
+    public override async Task HandleAsync(Request req, CancellationToken ct)
     {
         Video[]? videos;
 
         if (req.Title is not null)
-            videos = await _mediator.Send(new GetByTitleQuery { Title = req.Title}, ct);
+            videos = await _mediator.Send(new GetByTitleQuery
+            {
+                Title = req.Title,
+                PaginationOptions = new PaginationOptions(req.Page, req.PageSize)
+            }, ct);
         else
-            videos = await _mediator.Send(new GetAllVideosQuery(), ct);
+            videos = await _mediator.Send(new GetAllVideosQuery
+            {
+                PaginationOptions = new PaginationOptions(req.Page, req.PageSize)
+            }, ct);
 
         await SendAsync(new Response
         {

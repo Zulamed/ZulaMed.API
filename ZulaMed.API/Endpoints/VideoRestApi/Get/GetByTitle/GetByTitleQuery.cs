@@ -2,6 +2,7 @@ using Mediator;
 using Microsoft.EntityFrameworkCore;
 using ZulaMed.API.Data;
 using ZulaMed.API.Domain.Video;
+using ZulaMed.API.Extensions;
 
 namespace ZulaMed.API.Endpoints.VideoRestApi.Get.GetByTitle;
 
@@ -9,6 +10,8 @@ namespace ZulaMed.API.Endpoints.VideoRestApi.Get.GetByTitle;
 public class GetByTitleQuery : IQuery<Video[]>
 {
     public required string Title { get; init; }
+    
+    public required PaginationOptions PaginationOptions { get; init; }
 }
 
 
@@ -25,7 +28,9 @@ public class GetByTitleQueryHandler : IQueryHandler<GetByTitleQuery, Video[]>
     {
         var videos = await _context.Set<Video>()
             .Include(x => x.Publisher)
-            .Where(x => x.VideoTitle.Value.Contains(query.Title)).ToArrayAsync(cancellationToken: cancellationToken);
+            .Where(x => x.VideoTitle.Value.Contains(query.Title))
+            .Paginate(x => x.VideoPublishedDate, query.PaginationOptions)
+            .ToArrayAsync(cancellationToken: cancellationToken);
         return videos;
     }
 }
