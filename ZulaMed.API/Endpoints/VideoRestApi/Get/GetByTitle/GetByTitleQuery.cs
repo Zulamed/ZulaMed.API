@@ -1,3 +1,4 @@
+using Google.Apis.Auth;
 using Mediator;
 using Microsoft.EntityFrameworkCore;
 using ZulaMed.API.Data;
@@ -28,7 +29,7 @@ public class GetByTitleQueryHandler : IQueryHandler<GetByTitleQuery, Video[]>
     {
         var videos = await _context.Set<Video>()
             .Include(x => x.Publisher)
-            .Where(x => x.VideoTitle.Value.Contains(query.Title))
+            .Where(x => EF.Functions.ILike((string)x.VideoTitle, $"%{query.Title}%"))
             .Paginate(x => x.VideoPublishedDate, query.PaginationOptions)
             .ToArrayAsync(cancellationToken: cancellationToken);
         return videos;
