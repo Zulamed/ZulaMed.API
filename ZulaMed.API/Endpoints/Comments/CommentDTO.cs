@@ -15,5 +15,4 @@ public class CommentDTO
     public required string Content { get; init; }
     public required UserMinimalDTO SentBy { get; init; } 
     public required DateTime SentAt { get; init; }
-    public required Guid RelatedVideo { get; init; }
 }

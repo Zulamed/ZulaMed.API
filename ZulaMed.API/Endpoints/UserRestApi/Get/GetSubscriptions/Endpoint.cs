@@ -2,12 +2,17 @@ using FastEndpoints;
 using Microsoft.EntityFrameworkCore;
 using ZulaMed.API.Data;
 using ZulaMed.API.Domain.User;
+using ZulaMed.API.Extensions;
 
 namespace ZulaMed.API.Endpoints.UserRestApi.Get.GetSubscriptions;
 
 public class Request
 {
     public Guid UserId { get; init; }
+
+    [QueryParam] public int Page { get; init; } = 1;
+
+    [QueryParam] public int PageSize { get; init; } = 10;
 }
 
 public class Subscription
@@ -43,6 +48,7 @@ public class Endpoint : Endpoint<Request, Response>
             .Where(x => (Guid)x.Id == req.UserId)
             .SelectMany(x => x.Subscriptions)
             .Include(x => x.Group)
+            .Paginate(x => x.Login, new PaginationOptions(req.Page, req.PageSize))
             .Select(x => new
             {
                 Subscription = x,

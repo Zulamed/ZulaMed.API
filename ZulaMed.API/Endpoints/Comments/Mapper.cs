@@ -6,7 +6,7 @@ public static class Mapper
 {
    public static CommentDTO ToDTO(this Comment comment)
    {
-      return new()
+      return new CommentDTO
       {
          Id = (Guid)comment.Id,
          Content = (string)comment.Content,
@@ -17,7 +17,6 @@ public static class Mapper
             ProfilePictureUrl = comment.SentBy.PhotoUrl?.Value
          },
          SentAt = (DateTime)comment.SentAt,
-         RelatedVideo = (Guid)comment.RelatedVideo.Id
       };
    } 
 }

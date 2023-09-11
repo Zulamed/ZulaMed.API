@@ -9,6 +9,12 @@ public class Request
 {
     [QueryParam]
     public string? Title { get; init; }
+    
+    [QueryParam]
+    public int Page { get; init; } = 1;
+    
+    [QueryParam]
+    public int PageSize { get; init; } = 10;
 }
 
 public class UserDTO

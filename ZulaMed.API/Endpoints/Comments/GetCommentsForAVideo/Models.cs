@@ -4,12 +4,19 @@ using Mediator;
 using OneOf;
 using OneOf.Types;
 using ZulaMed.API.Domain.Comments;
+using ZulaMed.API.Extensions;
 
 namespace ZulaMed.API.Endpoints.Comments.GetCommentsForAVideo;
 
 public class Request
 {
     public required Guid VideoId { get; init; }
+    
+    [QueryParam]
+    public int Page { get; init; } = 1;
+    
+    [QueryParam]
+    public int PageSize { get; init; } = 10;
 }
 
 public class Response
@@ -31,4 +38,6 @@ public class RequestValidator : Validator<Request>
 public class GetCommentsForAVideoQuery : IQuery<Response?>
 {
     public required Guid VideoId { get; init; }
+    
+    public required PaginationOptions PaginationOptions { get; init; }
 }
