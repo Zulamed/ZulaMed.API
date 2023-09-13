@@ -22,6 +22,8 @@ public class Request
 public class Response
 {
     // public required List<Comment>? Comments { get; init; }
+    public required int Total { get; init; }
+    
     public required List<CommentDTO>? Comments { get; init; }
 }
 

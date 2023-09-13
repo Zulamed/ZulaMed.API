@@ -19,6 +19,11 @@ public class GetCommentsForAVideoQueryHandler : IQueryHandler<GetCommentsForAVid
 
     public async ValueTask<Response?> Handle(GetCommentsForAVideoQuery query, CancellationToken cancellationToken)
     {
+        var totalCount = await _dbContext
+            .Set<Comment>()
+            .Where(x => (Guid)x.RelatedVideo.Id == query.VideoId)
+            .CountAsync(cancellationToken: cancellationToken);
+        
         var comments = await _dbContext
             .Set<Comment>()
             .Where(x => (Guid)x.RelatedVideo.Id == query.VideoId)
@@ -28,7 +33,8 @@ public class GetCommentsForAVideoQueryHandler : IQueryHandler<GetCommentsForAVid
 
         return new Response
         {
-            Comments = comments.Select(x => x.ToDTO()).ToList()
+            Comments = comments.Select(x => x.ToDTO()).ToList(),
+            Total = totalCount
         };
     }
 }
