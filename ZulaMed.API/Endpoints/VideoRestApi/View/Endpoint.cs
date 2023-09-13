@@ -5,6 +5,7 @@ using OneOf;
 using OneOf.Types;
 using ZulaMed.API.Data;
 using ZulaMed.API.Domain.Video;
+using ZulaMed.API.Domain.ViewHistory;
 
 namespace ZulaMed.API.Endpoints.VideoRestApi.View;
 
@@ -21,6 +22,17 @@ public class ViewCommandHandler : Mediator.ICommandHandler<ViewCommand, OneOf<Su
     {
         try
         {
+            var video = await _dbContext.Set<Video>().FirstOrDefaultAsync(x => (Guid)x.Id == command.Id, cancellationToken);
+            if (video is null)
+            {
+                return new NotFound();
+            }
+            if (command.WatchedBy is not null)
+            {
+                await _dbContext.Database.ExecuteSqlAsync
+                ($"""INSERT INTO "ViewHistory" VALUES ({Guid.NewGuid()}, {command.Id}, {command.WatchedBy.Value}, {DateTime.UtcNow})""",
+                    cancellationToken: cancellationToken);
+            }
             var rows = await _dbContext.Database.ExecuteSqlAsync(
                 $"""UPDATE "Video" SET "VideoView" = "VideoView" + 1 WHERE "Id" = {command.Id}""", 
                 cancellationToken: cancellationToken);
