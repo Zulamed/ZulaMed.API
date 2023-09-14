@@ -17,24 +17,37 @@ public class ViewCommandHandler : Mediator.ICommandHandler<ViewCommand, OneOf<Su
     {
         _dbContext = dbContext;
     }
-    
-    public async ValueTask<OneOf<Success, Error<string>, NotFound>> Handle(ViewCommand command, CancellationToken cancellationToken)
+
+    public async ValueTask<OneOf<Success, Error<string>, NotFound>> Handle(ViewCommand command,
+        CancellationToken cancellationToken)
     {
         try
         {
-            var video = await _dbContext.Set<Video>().FirstOrDefaultAsync(x => (Guid)x.Id == command.Id, cancellationToken);
+            var video = await _dbContext.Set<Video>()
+                .FirstOrDefaultAsync(x => (Guid)x.Id == command.Id, cancellationToken);
             if (video is null)
             {
                 return new NotFound();
             }
+
             if (command.WatchedBy is not null)
             {
+                // var model = await _dbContext.Set<Domain.ViewHistory.ViewHistory>()
+                //     .FirstOrDefaultAsync(x => x.ViewedVideo.Id == video.Id && x.ViewedBy.Id == command.WatchedBy.Value,
+                //         cancellationToken);
+                // if (model is not null)
+                // {
+                //      var row = await _dbContext.Database.ExecuteSqlAsync(
+                //          $"""UPDATE "ViewHistory" SET "ViewedAt" = {DateTime.Now} WHERE "WatchedBy" = {command.}""", 
+                //          cancellationToken: cancellationToken);
+                // }
                 await _dbContext.Database.ExecuteSqlAsync
-                ($"""INSERT INTO "ViewHistory" VALUES ({Guid.NewGuid()}, {command.Id}, {command.WatchedBy.Value}, {DateTime.UtcNow})""",
+                ($"""INSERT INTO "ViewHistory" VALUES ({Guid.NewGuid()}, {DateTime.UtcNow}, {command.Id}, {command.WatchedBy.Value})""",
                     cancellationToken: cancellationToken);
             }
+
             var rows = await _dbContext.Database.ExecuteSqlAsync(
-                $"""UPDATE "Video" SET "VideoView" = "VideoView" + 1 WHERE "Id" = {command.Id}""", 
+                $"""UPDATE "Video" SET "VideoView" = "VideoView" + 1 WHERE "Id" = {command.Id}""",
                 cancellationToken: cancellationToken);
             return rows > 0 ? new Success() : new NotFound();
         }
@@ -56,14 +69,14 @@ public class Endpoint : Endpoint<Request>
 
     public override void Configure()
     {
-        Post("video/{id}/view");
+        Post("video/{id}/{watchedBy}/view");
         AllowAnonymous();
-        Description(b => { }, clearDefaults: true); 
+        Description(b => { }, clearDefaults: true);
     }
-    
+
     public override async Task HandleAsync(Request req, CancellationToken ct)
     {
-        var result = await _mediator.Send(new ViewCommand { Id = req.Id }, ct);
+        var result = await _mediator.Send(new ViewCommand { Id = req.Id, WatchedBy = req.WatchedBy}, ct);
         await result.Match(
             s => SendOkAsync(ct),
             e => SendAsync(new
