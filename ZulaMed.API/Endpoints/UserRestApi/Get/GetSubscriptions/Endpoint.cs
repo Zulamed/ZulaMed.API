@@ -1,7 +1,7 @@
 using FastEndpoints;
 using Microsoft.EntityFrameworkCore;
 using ZulaMed.API.Data;
-using ZulaMed.API.Domain.User;
+using ZulaMed.API.Domain.Subscriptions;
 using ZulaMed.API.Extensions;
 
 namespace ZulaMed.API.Endpoints.UserRestApi.Get.GetSubscriptions;
@@ -15,7 +15,7 @@ public class Request
     [QueryParam] public int PageSize { get; init; } = 10;
 }
 
-public class Subscription
+public class SubscriptionDTO
 {
     public required UserDTO User { get; init; }
     public required int NumberOfSubscribers { get; init; }
@@ -23,7 +23,7 @@ public class Subscription
 
 public class Response
 {
-    public required Subscription[] Subscriptions { get; init; }
+    public required SubscriptionDTO[] Subscriptions { get; init; }
 }
 
 public class Endpoint : Endpoint<Request, Response>
@@ -43,16 +43,28 @@ public class Endpoint : Endpoint<Request, Response>
 
     public override async Task HandleAsync(Request req, CancellationToken ct)
     {
+        // var subscriptions = await _dbContext
+        //     .Set<User>()
+        //     .Where(x => (Guid)x.Id == req.UserId)
+        //     .SelectMany(x => x.Subscriptions)
+        //     .Include(x => x.Group)
+        //     .Paginate(x => x.Login, new PaginationOptions(req.Page, req.PageSize))
+        //     .Select(x => new
+        //     {
+        //         Subscription = x,
+        //         SubscriptionCount = x.Subscribers.Count
+        //     })
+        //     .ToListAsync(ct);
         var subscriptions = await _dbContext
-            .Set<User>()
-            .Where(x => (Guid)x.Id == req.UserId)
-            .SelectMany(x => x.Subscriptions)
-            .Include(x => x.Group)
-            .Paginate(x => x.Login, new PaginationOptions(req.Page, req.PageSize))
+            .Set<Subscription>()
+            .Where(x => (Guid)x.Subscriber.Id == req.UserId)
+            .Include(x => x.SubscribedTo)
+            .ThenInclude(x => x.Group)
+            .Paginate(x => x.SubscribedTo.Login, new PaginationOptions(req.Page, req.PageSize))
             .Select(x => new
             {
-                Subscription = x,
-                SubscriptionCount = x.Subscribers.Count
+                Subscription = x.SubscribedTo,
+                SubscriptionCount = x.SubscribedTo.Subscribers.Count
             })
             .ToListAsync(ct);
         if (subscriptions.Count == 0)
@@ -60,16 +72,16 @@ public class Endpoint : Endpoint<Request, Response>
             await SendNotFoundAsync(ct);
             return;
         }
-
+        
         var response = new Response
         {
-            Subscriptions = subscriptions.Select(x => new Subscription()
+            Subscriptions = subscriptions.Select(x => new SubscriptionDTO()
             {
                 NumberOfSubscribers = x.SubscriptionCount,
                 User = x.Subscription.ToResponse()
             }).ToArray()
         };
-
+        
         await SendAsync(response, cancellation: ct);
     }
 }

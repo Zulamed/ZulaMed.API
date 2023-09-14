@@ -4,6 +4,7 @@ using Microsoft.EntityFrameworkCore;
 using OneOf;
 using OneOf.Types;
 using ZulaMed.API.Data;
+using ZulaMed.API.Domain.Subscriptions;
 using ZulaMed.API.Domain.User;
 
 namespace ZulaMed.API.Endpoints.UserRestApi.Unsubscribe;
@@ -18,19 +19,28 @@ public class
         _dbContext = dbContext;
     }
 
-    public async ValueTask<OneOf<Success, Error<string>, NotFound>> Handle(UnsubscribeCommand command, CancellationToken cancellationToken)
+    public async ValueTask<OneOf<Success, Error<string>, NotFound>> Handle(UnsubscribeCommand command,
+        CancellationToken cancellationToken)
     {
         try
         {
-            var subscriber = await _dbContext.Set<User>().FirstOrDefaultAsync(x => (Guid)x.Id == command.SubscriberId, cancellationToken);
-            var unSubToUser = await _dbContext.Set<User>().Include(x => x.Subscribers).FirstOrDefaultAsync(x => (Guid)x.Id == command.UnsubFromUserId, cancellationToken);
+            var subscriber = await _dbContext.Set<User>()
+                .FirstOrDefaultAsync(x => (Guid)x.Id == command.SubscriberId, cancellationToken);
+            var unSubToUser = await _dbContext.Set<User>().Include(x => x.Subscribers)
+                .FirstOrDefaultAsync(x => (Guid)x.Id == command.UnsubFromUserId, cancellationToken);
             if (subscriber is null || unSubToUser is null)
             {
                 return new NotFound();
             }
-            // subscriber.Subscriptions.Remove(subToUser);
-            unSubToUser.Subscribers.Remove(subscriber);
-            
+
+            var subscription = new Subscription()
+            {
+                Subscriber = subscriber,
+                SubscribedTo = unSubToUser
+            };
+            _dbContext.Set<Subscription>().Attach(subscription);
+            _dbContext.Set<Subscription>().Remove(subscription);
+
             await _dbContext.SaveChangesAsync(cancellationToken);
             return new Success();
         }
@@ -53,7 +63,7 @@ public class Endpoint : Endpoint<Request>
     public override void Configure()
     {
         Post("user/{unsubFromUserId}/unsubscribe");
-        Description(c => c.Produces(200), clearDefaults:true);
+        Description(c => c.Produces(200), clearDefaults: true);
     }
 
     public override async Task HandleAsync(Request req, CancellationToken ct)
