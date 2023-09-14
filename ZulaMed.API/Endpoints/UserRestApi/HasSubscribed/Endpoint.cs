@@ -37,8 +37,8 @@ public class Endpoint : Endpoint<Request>
               .SqlQuery<bool>(
                   $"""
                    SELECT EXISTS 
-                      (SELECT 1 FROM "UserUser"
-                          WHERE "SubscribersId" = {userId} AND "SubscriptionsId"= {req.UserId}) as "Value"
+                      (SELECT 1 FROM "Subscription"
+                          WHERE "SubscriberId" = {userId} AND "SubscribedToId"= {req.UserId}) as "Value"
                    """)
               .SingleOrDefaultAsync(cancellationToken: ct);
         if (isSubscribedTo)

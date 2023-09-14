@@ -1,6 +1,7 @@
 ﻿using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
 using ZulaMed.API.Domain.SpecialtyGroup;
+using ZulaMed.API.Domain.Subscriptions;
 using ZulaMed.API.Domain.User;
 
 namespace ZulaMed.API.Endpoints.UserRestApi;
@@ -22,11 +23,11 @@ public class UserConfiguration : IEntityTypeConfiguration<User>
         builder.Property(x => x.Email)
             .HasConversion<UserEmail.EfCoreValueConverter>()
             .IsRequired();
-        
+
         builder.Property(x => x.Login)
             .HasConversion<UserLogin.EfCoreValueConverter>()
             .IsRequired();
-        
+
         builder
             .HasIndex(x => x.Login)
             .IsUnique();
@@ -73,5 +74,22 @@ public class SpecialtyGroupConfiguration : IEntityTypeConfiguration<SpecialtyGro
         builder.Property(x => x.Name)
             .HasConversion<SpecialtyGroupName.EfCoreValueConverter>()
             .IsRequired();
+    }
+}
+
+public class SubscriptionConfiguration : IEntityTypeConfiguration<Subscription>
+{
+    public void Configure(EntityTypeBuilder<Subscription> builder)
+    {
+        builder.HasKey(x => new {x.SubscriberId, x.SubscribedToId});
+        
+        builder.HasOne(x => x.Subscriber)
+            .WithMany(x => x.Subscriptions)
+            .HasForeignKey(x => x.SubscriberId)
+            .OnDelete(DeleteBehavior.Restrict);
+
+        builder.HasOne(x => x.SubscribedTo)
+            .WithMany(x => x.Subscribers)
+            .HasForeignKey(x => x.SubscribedToId);
     }
 }

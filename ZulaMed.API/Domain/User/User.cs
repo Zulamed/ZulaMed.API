@@ -1,4 +1,6 @@
-﻿namespace ZulaMed.API.Domain.User;
+﻿using ZulaMed.API.Domain.Subscriptions;
+
+namespace ZulaMed.API.Domain.User;
 
 public class User
 {
@@ -21,8 +23,9 @@ public class User
     
     public required UserWorkPlace WorkPlace { get; init; }
     public PhotoUrl? PhotoUrl { get; set; } 
-    public List<User> Subscriptions { get; init; } = new();
-    public List<User> Subscribers { get; init; } = new();
+    
+    public List<Subscription> Subscriptions { get; init; } = new();
+    public List<Subscription> Subscribers { get; init; } = new();
     
     public List<Video.Video> Videos { get; init; } = new();
 }

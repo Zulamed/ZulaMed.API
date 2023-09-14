@@ -4,6 +4,7 @@ using Microsoft.EntityFrameworkCore;
 using OneOf;
 using OneOf.Types;
 using ZulaMed.API.Data;
+using ZulaMed.API.Domain.Subscriptions;
 using ZulaMed.API.Domain.User;
 
 namespace ZulaMed.API.Endpoints.UserRestApi.Subscribe;
@@ -32,8 +33,13 @@ public class
                 return new NotFound();
             }
 
-            subscriber.Subscriptions.Add(subToUser);
-            subToUser.Subscribers.Add(subscriber);
+            // subscriber.Subscriptions.Add(subToUser);
+            // subToUser.Subscribers.Add(subscriber);
+            _dbContext.Set<Subscription>().Add(new Subscription()
+            {
+                Subscriber = subscriber,
+                SubscribedTo = subToUser
+            });
             await _dbContext.SaveChangesAsync(cancellationToken);
             return new Success();
         }
