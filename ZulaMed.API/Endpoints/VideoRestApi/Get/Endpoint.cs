@@ -27,7 +27,7 @@ public class Endpoint : Endpoint<Request, Response>
 
     public override async Task HandleAsync(Request req, CancellationToken ct)
     {
-        Video[]? videos;
+        (Video[] Videos, int Count) videos;
 
         if (req.Title is not null)
             videos = await _mediator.Send(new GetByTitleQuery
@@ -43,7 +43,8 @@ public class Endpoint : Endpoint<Request, Response>
 
         await SendAsync(new Response
         {
-            Videos = videos.Select(x => x.ToResponse(_s3Configuration.Value.BaseUrl)).ToArray()
+            Videos = videos.Videos.Select(x => x.ToResponse(_s3Configuration.Value.BaseUrl)).ToArray(),
+            TotalCount = videos.Count
         }, cancellation: ct);
     }
 }
