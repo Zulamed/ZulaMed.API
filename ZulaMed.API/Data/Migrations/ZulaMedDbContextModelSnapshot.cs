@@ -314,6 +314,30 @@ namespace ZulaMed.API.Data.Migrations
                     b.ToTable("ViewHistory");
                 });
 
+            modelBuilder.Entity("ZulaMed.API.Domain.ViewHistory.ViewHistory", b =>
+                {
+                    b.Property<Guid>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("uuid");
+
+                    b.Property<DateTime>("ViewedAt")
+                        .HasColumnType("timestamp with time zone");
+
+                    b.Property<Guid>("ViewedById")
+                        .HasColumnType("uuid");
+
+                    b.Property<Guid>("ViewedVideoId")
+                        .HasColumnType("uuid");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("ViewedById");
+
+                    b.HasIndex("ViewedVideoId");
+
+                    b.ToTable("ViewHistory");
+                });
+
             modelBuilder.Entity("PlaylistVideo", b =>
                 {
                     b.HasOne("ZulaMed.API.Domain.Playlist.Playlist", null)
