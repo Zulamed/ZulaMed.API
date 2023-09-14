@@ -35,5 +35,7 @@ public class AllVideoDto
 public class Response
 {
     public required AllVideoDto[] Videos { get; init; }
+    
+    public required int TotalCount { get; init; }
 }
 

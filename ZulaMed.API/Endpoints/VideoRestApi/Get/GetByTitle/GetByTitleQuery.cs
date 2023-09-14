@@ -8,7 +8,7 @@ using ZulaMed.API.Extensions;
 namespace ZulaMed.API.Endpoints.VideoRestApi.Get.GetByTitle;
 
 
-public class GetByTitleQuery : IQuery<Video[]>
+public class GetByTitleQuery : IQuery<ValueTuple<Video[], int>>
 {
     public required string Title { get; init; }
     
@@ -16,7 +16,7 @@ public class GetByTitleQuery : IQuery<Video[]>
 }
 
 
-public class GetByTitleQueryHandler : IQueryHandler<GetByTitleQuery, Video[]>
+public class GetByTitleQueryHandler : IQueryHandler<GetByTitleQuery, ValueTuple<Video[], int>>
 {
     private readonly ZulaMedDbContext _context;
 
@@ -25,13 +25,17 @@ public class GetByTitleQueryHandler : IQueryHandler<GetByTitleQuery, Video[]>
         _context = context;
     }
     
-    public async ValueTask<Video[]> Handle(GetByTitleQuery query, CancellationToken cancellationToken)
+    public async ValueTask<(Video[], int)> Handle(GetByTitleQuery query, CancellationToken cancellationToken)
     {
+        var count = await _context.Set<Video>()
+            .Where(x => EF.Functions.ILike((string)x.VideoTitle, $"%{query.Title}%"))
+            .CountAsync(cancellationToken: cancellationToken);
+        
         var videos = await _context.Set<Video>()
             .Include(x => x.Publisher)
             .Where(x => EF.Functions.ILike((string)x.VideoTitle, $"%{query.Title}%"))
             .Paginate(x => x.VideoPublishedDate, query.PaginationOptions)
             .ToArrayAsync(cancellationToken: cancellationToken);
-        return videos;
+        return (videos, count);
     }
 }
