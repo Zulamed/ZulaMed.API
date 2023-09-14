@@ -32,18 +32,15 @@ public class ViewCommandHandler : Mediator.ICommandHandler<ViewCommand, OneOf<Su
 
             if (command.WatchedBy is not null)
             {
-                // var model = await _dbContext.Set<Domain.ViewHistory.ViewHistory>()
-                //     .FirstOrDefaultAsync(x => x.ViewedVideo.Id == video.Id && x.ViewedBy.Id == command.WatchedBy.Value,
-                //         cancellationToken);
-                // if (model is not null)
-                // {
-                //      var row = await _dbContext.Database.ExecuteSqlAsync(
-                //          $"""UPDATE "ViewHistory" SET "ViewedAt" = {DateTime.Now} WHERE "WatchedBy" = {command.}""", 
-                //          cancellationToken: cancellationToken);
-                // }
-                await _dbContext.Database.ExecuteSqlAsync
-                ($"""INSERT INTO "ViewHistory" VALUES ({Guid.NewGuid()}, {DateTime.UtcNow}, {command.Id}, {command.WatchedBy.Value})""",
+                var row = await _dbContext.Database.ExecuteSqlAsync(
+                    $"""UPDATE "ViewHistory" SET "ViewedAt" = {DateTime.UtcNow} WHERE "ViewedById" = {command.WatchedBy.Value} AND "ViewedVideoId" = {video.Id.Value}""",
                     cancellationToken: cancellationToken);
+                if (row == 0)
+                {
+                    await _dbContext.Database.ExecuteSqlAsync
+                    ($"""INSERT INTO "ViewHistory" VALUES ({Guid.NewGuid()}, {DateTime.UtcNow}, {command.Id}, {command.WatchedBy.Value})""",
+                        cancellationToken: cancellationToken);
+                }
             }
 
             var rows = await _dbContext.Database.ExecuteSqlAsync(
@@ -76,7 +73,7 @@ public class Endpoint : Endpoint<Request>
 
     public override async Task HandleAsync(Request req, CancellationToken ct)
     {
-        var result = await _mediator.Send(new ViewCommand { Id = req.Id, WatchedBy = req.WatchedBy}, ct);
+        var result = await _mediator.Send(new ViewCommand { Id = req.Id, WatchedBy = req.WatchedBy }, ct);
         await result.Match(
             s => SendOkAsync(ct),
             e => SendAsync(new
