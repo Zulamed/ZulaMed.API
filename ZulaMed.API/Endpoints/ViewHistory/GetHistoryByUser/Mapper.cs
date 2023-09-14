@@ -6,7 +6,7 @@ public static class Mapper
     {
         return new ViewHistoryDTO
         {
-            ViewHistoryId = viewHistory.ViewHistoryId.Value,
+            ViewHistoryId = viewHistory.Id.Value,
             ViewedBy = viewHistory.ViewedBy,
             ViewedVideo = viewHistory.ViewedVideo,
             ViewedAt = viewHistory.ViewedAt.Value,

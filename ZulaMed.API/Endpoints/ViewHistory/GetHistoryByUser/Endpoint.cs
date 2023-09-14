@@ -18,6 +18,8 @@ public class GetViewHistoriesByUserQueryHandler : IQueryHandler<GetViewHistories
     {
         var viewHistories = await _context.Set<Domain.ViewHistory.ViewHistory>()
             .Where(x => (Guid)x.ViewedBy.Id == query.OwnerId)
+            .Include(x => x.ViewedVideo)
+            .Include(x => x.ViewedBy)
             .ToArrayAsync(cancellationToken: cancellationToken);
         return viewHistories;
     }
@@ -34,7 +36,7 @@ public class Endpoint : Endpoint<Request>
 
     public override void Configure()
     {
-        Get("/viewHistory/user/{ownerId}");
+        Get("/viewHistory/{ownerId}");
         AllowAnonymous();
     }
 

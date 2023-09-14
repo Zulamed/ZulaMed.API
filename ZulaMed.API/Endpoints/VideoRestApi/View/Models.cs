@@ -1,4 +1,4 @@
-using Mediator;
+using FastEndpoints;
 using OneOf;
 using OneOf.Types;
 
