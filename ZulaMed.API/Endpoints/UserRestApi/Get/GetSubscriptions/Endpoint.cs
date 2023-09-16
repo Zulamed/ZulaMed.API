@@ -64,7 +64,7 @@ public class Endpoint : Endpoint<Request, Response>
             .Select(x => new
             {
                 Subscription = x.SubscribedTo,
-                SubscriptionCount = x.SubscribedTo.Subscribers.Count
+                SubscriptionCount = (int)x.SubscribedTo.SubscriberCount
             })
             .ToListAsync(ct);
         if (subscriptions.Count == 0)

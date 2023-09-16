@@ -22,6 +22,7 @@ public class
     public async ValueTask<OneOf<Success, Error<string>, NotFound>> Handle(SubscribeCommand command,
         CancellationToken cancellationToken)
     {
+        await using var transaction = await _dbContext.Database.BeginTransactionAsync(cancellationToken);
         try
         {
             var subscriber = await _dbContext.Set<User>()
@@ -33,18 +34,27 @@ public class
                 return new NotFound();
             }
 
-            // subscriber.Subscriptions.Add(subToUser);
-            // subToUser.Subscribers.Add(subscriber);
             _dbContext.Set<Subscription>().Add(new Subscription()
             {
                 Subscriber = subscriber,
                 SubscribedTo = subToUser
             });
             await _dbContext.SaveChangesAsync(cancellationToken);
+
+            FormattableString sql =
+                $"""
+                 UPDATE "User"
+                 SET "SubscriberCount" = "SubscriberCount" + 1
+                 WHERE "Id" = "{command.SubToUserId}"
+                 """;
+            await _dbContext.Database.ExecuteSqlAsync(sql, cancellationToken: cancellationToken);
+            
+            await transaction.CommitAsync(cancellationToken);
             return new Success();
         }
         catch (Exception e)
         {
+            await transaction.RollbackAsync(cancellationToken);
             return new Error<string>(e.Message);
         }
     }
@@ -70,9 +80,9 @@ public class Endpoint : Endpoint<Request>
         var userId = Guid.Parse(HttpContext.User.Claims.FirstOrDefault(x => x.Type == "UserId")!.Value);
         if (userId == req.SubToUserId)
         {
-           AddError("You can't subscribe to yourself!");
-           await SendErrorsAsync(cancellation: ct);
-           return;
+            AddError("You can't subscribe to yourself!");
+            await SendErrorsAsync(cancellation: ct);
+            return;
         }
 
         var result = await _mediator.Send(new SubscribeCommand
