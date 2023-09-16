@@ -45,7 +45,7 @@ public class
                 $"""
                  UPDATE "User"
                  SET "SubscriberCount" = "SubscriberCount" + 1
-                 WHERE "Id" = "{command.SubToUserId}"
+                 WHERE "Id" = {command.SubToUserId}
                  """;
             await _dbContext.Database.ExecuteSqlAsync(sql, cancellationToken: cancellationToken);
             
