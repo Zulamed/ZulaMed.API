@@ -24,6 +24,8 @@ public class SubscriptionDTO
 public class Response
 {
     public required SubscriptionDTO[] Subscriptions { get; init; }
+    
+    public required int Total { get; init; }
 }
 
 public class Endpoint : Endpoint<Request, Response>
@@ -43,18 +45,7 @@ public class Endpoint : Endpoint<Request, Response>
 
     public override async Task HandleAsync(Request req, CancellationToken ct)
     {
-        // var subscriptions = await _dbContext
-        //     .Set<User>()
-        //     .Where(x => (Guid)x.Id == req.UserId)
-        //     .SelectMany(x => x.Subscriptions)
-        //     .Include(x => x.Group)
-        //     .Paginate(x => x.Login, new PaginationOptions(req.Page, req.PageSize))
-        //     .Select(x => new
-        //     {
-        //         Subscription = x,
-        //         SubscriptionCount = x.Subscribers.Count
-        //     })
-        //     .ToListAsync(ct);
+        var count = _dbContext.Set<Subscription>().Count(x => (Guid)x.Subscriber.Id == req.UserId);
         var subscriptions = await _dbContext
             .Set<Subscription>()
             .Where(x => (Guid)x.Subscriber.Id == req.UserId)
@@ -79,7 +70,8 @@ public class Endpoint : Endpoint<Request, Response>
             {
                 NumberOfSubscribers = x.SubscriptionCount,
                 User = x.Subscription.ToResponse()
-            }).ToArray()
+            }).ToArray(),
+            Total = count
         };
         
         await SendAsync(response, cancellation: ct);
