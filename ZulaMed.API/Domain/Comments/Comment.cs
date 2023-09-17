@@ -1,9 +1,11 @@
+using ZulaMed.API.Domain.Shared;
+
 namespace ZulaMed.API.Domain.Comments;
 
 public class Comment
 {
-    public required CommentId Id { get; init; }
-
+    public required Id Id { get; init; } = null!;
+    
     public required CommentContent Content { get; init; }
 
     public required User.User SentBy { get; init; }

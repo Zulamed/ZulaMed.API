@@ -7,6 +7,7 @@ using OneOf.Types;
 using Vogen;
 using ZulaMed.API.Data;
 using ZulaMed.API.Domain.Comments;
+using ZulaMed.API.Domain.Shared;
 using ZulaMed.API.Domain.User;
 using ZulaMed.API.Domain.Video;
 
@@ -55,7 +56,7 @@ public class ReplyToCommentCommandHandler : Mediator.ICommandHandler<ReplyToComm
 
         var entity = await _dbContext.Set<Comment>().AddAsync(new Comment
         {
-            Id = (CommentId)Guid.NewGuid(),
+            Id = (Id)Guid.NewGuid(),
             Content = (CommentContent)command.Content,
             SentBy = user,
             SentAt = (CommentSentDate)DateTime.UtcNow,

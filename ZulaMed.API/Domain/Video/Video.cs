@@ -1,12 +1,13 @@
 using ZulaMed.API.Domain.Comments;
 using ZulaMed.API.Domain.Like;
 using ZulaMed.API.Domain.Dislike;
+using ZulaMed.API.Domain.Shared;
 
 namespace ZulaMed.API.Domain.Video;
 
 public class Video
 {
-    public required VideoId Id { get; init; }
+    public Id Id { get; init; } = null!;
     public required VideoTitle VideoTitle { get; init; }
     public required VideoUrl VideoUrl { get; init; }
     public required VideoThumbnail VideoThumbnail { get; init; }

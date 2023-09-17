@@ -1,5 +1,6 @@
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
+using ZulaMed.API.Domain.Shared;
 using ZulaMed.API.Domain.Video;
 
 namespace ZulaMed.API.Endpoints.VideoRestApi;
@@ -11,7 +12,7 @@ public class VideoConfiguration : IEntityTypeConfiguration<Video>
         builder.HasKey(x => x.Id);
 
         builder.Property(x => x.Id)
-            .HasConversion<VideoId.EfCoreValueConverter>()
+            .HasConversion<Id.EfCoreValueConverter>()
             .ValueGeneratedOnAdd()
             .IsRequired();
         builder.Property(x => x.VideoUrl)

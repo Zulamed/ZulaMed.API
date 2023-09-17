@@ -4,6 +4,7 @@ using Microsoft.EntityFrameworkCore;
 using OneOf.Types;
 using ZulaMed.API.Data;
 using ZulaMed.API.Domain.Playlist;
+using ZulaMed.API.Domain.Shared;
 using ZulaMed.API.Domain.User;
 
 namespace ZulaMed.API.Endpoints.PlaylistRestApi.Post;
@@ -32,7 +33,7 @@ public class CreatePlaylistCommandHandler : Mediator.ICommandHandler<CreatePlayl
             var dbSet = _dbContext.Set<Playlist>();
             var entity = await dbSet.AddAsync(new Playlist
             {
-                Id = (PlaylistId)Guid.NewGuid(),
+                Id = (Id)Guid.NewGuid(),
                 Owner = owner,
                 PlaylistName = (PlaylistName)command.PlaylistName,
                 PlaylistDescription = (PlaylistDescription)command.PlaylistDescription,

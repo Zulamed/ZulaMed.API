@@ -1,3 +1,5 @@
+using ZulaMed.API.Domain.Shared;
+
 namespace ZulaMed.API.Domain.Dislike;
 
 public class Dislike<TParent>

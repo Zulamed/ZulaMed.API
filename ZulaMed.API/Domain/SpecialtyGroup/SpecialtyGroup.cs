@@ -1,7 +1,9 @@
-﻿namespace ZulaMed.API.Domain.SpecialtyGroup;
+﻿using ZulaMed.API.Domain.Shared;
+
+namespace ZulaMed.API.Domain.SpecialtyGroup;
 
 public class SpecialtyGroup
 {
-    public required SpecialtyGroupId Id { get; init; }
+    public required SequentialId Id { get; init; }
     public required SpecialtyGroupName Name { get; init; }
 }

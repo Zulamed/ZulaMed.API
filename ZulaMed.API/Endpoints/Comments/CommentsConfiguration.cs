@@ -1,6 +1,7 @@
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
 using ZulaMed.API.Domain.Comments;
+using ZulaMed.API.Domain.Shared;
 
 namespace ZulaMed.API.Endpoints.Comments;
 
@@ -11,7 +12,7 @@ public class CommentsConfiguration : IEntityTypeConfiguration<Comment>
         builder.HasKey(x => x.Id);
 
         builder.Property(x => x.Id)
-            .HasConversion<CommentId.EfCoreValueConverter>()
+            .HasConversion<Id.EfCoreValueConverter>()
             .IsRequired();
 
         builder.Property(x => x.Content)

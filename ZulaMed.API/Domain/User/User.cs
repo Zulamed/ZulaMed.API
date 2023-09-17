@@ -1,10 +1,11 @@
-﻿using ZulaMed.API.Domain.Subscriptions;
+﻿using ZulaMed.API.Domain.Shared;
+using ZulaMed.API.Domain.Subscriptions;
 
 namespace ZulaMed.API.Domain.User;
 
 public class User
 {
-    public required UserId Id { get; init; }
+    public Id Id { get; init; } = null!;
     
     public required UserLogin Login { get; init; }
     public required UserEmail Email { get; init; }

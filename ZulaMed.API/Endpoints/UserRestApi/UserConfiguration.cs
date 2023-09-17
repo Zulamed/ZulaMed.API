@@ -1,5 +1,6 @@
 ﻿using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
+using ZulaMed.API.Domain.Shared;
 using ZulaMed.API.Domain.SpecialtyGroup;
 using ZulaMed.API.Domain.Subscriptions;
 using ZulaMed.API.Domain.User;
@@ -16,7 +17,7 @@ public class UserConfiguration : IEntityTypeConfiguration<User>
             .IsUnique();
 
         builder.Property(x => x.Id)
-            .HasConversion<UserId.EfCoreValueConverter>()
+            .HasConversion<Id.EfCoreValueConverter>()
             .ValueGeneratedOnAdd()
             .IsRequired();
 
@@ -71,7 +72,7 @@ public class SpecialtyGroupConfiguration : IEntityTypeConfiguration<SpecialtyGro
         builder.HasKey(x => x.Id);
 
         builder.Property(x => x.Id)
-            .HasConversion<SpecialtyGroupId.EfCoreValueConverter>()
+            .HasConversion<SequentialId.EfCoreValueConverter>()
             .ValueGeneratedOnAdd()
             .IsRequired();
 

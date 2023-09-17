@@ -1,6 +1,7 @@
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
 using ZulaMed.API.Domain.Playlist;
+using ZulaMed.API.Domain.Shared;
 
 namespace ZulaMed.API.Endpoints.PlaylistRestApi;
 
@@ -11,7 +12,7 @@ public class PlaylistConfiguration : IEntityTypeConfiguration<Playlist>
         builder.HasKey(x => x.Id);
         
         builder.Property(x => x.Id)
-            .HasConversion<PlaylistId.EfCoreValueConverter>()
+            .HasConversion<Id.EfCoreValueConverter>()
             .ValueGeneratedOnAdd()
             .IsRequired();
         

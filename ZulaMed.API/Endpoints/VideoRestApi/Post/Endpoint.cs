@@ -12,6 +12,7 @@ using ZulaMed.API.Data;
 using ZulaMed.API.Domain.User;
 using ZulaMed.API.Domain.Video;
 using System.Text.Json;
+using ZulaMed.API.Domain.Shared;
 using VoException = Vogen.ValueObjectValidationException;
 
 namespace ZulaMed.API.Endpoints.VideoRestApi.Post;
@@ -52,7 +53,7 @@ public class CreateVideoCommandHandler
             var fileExtension = Path.GetExtension(command.Video.FileName);
             var entity = await dbSet.AddAsync(new Video
             {
-                Id = (VideoId)guid,
+                Id = (Id)guid,
                 VideoDescription = (VideoDescription)command.VideoDescription,
                 VideoPublishedDate = (VideoPublishedDate)DateTime.UtcNow,
                 VideoThumbnail = (VideoThumbnail)command.VideoThumbnail,

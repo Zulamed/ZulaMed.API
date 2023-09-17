@@ -5,6 +5,7 @@ using OneOf;
 using OneOf.Types;
 using ZulaMed.API.Data;
 using ZulaMed.API.Domain.Comments;
+using ZulaMed.API.Domain.Shared;
 using ZulaMed.API.Domain.User;
 using ZulaMed.API.Domain.Video;
 using ZulaMed.API.Endpoints.Comments.GetCommentsForAVideo;
@@ -45,7 +46,7 @@ public class
 
         var comment = new Comment
         {
-            Id = (CommentId)Guid.NewGuid(),
+            Id = (Id)Guid.NewGuid(),
             SentAt = (CommentSentDate)DateTime.UtcNow,
             Content = (CommentContent)command.Content,
             SentBy = user,

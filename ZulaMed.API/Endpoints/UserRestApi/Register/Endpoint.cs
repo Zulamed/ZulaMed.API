@@ -4,6 +4,7 @@ using Mediator;
 using Microsoft.EntityFrameworkCore;
 using OneOf.Types;
 using ZulaMed.API.Data;
+using ZulaMed.API.Domain.Shared;
 using ZulaMed.API.Domain.SpecialtyGroup;
 using ZulaMed.API.Domain.User;
 using VoException = Vogen.ValueObjectValidationException;
@@ -29,7 +30,7 @@ public class CreateVideoCommandHandler : Mediator.ICommandHandler<CreateUserComm
         {
             var entity = await dbSet.AddAsync(new User
             {
-                Id = (UserId)Guid.NewGuid(),
+                Id = (Id)Guid.NewGuid(),
                 Login = (UserLogin)command.Login,
                 Email = (UserEmail)command.Email,
                 Group = (await _dbContext.Set<SpecialtyGroup>()

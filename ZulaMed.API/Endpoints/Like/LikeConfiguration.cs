@@ -1,6 +1,7 @@
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
 using ZulaMed.API.Domain.Like;
+using ZulaMed.API.Domain.Shared;
 
 namespace ZulaMed.API.Endpoints.Like;
 
