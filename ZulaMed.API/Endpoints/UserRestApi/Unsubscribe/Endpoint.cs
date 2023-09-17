@@ -27,7 +27,7 @@ public class
         {
             var subscriber = await _dbContext.Set<User>()
                 .FirstOrDefaultAsync(x => (Guid)x.Id == command.SubscriberId, cancellationToken);
-            var unSubToUser = await _dbContext.Set<User>().Include(x => x.Subscribers)
+            var unSubToUser = await _dbContext.Set<User>()
                 .FirstOrDefaultAsync(x => (Guid)x.Id == command.UnsubFromUserId, cancellationToken);
             if (subscriber is null || unSubToUser is null)
             {
