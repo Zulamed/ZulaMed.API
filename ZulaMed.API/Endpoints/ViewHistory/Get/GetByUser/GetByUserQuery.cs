@@ -1,22 +1,27 @@
-using FastEndpoints;
 using Mediator;
 using Microsoft.EntityFrameworkCore;
 using ZulaMed.API.Data;
 using ZulaMed.API.Extensions;
 
-namespace ZulaMed.API.Endpoints.ViewHistory.GetHistoryByUser;
+namespace ZulaMed.API.Endpoints.ViewHistory.Get.GetByUser;
+
+public class GetByUserQuery : IQuery<Response>
+{
+    public required Guid OwnerId { get; init; }
+    public required PaginationOptions PaginationOptions { get; init; }
+}
 
 public class
-    GetViewHistoriesByUserQueryHandler : IQueryHandler<GetViewHistoriesByUserQuery, Response>
+    GetByUserQueryHandler : IQueryHandler<GetByUserQuery, Response>
 {
     private readonly ZulaMedDbContext _context;
 
-    public GetViewHistoriesByUserQueryHandler(ZulaMedDbContext context)
+    public GetByUserQueryHandler(ZulaMedDbContext context)
     {
         _context = context;
     }
 
-    public async ValueTask<Response> Handle(GetViewHistoriesByUserQuery query,
+    public async ValueTask<Response> Handle(GetByUserQuery query,
         CancellationToken cancellationToken)
     {
         var count = await _context.Set<Domain.ViewHistory.ViewHistory>()
@@ -35,32 +40,5 @@ public class
                 .ToArray(),
             Total = count
         };
-    }
-}
-
-public class Endpoint : Endpoint<Request, Response>
-{
-    private readonly IMediator _mediator;
-
-    public Endpoint(IMediator mediator)
-    {
-        _mediator = mediator;
-    }
-
-    public override void Configure()
-    {
-        Get("/viewHistory/{ownerId}");
-        AllowAnonymous();
-    }
-
-    public override async Task HandleAsync(Request req, CancellationToken ct)
-    {
-        var response = await _mediator.Send(new GetViewHistoriesByUserQuery
-        {
-            OwnerId = req.OwnerId,
-            PaginationOptions = new PaginationOptions(req.Page, req.PageSize)
-        }, ct);
-
-        await SendAsync(response, cancellation: ct);
     }
 }

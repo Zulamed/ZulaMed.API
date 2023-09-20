@@ -14,6 +14,7 @@ public class UserDTO
     public required string City { get; init; }
     public required string University { get; init; }
     public required string WorkPlace { get; init; }
+    public required bool HistoryPaused { get; init; }
     
     public string? ProfilePictureUrl { get; init; }
 }

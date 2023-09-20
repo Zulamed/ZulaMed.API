@@ -4,6 +4,7 @@ using Microsoft.EntityFrameworkCore;
 using OneOf;
 using OneOf.Types;
 using ZulaMed.API.Data;
+using ZulaMed.API.Domain.User;
 using ZulaMed.API.Domain.Video;
 using ZulaMed.API.Domain.ViewHistory;
 
@@ -29,16 +30,21 @@ public class ViewCommandHandler : Mediator.ICommandHandler<ViewCommand, OneOf<Su
             {
                 return new NotFound();
             }
-
+            User? user = null;
             if (command.WatchedBy is not null)
             {
+                user = await _dbContext.Set<User>()
+                    .FirstOrDefaultAsync(x => (Guid)x.Id == command.WatchedBy.Value, cancellationToken);
+            }
+            if (user is not null && !user.HistoryPaused.Value)
+            {
                 var row = await _dbContext.Database.ExecuteSqlAsync(
-                    $"""UPDATE "ViewHistory" SET "ViewedAt" = {DateTime.UtcNow} WHERE "ViewedById" = {command.WatchedBy.Value} AND "ViewedVideoId" = {video.Id.Value}""",
+                    $"""UPDATE "ViewHistory" SET "ViewedAt" = {DateTime.UtcNow} WHERE "ViewedById" = {user.Id.Value} AND "ViewedVideoId" = {video.Id.Value}""",
                     cancellationToken: cancellationToken);
                 if (row == 0)
                 {
                     await _dbContext.Database.ExecuteSqlAsync
-                    ($"""INSERT INTO "ViewHistory" VALUES ({Guid.NewGuid()}, {DateTime.UtcNow}, {command.Id}, {command.WatchedBy.Value})""",
+                    ($"""INSERT INTO "ViewHistory" VALUES ({Guid.NewGuid()}, {DateTime.UtcNow}, {command.Id}, {user.Id.Value})""",
                         cancellationToken: cancellationToken);
                 }
             }

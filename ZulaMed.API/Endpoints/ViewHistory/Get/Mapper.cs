@@ -1,4 +1,4 @@
-namespace ZulaMed.API.Endpoints.ViewHistory.GetHistoryByUser;
+namespace ZulaMed.API.Endpoints.ViewHistory.Get;
 
 public static class Mapper
 {
