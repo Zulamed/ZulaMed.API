@@ -25,6 +25,8 @@ public class User
     public PhotoUrl? PhotoUrl { get; set; }
     public HistoryPaused HistoryPaused { get; init; } 
     
+    public SubscriberCount SubscriberCount { get; init; } = SubscriberCount.Zero;
+    
     public List<Subscription> Subscriptions { get; init; } = new();
     public List<Subscription> Subscribers { get; init; } = new();
     

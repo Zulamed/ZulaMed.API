@@ -2,6 +2,7 @@
 using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 using ZulaMed.API.Data;
@@ -11,9 +12,11 @@ using ZulaMed.API.Data;
 namespace ZulaMed.API.Data.Migrations
 {
     [DbContext(typeof(ZulaMedDbContext))]
-    partial class ZulaMedDbContextModelSnapshot : ModelSnapshot
+    [Migration("20230916172816_AddSubCount")]
+    partial class AddSubCount
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -204,9 +207,6 @@ namespace ZulaMed.API.Data.Migrations
                     b.Property<int>("GroupId")
                         .HasColumnType("integer");
 
-                    b.Property<bool>("HistoryPaused")
-                        .HasColumnType("boolean");
-
                     b.Property<string>("Login")
                         .IsRequired()
                         .HasColumnType("text");
@@ -296,30 +296,6 @@ namespace ZulaMed.API.Data.Migrations
                     b.HasIndex("PublisherId");
 
                     b.ToTable("Video");
-                });
-
-            modelBuilder.Entity("ZulaMed.API.Domain.ViewHistory.ViewHistory", b =>
-                {
-                    b.Property<Guid>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("uuid");
-
-                    b.Property<DateTime>("ViewedAt")
-                        .HasColumnType("timestamp with time zone");
-
-                    b.Property<Guid>("ViewedById")
-                        .HasColumnType("uuid");
-
-                    b.Property<Guid>("ViewedVideoId")
-                        .HasColumnType("uuid");
-
-                    b.HasKey("Id");
-
-                    b.HasIndex("ViewedById");
-
-                    b.HasIndex("ViewedVideoId");
-
-                    b.ToTable("ViewHistory");
                 });
 
             modelBuilder.Entity("PlaylistVideo", b =>
@@ -465,25 +441,6 @@ namespace ZulaMed.API.Data.Migrations
                     b.Navigation("Publisher");
                 });
 
-            modelBuilder.Entity("ZulaMed.API.Domain.ViewHistory.ViewHistory", b =>
-                {
-                    b.HasOne("ZulaMed.API.Domain.User.User", "ViewedBy")
-                        .WithMany()
-                        .HasForeignKey("ViewedById")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
-                    b.HasOne("ZulaMed.API.Domain.Video.Video", "ViewedVideo")
-                        .WithMany("ViewHistories")
-                        .HasForeignKey("ViewedVideoId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
-                    b.Navigation("ViewedBy");
-
-                    b.Navigation("ViewedVideo");
-                });
-
             modelBuilder.Entity("ZulaMed.API.Domain.User.User", b =>
                 {
                     b.Navigation("Subscribers");
@@ -500,8 +457,6 @@ namespace ZulaMed.API.Data.Migrations
                     b.Navigation("Dislikes");
 
                     b.Navigation("Likes");
-
-                    b.Navigation("ViewHistories");
                 });
 #pragma warning restore 612, 618
         }

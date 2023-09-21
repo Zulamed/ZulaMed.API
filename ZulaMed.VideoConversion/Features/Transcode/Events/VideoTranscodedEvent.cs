@@ -1,9 +1,11 @@
 using System.Drawing;
+using System.Net;
 using Amazon.S3;
 using Amazon.S3.Model;
 using FFMpegCore;
 using Mediator;
 using Microsoft.Extensions.Options;
+using Polly;
 
 namespace ZulaMed.VideoConversion.Features.Transcode.Events;
 
@@ -61,23 +63,31 @@ public class VideoTranscodedUploadToS3Handler : INotificationHandler<VideoTransc
             "*", SearchOption.AllDirectories);
         var tasks = (
                 from file in directory
-                select UploadToS3(notification, file, cancellationToken))
+                select RetryUpload(notification, file, cancellationToken))
             .ToList();
         await Task.WhenAll(tasks);
     }
 
-
-    private async Task UploadToS3(VideoTranscodedEvent notification, string fileName, CancellationToken token)
+    private async Task RetryUpload(VideoTranscodedEvent notification, string file, CancellationToken cancellationToken)
     {
-        // need to add retry with Polly
-        if (notification.VideoNameWithExtension == Path.GetFileName(fileName))
+        if (notification.VideoNameWithExtension == Path.GetFileName(file))
             return;
+        await Policy.HandleResult<HttpStatusCode>(r => HttpStatusCode.OK != r)
+            .WaitAndRetryAsync(3, retryAttempt => TimeSpan.FromSeconds(Math.Pow(2, retryAttempt)))
+            .ExecuteAsync(async () => await UploadToS3(notification, file, cancellationToken));
+    }
+
+
+    private async Task<HttpStatusCode> UploadToS3(VideoTranscodedEvent notification, string fileName,
+        CancellationToken token)
+    {
         var request = new PutObjectRequest
         {
             BucketName = _s3Options.Value.BucketNameConverted,
             Key = fileName,
             FilePath = fileName
         };
-        await _s3.PutObjectAsync(request, token);
+        var response = await _s3.PutObjectAsync(request, token);
+        return response.HttpStatusCode;
     }
 }

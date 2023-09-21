@@ -57,8 +57,13 @@ public class UserConfiguration : IEntityTypeConfiguration<User>
             .HasConversion<UserUniversity.EfCoreValueConverter>();
         builder.Property(x => x.WorkPlace)
             .HasConversion<UserWorkPlace.EfCoreValueConverter>();
+
         builder.Property(x => x.HistoryPaused)
             .HasConversion<HistoryPaused.EfCoreValueConverter>();
+
+        builder.Property(x => x.SubscriberCount)
+            .HasConversion<SubscriberCount.EfCoreValueConverter>()
+            .HasDefaultValue(SubscriberCount.Zero);
     }
 }
 

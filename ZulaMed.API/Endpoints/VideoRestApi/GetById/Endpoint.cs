@@ -31,11 +31,6 @@ public class GetVideoByIdQueryHandler : IQueryHandler<GetVideoByIdQuery, OneOf<R
             return new NotFound();
         }
 
-        var subscriberCount = await _context
-            .Entry(video.Publisher)
-            .Collection(x => x.Subscribers)
-            .Query()
-            .CountAsync(cancellationToken: cancellationToken);
 
 
         return new Response
@@ -44,7 +39,7 @@ public class GetVideoByIdQueryHandler : IQueryHandler<GetVideoByIdQuery, OneOf<R
             {
                 Id = video.Publisher.Id.Value,
                 ProfilePictureUrl = video.Publisher.PhotoUrl?.Value,
-                Subscribers = subscriberCount,
+                Subscribers = video.Publisher.SubscriberCount.Value,
                 Username = video.Publisher.Login.Value,
             },
             NumberOfLikes = video.VideoLike.Value

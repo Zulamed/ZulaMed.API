@@ -22,11 +22,12 @@ public class
     public async ValueTask<OneOf<Success, Error<string>, NotFound>> Handle(UnsubscribeCommand command,
         CancellationToken cancellationToken)
     {
+        await using var transaction = await _dbContext.Database.BeginTransactionAsync(cancellationToken);
         try
         {
             var subscriber = await _dbContext.Set<User>()
                 .FirstOrDefaultAsync(x => (Guid)x.Id == command.SubscriberId, cancellationToken);
-            var unSubToUser = await _dbContext.Set<User>().Include(x => x.Subscribers)
+            var unSubToUser = await _dbContext.Set<User>()
                 .FirstOrDefaultAsync(x => (Guid)x.Id == command.UnsubFromUserId, cancellationToken);
             if (subscriber is null || unSubToUser is null)
             {
@@ -42,10 +43,20 @@ public class
             _dbContext.Set<Subscription>().Remove(subscription);
 
             await _dbContext.SaveChangesAsync(cancellationToken);
+
+            FormattableString sql =
+                $"""
+                 UPDATE "User"
+                 SET "SubscriberCount" = "SubscriberCount" - 1
+                 WHERE "Id" = {command.UnsubFromUserId}
+                 """;
+            await _dbContext.Database.ExecuteSqlAsync(sql, cancellationToken: cancellationToken);
+            await transaction.CommitAsync(cancellationToken);
             return new Success();
         }
         catch (Exception e)
         {
+            await transaction.RollbackAsync(cancellationToken);
             return new Error<string>(e.Message);
         }
     }

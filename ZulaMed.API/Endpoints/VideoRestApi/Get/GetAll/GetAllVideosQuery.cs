@@ -6,12 +6,12 @@ using ZulaMed.API.Extensions;
 
 namespace ZulaMed.API.Endpoints.VideoRestApi.Get.GetAll;
 
-public class GetAllVideosQuery : IQuery<Video[]>
+public class GetAllVideosQuery : IQuery<(Video[], int)>
 {
     public required PaginationOptions PaginationOptions { get; init; }
 }
 
-public class GetAllVideosQueryHandler : IQueryHandler<GetAllVideosQuery, Video[]>
+public class GetAllVideosQueryHandler : IQueryHandler<GetAllVideosQuery, (Video[], int)>
 {
     private readonly ZulaMedDbContext _context;
 
@@ -19,12 +19,15 @@ public class GetAllVideosQueryHandler : IQueryHandler<GetAllVideosQuery, Video[]
     {
         _context = context;
     }
-    public async ValueTask<Video[]> Handle(GetAllVideosQuery query, CancellationToken cancellationToken)
+    public async ValueTask<(Video[], int)> Handle(GetAllVideosQuery query, CancellationToken cancellationToken)
     {
+        var count = await _context.Set<Video>()
+            .CountAsync(cancellationToken: cancellationToken);
+        
         var videos = await _context.Set<Video>()
             .Include(x => x.Publisher)
             .Paginate(x => x.VideoPublishedDate, query.PaginationOptions)
             .ToArrayAsync(cancellationToken: cancellationToken);
-        return videos;
+        return (videos, count);
     }
 }

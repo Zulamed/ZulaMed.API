@@ -17,7 +17,7 @@ public class Worker : BackgroundService
         _mediator = mediator;
         _logger = logger;
     }
-
+    
 
     protected override async Task ExecuteAsync(CancellationToken stoppingToken)
     {
