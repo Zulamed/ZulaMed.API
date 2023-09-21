@@ -18,16 +18,14 @@ public class CreateVideoCommandHandler
 {
     private readonly IAmazonS3 _s3Client;
     private readonly IOptions<S3BucketOptions> _s3Options;
-    private readonly IOptions<SqsQueueOptions> _sqsOptions;
     private readonly ZulaMedDbContext _dbContext;
 
     public CreateVideoCommandHandler(ZulaMedDbContext dbContext, IAmazonS3 s3Client,
-        IOptions<S3BucketOptions> s3Options, IOptions<SqsQueueOptions> sqsOptions)
+        IOptions<S3BucketOptions> s3Options)
     {
         _dbContext = dbContext;
         _s3Client = s3Client;
         _s3Options = s3Options;
-        _sqsOptions = sqsOptions;
     }
 
     public async ValueTask<Result<Video, ValueObjectValidationException>> Handle(CreateVideoCommand command,

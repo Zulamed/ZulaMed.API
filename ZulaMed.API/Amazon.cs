@@ -11,11 +11,6 @@ public static class AwsExtensions
           .BindConfiguration("S3BucketOptions")
           .ValidateDataAnnotations();
       
-      services.AddOptions<SqsQueueOptions>()
-          .BindConfiguration("SQSQueueOptions")
-          .ValidateDataAnnotations();
-      
-      
       AWSConfigsS3.EnableUnicodeEncodingForObjectMetadata = true;
       services.AddSingleton<IAmazonS3, AmazonS3Client>();
    }  
