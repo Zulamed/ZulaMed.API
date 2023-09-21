@@ -1,7 +1,5 @@
 using Amazon.S3;
 using Amazon.S3.Model;
-using Amazon.SQS;
-using Amazon.SQS.Model;
 using FastEndpoints;
 using Mediator;
 using Microsoft.EntityFrameworkCore;
@@ -11,7 +9,6 @@ using Vogen;
 using ZulaMed.API.Data;
 using ZulaMed.API.Domain.User;
 using ZulaMed.API.Domain.Video;
-using System.Text.Json;
 using VoException = Vogen.ValueObjectValidationException;
 
 namespace ZulaMed.API.Endpoints.VideoRestApi.Post;
@@ -21,17 +18,15 @@ public class CreateVideoCommandHandler
 {
     private readonly IAmazonS3 _s3Client;
     private readonly IOptions<S3BucketOptions> _s3Options;
-    private readonly IAmazonSQS _sqs;
     private readonly IOptions<SqsQueueOptions> _sqsOptions;
     private readonly ZulaMedDbContext _dbContext;
 
     public CreateVideoCommandHandler(ZulaMedDbContext dbContext, IAmazonS3 s3Client,
-        IOptions<S3BucketOptions> s3Options, IAmazonSQS sqs, IOptions<SqsQueueOptions> sqsOptions)
+        IOptions<S3BucketOptions> s3Options, IOptions<SqsQueueOptions> sqsOptions)
     {
         _dbContext = dbContext;
         _s3Client = s3Client;
         _s3Options = s3Options;
-        _sqs = sqs;
         _sqsOptions = sqsOptions;
     }
 
@@ -76,9 +71,6 @@ public class CreateVideoCommandHandler
 
             await _dbContext.SaveChangesAsync(cancellationToken);
             
-            await _sqs.SendMessageAsync(await GetSqsUrl(),
-                JsonSerializer.Serialize(new { VideoS3Path = $"videos/{guid}" }), cancellationToken);
-            
             return entity.Entity;
         }
         catch (DbUpdateException)
@@ -90,16 +82,6 @@ public class CreateVideoCommandHandler
         {
             return new Error<VoException>(e);
         }
-    }
-
-    private async Task<string> GetSqsUrl()
-    {
-        var request = new GetQueueUrlRequest
-        {
-            QueueName = _sqsOptions.Value.QueueName
-        };
-        var response = await _sqs.GetQueueUrlAsync(request);
-        return response.QueueUrl;
     }
 }
 
