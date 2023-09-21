@@ -1,6 +1,3 @@
-using Amazon;
-using Amazon.S3;
-using Amazon.SQS;
 using FastEndpoints;
 using FastEndpoints.Swagger;
 using FirebaseAdmin;
@@ -44,18 +41,7 @@ builder.Services.SwaggerDocument(o =>
     o.RemoveEmptyRequestSchema = false;
 });
 
-builder.Services.AddOptions<S3BucketOptions>()
-    .BindConfiguration("S3BucketOptions")
-    .ValidateDataAnnotations();
-
-builder.Services.AddOptions<SqsQueueOptions>()
-    .BindConfiguration("SQSQueueOptions")
-    .ValidateDataAnnotations();
-
-
-AWSConfigsS3.EnableUnicodeEncodingForObjectMetadata = true;
-builder.Services.AddSingleton<IAmazonS3, AmazonS3Client>();
-builder.Services.AddSingleton<IAmazonSQS, AmazonSQSClient>();
+builder.Services.AddAmazon();
 
 builder.Services.AddMediator(x => { x.ServiceLifetime = ServiceLifetime.Scoped; });
 
