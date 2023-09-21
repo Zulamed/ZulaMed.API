@@ -6,7 +6,7 @@ public static class Mapper
 {
     public static UserDTO ToResponse(this User user)
     {
-        return new UserDTO()
+        return new UserDTO
         {
             Id = user.Id.Value,
             City = user.City.Value,
@@ -18,7 +18,8 @@ public static class Mapper
             Surname = user.Surname.Value,
             University = user.University.Value,
             WorkPlace = user.WorkPlace.Value,
-            ProfilePictureUrl = user.PhotoUrl?.Value
+            ProfilePictureUrl = user.PhotoUrl?.Value,
+            HistoryPaused = user.HistoryPaused.Value 
         };
     }
 }

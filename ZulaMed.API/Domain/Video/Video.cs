@@ -27,4 +27,5 @@ public class Video
     public List<Like<Video>> Likes { get; init; } = new();
     public List<Dislike<Video>> Dislikes { get; init; } = new();
     public List<Playlist.Playlist> Playlists { get; init; } = new();
+    public List<ViewHistory.ViewHistory> ViewHistories { get; init; } = new();
 }

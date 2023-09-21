@@ -22,7 +22,8 @@ public class User
     public required UserUniversity University { get; init; }
     
     public required UserWorkPlace WorkPlace { get; init; }
-    public PhotoUrl? PhotoUrl { get; set; } 
+    public PhotoUrl? PhotoUrl { get; set; }
+    public HistoryPaused HistoryPaused { get; init; } 
     
     public SubscriberCount SubscriberCount { get; init; } = SubscriberCount.Zero;
     

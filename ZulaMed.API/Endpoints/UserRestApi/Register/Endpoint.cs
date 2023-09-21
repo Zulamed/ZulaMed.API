@@ -39,7 +39,8 @@ public class CreateVideoCommandHandler : Mediator.ICommandHandler<CreateUserComm
                 Country = (UserCountry)command.Country,
                 City = (UserCity)command.City,
                 University = (UserUniversity)command.University,
-                WorkPlace = (UserWorkPlace)command.WorkPlace
+                WorkPlace = (UserWorkPlace)command.WorkPlace,
+                HistoryPaused = (HistoryPaused)false
             }, cancellationToken);
             await _dbContext.SaveChangesAsync(cancellationToken);
             await AddUserToFirebase(command.Email, command.Password, entity.Entity.Id.Value, cancellationToken);

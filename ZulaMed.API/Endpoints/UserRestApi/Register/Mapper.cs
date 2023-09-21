@@ -36,6 +36,7 @@ public static class Mapper
             City = user.City.Value,
             University = user.University.Value,
             WorkPlace = user.WorkPlace.Value,
+            HistoryPaused = user.HistoryPaused.Value,
         };
     }
 }

@@ -2,6 +2,7 @@
 using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 using ZulaMed.API.Data;
@@ -11,9 +12,11 @@ using ZulaMed.API.Data;
 namespace ZulaMed.API.Data.Migrations
 {
     [DbContext(typeof(ZulaMedDbContext))]
-    partial class ZulaMedDbContextModelSnapshot : ModelSnapshot
+    [Migration("20230914140105_AddViewHistory")]
+    partial class AddViewHistory
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -35,6 +38,21 @@ namespace ZulaMed.API.Data.Migrations
                     b.HasIndex("VideosId");
 
                     b.ToTable("PlaylistVideo");
+                });
+
+            modelBuilder.Entity("UserUser", b =>
+                {
+                    b.Property<Guid>("SubscribersId")
+                        .HasColumnType("uuid");
+
+                    b.Property<Guid>("SubscriptionsId")
+                        .HasColumnType("uuid");
+
+                    b.HasKey("SubscribersId", "SubscriptionsId");
+
+                    b.HasIndex("SubscriptionsId");
+
+                    b.ToTable("UserUser");
                 });
 
             modelBuilder.Entity("ZulaMed.API.Domain.Comments.Comment", b =>
@@ -168,21 +186,6 @@ namespace ZulaMed.API.Data.Migrations
                     b.ToTable("SpecialtyGroup");
                 });
 
-            modelBuilder.Entity("ZulaMed.API.Domain.Subscriptions.Subscription", b =>
-                {
-                    b.Property<Guid>("SubscriberId")
-                        .HasColumnType("uuid");
-
-                    b.Property<Guid>("SubscribedToId")
-                        .HasColumnType("uuid");
-
-                    b.HasKey("SubscriberId", "SubscribedToId");
-
-                    b.HasIndex("SubscribedToId");
-
-                    b.ToTable("Subscription");
-                });
-
             modelBuilder.Entity("ZulaMed.API.Domain.User.User", b =>
                 {
                     b.Property<Guid>("Id")
@@ -204,9 +207,6 @@ namespace ZulaMed.API.Data.Migrations
                     b.Property<int>("GroupId")
                         .HasColumnType("integer");
 
-                    b.Property<bool>("HistoryPaused")
-                        .HasColumnType("boolean");
-
                     b.Property<string>("Login")
                         .IsRequired()
                         .HasColumnType("text");
@@ -217,11 +217,6 @@ namespace ZulaMed.API.Data.Migrations
 
                     b.Property<string>("PhotoUrl")
                         .HasColumnType("text");
-
-                    b.Property<int>("SubscriberCount")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("integer")
-                        .HasDefaultValue(0);
 
                     b.Property<string>("Surname")
                         .IsRequired()
@@ -337,6 +332,21 @@ namespace ZulaMed.API.Data.Migrations
                         .IsRequired();
                 });
 
+            modelBuilder.Entity("UserUser", b =>
+                {
+                    b.HasOne("ZulaMed.API.Domain.User.User", null)
+                        .WithMany()
+                        .HasForeignKey("SubscribersId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.HasOne("ZulaMed.API.Domain.User.User", null)
+                        .WithMany()
+                        .HasForeignKey("SubscriptionsId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+                });
+
             modelBuilder.Entity("ZulaMed.API.Domain.Comments.Comment", b =>
                 {
                     b.HasOne("ZulaMed.API.Domain.Video.Video", "RelatedVideo")
@@ -424,25 +434,6 @@ namespace ZulaMed.API.Data.Migrations
                     b.Navigation("Owner");
                 });
 
-            modelBuilder.Entity("ZulaMed.API.Domain.Subscriptions.Subscription", b =>
-                {
-                    b.HasOne("ZulaMed.API.Domain.User.User", "SubscribedTo")
-                        .WithMany("Subscribers")
-                        .HasForeignKey("SubscribedToId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
-                    b.HasOne("ZulaMed.API.Domain.User.User", "Subscriber")
-                        .WithMany("Subscriptions")
-                        .HasForeignKey("SubscriberId")
-                        .OnDelete(DeleteBehavior.Restrict)
-                        .IsRequired();
-
-                    b.Navigation("SubscribedTo");
-
-                    b.Navigation("Subscriber");
-                });
-
             modelBuilder.Entity("ZulaMed.API.Domain.User.User", b =>
                 {
                     b.HasOne("ZulaMed.API.Domain.SpecialtyGroup.SpecialtyGroup", "Group")
@@ -486,10 +477,6 @@ namespace ZulaMed.API.Data.Migrations
 
             modelBuilder.Entity("ZulaMed.API.Domain.User.User", b =>
                 {
-                    b.Navigation("Subscribers");
-
-                    b.Navigation("Subscriptions");
-
                     b.Navigation("Videos");
                 });
 
