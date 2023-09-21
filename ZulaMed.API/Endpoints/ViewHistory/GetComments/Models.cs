@@ -16,7 +16,7 @@ public class Request
     public int PageSize { get; init; } = 10;
 }
 
-public class RequestValidator : Validator<Get.Request>
+public class RequestValidator : Validator<Request>
 {
     public RequestValidator()
     {

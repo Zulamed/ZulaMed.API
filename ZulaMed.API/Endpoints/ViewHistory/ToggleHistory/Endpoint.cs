@@ -17,11 +17,10 @@ public class ToggleHistoryCommandHandler : Mediator.ICommandHandler<ToggleHistor
 
     public async ValueTask<bool> Handle(ToggleHistoryCommand command, CancellationToken cancellationToken)
     {
-        var rows = await _dbContext.Set<User>()
-            .Where(x => (Guid)x.Id == command.Id)
-            .ExecuteUpdateAsync(calls => calls
-                .SetProperty(x => x.HistoryPaused, x => (HistoryPaused)!x.HistoryPaused.Value),
-                cancellationToken);
+        var rows = await _dbContext.Database.ExecuteSqlAsync(
+            $"""UPDATE "User" SET "HistoryPaused" = NOT "HistoryPaused" WHERE "Id" = {command.Id}""",
+            cancellationToken: cancellationToken);
+        
         return rows > 0;
     }
 }
@@ -37,7 +36,7 @@ public class Endpoint : Endpoint<Request>
 
     public override void Configure()
     {
-        Put("/viewHistory/{Id}");
+        Put("/viewHistory/{ownerId}");
         AllowAnonymous();
     }
 

@@ -7,6 +7,7 @@ namespace ZulaMed.API.Endpoints.ViewHistory.Get;
 
 public class Request
 {
+    [QueryParam]
     public required Guid OwnerId { get; init; }
     
     [QueryParam]
