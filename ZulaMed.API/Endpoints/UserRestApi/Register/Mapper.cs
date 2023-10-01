@@ -29,13 +29,10 @@ public static class Mapper
             Id = user.Id.Value,
             Login = user.Login.Value,
             Email = user.Email.Value,
-            Group = user.Group.Name.Value,
             Name = user.Name.Value,
             Surname = user.Surname.Value,
             Country = user.Country.Value,
             City = user.City.Value,
-            University = user.University.Value,
-            WorkPlace = user.WorkPlace.Value,
             HistoryPaused = user.HistoryPaused.Value,
         };
     }

@@ -9,6 +9,8 @@ public class PersonalAccount
     public required AccountProfessionalActivity AccountProfessionalActivity { get; init; }
     public required AccountSpecialty AccountSpecialty { get; init; }
     public required AccountDepartment AccountDepartment { get; init; }
+    public required AccountBirthDate AccountBirthDate { get; init; }
+    public required AccountInstitute AccountInstitute { get; init; }
     public required AccountRole AccountRole { get; init; }
     public required List<string> PlacesOfWork { get; init; } = new();
 }

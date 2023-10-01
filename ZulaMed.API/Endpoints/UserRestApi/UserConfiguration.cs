@@ -1,6 +1,5 @@
 ﻿using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
-using ZulaMed.API.Domain.SpecialtyGroup;
 using ZulaMed.API.Domain.Subscriptions;
 using ZulaMed.API.Domain.User;
 
@@ -31,8 +30,6 @@ public class UserConfiguration : IEntityTypeConfiguration<User>
         builder
             .HasIndex(x => x.Login)
             .IsUnique();
-        // builder.HasOne(x => x.Group)
-        //     .WithMany();
 
         builder.Property(x => x.Name)
             .HasConversion<UserName.EfCoreValueConverter>()
@@ -53,34 +50,12 @@ public class UserConfiguration : IEntityTypeConfiguration<User>
         builder.Property(x => x.PhotoUrl)
             .HasConversion<PhotoUrl.EfCoreValueConverter>();
 
-        builder.Property(x => x.University)
-            .HasConversion<UserUniversity.EfCoreValueConverter>();
-        builder.Property(x => x.WorkPlace)
-            .HasConversion<UserWorkPlace.EfCoreValueConverter>();
-
         builder.Property(x => x.HistoryPaused)
             .HasConversion<HistoryPaused.EfCoreValueConverter>();
 
         builder.Property(x => x.SubscriberCount)
             .HasConversion<SubscriberCount.EfCoreValueConverter>()
             .HasDefaultValue(SubscriberCount.Zero);
-    }
-}
-
-public class SpecialtyGroupConfiguration : IEntityTypeConfiguration<SpecialtyGroup>
-{
-    public void Configure(EntityTypeBuilder<SpecialtyGroup> builder)
-    {
-        builder.HasKey(x => x.Id);
-
-        builder.Property(x => x.Id)
-            .HasConversion<SpecialtyGroupId.EfCoreValueConverter>()
-            .ValueGeneratedOnAdd()
-            .IsRequired();
-
-        builder.Property(x => x.Name)
-            .HasConversion<SpecialtyGroupName.EfCoreValueConverter>()
-            .IsRequired();
     }
 }
 

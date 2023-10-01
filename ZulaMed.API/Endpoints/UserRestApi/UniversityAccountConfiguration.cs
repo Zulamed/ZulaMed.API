@@ -20,7 +20,6 @@ public class UniversityAccountConfiguration : IEntityTypeConfiguration<Universit
             .HasConversion<AccountPhone.EfCoreValueConverter>()
             .IsRequired();
         
-        
         builder.HasKey("UserId");
         builder.HasOne(x => x.User)
             .WithMany()

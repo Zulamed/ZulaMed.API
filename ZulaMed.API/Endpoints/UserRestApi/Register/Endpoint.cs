@@ -4,7 +4,6 @@ using Mediator;
 using Microsoft.EntityFrameworkCore;
 using OneOf.Types;
 using ZulaMed.API.Data;
-using ZulaMed.API.Domain.SpecialtyGroup;
 using ZulaMed.API.Domain.User;
 using VoException = Vogen.ValueObjectValidationException;
 
@@ -32,14 +31,10 @@ public class CreateVideoCommandHandler : Mediator.ICommandHandler<CreateUserComm
                 Id = (UserId)Guid.NewGuid(),
                 Login = (UserLogin)command.Login,
                 Email = (UserEmail)command.Email,
-                Group = (await _dbContext.Set<SpecialtyGroup>()
-                    .FirstOrDefaultAsync(x => (int)x.Id == command.GroupId, cancellationToken))!,
                 Name = (UserName)command.Name,
                 Surname = (UserSurname)command.Surname,
                 Country = (UserCountry)command.Country,
                 City = (UserCity)command.City,
-                University = (UserUniversity)command.University,
-                WorkPlace = (UserWorkPlace)command.WorkPlace,
                 HistoryPaused = (HistoryPaused)false
             }, cancellationToken);
             await _dbContext.SaveChangesAsync(cancellationToken);

@@ -30,6 +30,12 @@ public class PersonalAccountConfiguration : IEntityTypeConfiguration<PersonalAcc
             .IsRequired();
         builder.Property(x => x.AccountProfessionalActivity)
             .HasConversion<AccountProfessionalActivity.EfCoreValueConverter>()
+            .IsRequired();       
+        builder.Property(x => x.AccountBirthDate)
+            .HasConversion<AccountBirthDate.EfCoreValueConverter>()
+            .IsRequired();        
+        builder.Property(x => x.AccountInstitute)
+            .HasConversion<AccountInstitute.EfCoreValueConverter>()
             .IsRequired();
 
 

@@ -3,7 +3,6 @@ using Mediator;
 using Microsoft.EntityFrameworkCore;
 using ZulaMed.API.Data;
 using ZulaMed.API.Domain.User;
-using ZulaMed.API.Endpoints.UserRestApi.Get.GetAll;
 
 namespace ZulaMed.API.Endpoints.UserRestApi.Get.GetById;
 
@@ -18,7 +17,6 @@ public class GetUserByIdQueryHandler : IQueryHandler<GetUserByIdQuery, Response>
     public async ValueTask<Response> Handle(GetUserByIdQuery query, CancellationToken cancellationToken)
     {
         var user = await _context.Set<User>()
-            .Include(x => x.Group)
             .FirstOrDefaultAsync(x => (Guid)x.Id == query.Id, cancellationToken);
         return new Response { User = user?.ToResponse() };
     }

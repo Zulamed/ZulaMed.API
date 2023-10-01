@@ -1,8 +1,6 @@
-﻿using Microsoft.EntityFrameworkCore;
 using Vogen;
 
 namespace ZulaMed.API.Domain.User;
-
 
 [ValueObject<string>(Conversions.EfCoreValueConverter)]
 public readonly partial struct UserName

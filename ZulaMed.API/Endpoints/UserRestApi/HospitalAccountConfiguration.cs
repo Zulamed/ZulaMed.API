@@ -21,7 +21,7 @@ public class HospitalAccountConfiguration : IEntityTypeConfiguration<HospitalAcc
             .IsRequired(); 
         builder.Property(x => x.AccountHospital)
             .HasConversion<AccountHospital.EfCoreValueConverter>()
-            .IsRequired();
+            .IsRequired();     
         
         
         builder.HasKey("UserId");

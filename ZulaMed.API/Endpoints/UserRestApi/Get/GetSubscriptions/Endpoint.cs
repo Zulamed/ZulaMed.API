@@ -50,7 +50,6 @@ public class Endpoint : Endpoint<Request, Response>
             .Set<Subscription>()
             .Where(x => (Guid)x.Subscriber.Id == req.UserId)
             .Include(x => x.SubscribedTo)
-            .ThenInclude(x => x.Group)
             .Paginate(x => x.SubscribedTo.Login, new PaginationOptions(req.Page, req.PageSize))
             .Select(x => new
             {

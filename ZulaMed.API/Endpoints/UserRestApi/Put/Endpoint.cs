@@ -4,7 +4,6 @@ using Microsoft.EntityFrameworkCore;
 using OneOf.Types;
 using Vogen;
 using ZulaMed.API.Data;
-using ZulaMed.API.Domain.SpecialtyGroup;
 using ZulaMed.API.Domain.User;
 
 namespace ZulaMed.API.Endpoints.UserRestApi.Put;
@@ -21,15 +20,11 @@ public class UpdateUserCommandHandler : Mediator.ICommandHandler<UpdateUserComma
     {
         try
         {
-            // make group changeable as well
-            var group = await _dbContext.Set<SpecialtyGroup>()
-                .FirstOrDefaultAsync(x => (int)x.Id == command.GroupId, cancellationToken);
             var rows = await _dbContext.Set<User>()
                 .Where(x => (Guid)x.Id == command.Id)
                 .ExecuteUpdateAsync(calls => calls
                     .SetProperty(x => x.Name, (UserName)command.Name)
                     .SetProperty(x => x.Surname, (UserSurname)command.Surname)
-                    .SetProperty(x => x.WorkPlace, (UserWorkPlace)command.WorkPlace)
                     .SetProperty(x => x.Country, (UserCountry)command.Country)
                     .SetProperty(x => x.City, (UserCity)command.City)
                     .SetProperty(x => x.Email, (UserEmail)command.Email),
