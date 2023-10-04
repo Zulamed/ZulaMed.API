@@ -34,6 +34,7 @@
       <PackageReference Include="OneOf" Version="3.0.243" />
       <PackageReference Include="OneOf.SourceGenerator" Version="3.0.243" />
       <PackageReference Include="Refit" Version="7.0.0" />
+      <PackageReference Include="Refit.HttpClientFactory" Version="7.0.0" />
       <PackageReference Include="Vogen" Version="3.0.16" />
     </ItemGroup>
 
