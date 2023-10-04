@@ -1,15 +1,13 @@
 using FastEndpoints;
 using FastEndpoints.Swagger;
-using FirebaseAdmin;
-using FirebaseAdmin.Auth;
 using Google.Apis.Auth.OAuth2;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Http.Features;
-using Microsoft.EntityFrameworkCore;
 using Microsoft.IdentityModel.Tokens;
-using Npgsql;
+using Refit;
 using ZulaMed.API;
-using ZulaMed.API.Data;
+using ZulaMed.API.Endpoints.VideoRestApi;
+using ZulaMed.API.Endpoints.VideoRestApi.Upload;
 using ZulaMed.API.Health;
 
 var builder = WebApplication.CreateBuilder(args);
@@ -24,6 +22,10 @@ builder.Services.Configure<FormOptions>(options =>
 
 builder.Services.AddCors();
 
+builder.Services.AddMux(builder.Configuration["MuxSettings:Secret"]!,
+    builder.Configuration["MuxSettings:Id"]!);
+
+
 
 builder.Services.AddFastEndpoints(options => { options.SourceGeneratorDiscoveredTypes = DiscoveredTypes.All; });
 
@@ -31,7 +33,6 @@ builder.Services.SwaggerDocument(o =>
 {
     o.DocumentSettings = s =>
     {
-        s.DocumentName = "Initial Release";
         s.Title = "Web API";
         s.Version = "v0.0";
         s.SchemaType = NJsonSchema.SchemaType.OpenApi3;
@@ -49,29 +50,17 @@ var connectionString = string.IsNullOrEmpty(builder.Configuration["DATABASE_CONN
     ? builder.Configuration["Database:ConnectionString"]
     : builder.Configuration["DATABASE_CONNECTION_STRING"];
 
-var dataSourceBuilder = new NpgsqlDataSourceBuilder(connectionString);
-var dataSource = dataSourceBuilder.Build();
+builder.Services.AddDatabase(connectionString);
 
+var credential = await GoogleCredential.FromFileAsync("firebase-adminsdk-configuration.json",
+    CancellationToken.None);
 
-builder.Services.AddDbContext<ZulaMedDbContext>(options => { options.UseNpgsql(dataSource); });
-
-
-builder.Services.AddSingleton(FirebaseApp.Create(new AppOptions
-{
-    Credential = await GoogleCredential.FromFileAsync("firebase-adminsdk-configuration.json", CancellationToken.None)
-}));
-
-builder.Services.AddSingleton<FirebaseAuth>(provider =>
-{
-    var app = provider.GetRequiredService<FirebaseApp>();
-    return FirebaseAuth.GetAuth(app);
-});
+builder.Services.AddFirebase(credential);
 
 builder.Services.AddTransient<VogenValidationMiddleware>();
 
 builder.Services.AddHealthChecks()
     .AddCheck<StubHealthCheck>("Stub");
-
 
 
 builder.Services
@@ -96,6 +85,8 @@ app.UseCors(c =>
 {
     c.AllowAnyMethod();
     c.AllowAnyOrigin();
+    c.AllowAnyHeader();
+    c.WithExposedHeaders("Location");
 });
 
 app.UseHealthChecks("/_health");
@@ -109,7 +100,7 @@ app.UseFastEndpoints();
 if (!app.Environment.IsProduction())
 {
     app.Map("/", () => Results.Redirect("/swagger"));
-    app.UseSwaggerGen(uiConfig: settings => settings.ConfigureDefaults());
+    app.UseSwaggerGen();
 }
 
 app.Run();
