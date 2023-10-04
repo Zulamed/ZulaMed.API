@@ -4,25 +4,24 @@ using Mediator;
 using Microsoft.EntityFrameworkCore;
 using OneOf.Types;
 using ZulaMed.API.Data;
-using ZulaMed.API.Domain.Accounts;
-using ZulaMed.API.Domain.Accounts.HospitalAccount;
+using ZulaMed.API.Domain.Accounts.PersonalAccount;
 using ZulaMed.API.Domain.User;
 
-namespace ZulaMed.API.Endpoints.UserRestApi.Register.Hospital;
+namespace ZulaMed.API.Endpoints.UserRestApi.Register.Personal;
 
-public class CreateHospitalAccountCommandHandler : Mediator.ICommandHandler<CreateHospitalAccountCommand,
-    Result<HospitalAccount, Exception>>
+public class CreatePersonalAccountCommandHandler : Mediator.ICommandHandler<CreatePersonalAccountCommand,
+    Result<PersonalAccount, Exception>>
 {
     private readonly ZulaMedDbContext _dbContext;
     private readonly FirebaseAuth _auth;
 
-    public CreateHospitalAccountCommandHandler(ZulaMedDbContext dbContext, FirebaseAuth auth)
+    public CreatePersonalAccountCommandHandler(ZulaMedDbContext dbContext, FirebaseAuth auth)
     {
         _dbContext = dbContext;
         _auth = auth;
     }
 
-    public async ValueTask<Result<HospitalAccount, Exception>> Handle(CreateHospitalAccountCommand command,
+    public async ValueTask<Result<PersonalAccount, Exception>> Handle(CreatePersonalAccountCommand command,
         CancellationToken cancellationToken)
     {
         try
@@ -42,15 +41,21 @@ public class CreateHospitalAccountCommandHandler : Mediator.ICommandHandler<Crea
             await _dbContext.SaveChangesAsync(cancellationToken);
             await AddUserToFirebase(command.Email, command.Password, userEntity.Entity.Id.Value, cancellationToken);
 
-            var account = new HospitalAccount
+            var account = new PersonalAccount
             {
                 User = user,
-                AccountHospital = (AccountHospital)command.AccountHospital,
-                AccountAddress = (AccountAddress)command.AccountAddress,
-                AccountPostCode = (AccountPostCode)command.AccountPostCode,
-                AccountPhone = (AccountPhone)command.AccountPhone
+                AccountGender = (AccountGender)(command.AccountGender ? Gender.Male : Gender.Female),
+                AccountTitle = (AccountTitle)command.AccountTitle,
+                AccountCareerStage = (AccountCareerStage)command.AccountCareerStage,
+                AccountProfessionalActivity = (AccountProfessionalActivity)command.AccountProfessionalActivity,
+                AccountSpecialty = (AccountSpecialty)command.AccountSpecialty,
+                AccountDepartment = (AccountDepartment)command.AccountDepartment,
+                AccountBirthDate = (AccountBirthDate)command.AccountBirthDate,
+                AccountInstitute = (AccountInstitute)command.AccountInstitute,
+                AccountRole = (AccountRole)command.AccountRole,
+                PlacesOfWork = command.PlacesOfWork,
             };
-            var accountEntity = await _dbContext.Set<HospitalAccount>().AddAsync(account, cancellationToken);
+            var accountEntity = await _dbContext.Set<PersonalAccount>().AddAsync(account, cancellationToken);
             await _dbContext.SaveChangesAsync(cancellationToken);
             return accountEntity.Entity;
         }
@@ -80,7 +85,7 @@ public class CreateHospitalAccountCommandHandler : Mediator.ICommandHandler<Crea
     }
 }
 
-public class Endpoint : Endpoint<Request, HospitalAccountDTO>
+public class Endpoint : Endpoint<Request, PersonalAccountDTO>
 {
     private readonly IMediator _mediator;
 
@@ -91,7 +96,7 @@ public class Endpoint : Endpoint<Request, HospitalAccountDTO>
 
     public override void Configure()
     {
-        Post("/hospitalAccount");
+        Post("/personalAccount");
         AllowAnonymous();
     }
 

@@ -1,14 +1,13 @@
-using ZulaMed.API.Domain.Accounts.HospitalAccount;
+using ZulaMed.API.Domain.Accounts.UniversityAccount;
 
-namespace ZulaMed.API.Endpoints.UserRestApi.Register.Hospital;
+namespace ZulaMed.API.Endpoints.UserRestApi.Register.University;
 
 public static class Mapper
 {
-    public static CreateHospitalAccountCommand MapToCommand(this Request request)
+    public static CreateUniversityAccountCommand MapToCommand(this Request request)
     {
-        return new CreateHospitalAccountCommand
+        return new CreateUniversityAccountCommand
         {
-            AccountHospital = request.AccountHospital,
             AccountAddress = request.AccountAddress,
             AccountPostCode = request.AccountPostCode,
             AccountPhone = request.AccountPhone,
@@ -18,19 +17,20 @@ public static class Mapper
             Name = request.Name,
             Surname = request.Surname,
             Country = request.Country,
-            City = request.City
+            City = request.City,
+            AccountUniversity = request.AccountUniversity
         };
     }
 
-    public static HospitalAccountDTO MapToResponse(this HospitalAccount account)
+    public static UniversityAccountDTO MapToResponse(this UniversityAccount account)
     {
-        return new HospitalAccountDTO
+        return new UniversityAccountDTO
         {
             UserId = account.User.Id.Value,
-            AccountHospital = account.AccountHospital.Value,
             AccountAddress = account.AccountAddress.Value,
             AccountPostCode = account.AccountPostCode.Value,
-            AccountPhone = account.AccountPhone.Value
+            AccountPhone = account.AccountPhone.Value,
+            AccountUniversity = account.AccountUniversity.Value
         };
     }
 }

@@ -37,10 +37,5 @@
       <PackageReference Include="Vogen" Version="3.0.16" />
     </ItemGroup>
 
-    <ItemGroup>
-      <Folder Include="Endpoints\UserRestApi\Register\Personal\" />
-      <Folder Include="Endpoints\UserRestApi\Register\University\" />
-    </ItemGroup>
-
 
 </Project>

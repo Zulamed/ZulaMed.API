@@ -18,6 +18,9 @@ public class UniversityAccountConfiguration : IEntityTypeConfiguration<Universit
             .IsRequired();
         builder.Property(x => x.AccountPhone)
             .HasConversion<AccountPhone.EfCoreValueConverter>()
+            .IsRequired();    
+        builder.Property(x => x.AccountUniversity)
+            .HasConversion<AccountUniversity.EfCoreValueConverter>()
             .IsRequired();
         
         builder.HasKey("UserId");

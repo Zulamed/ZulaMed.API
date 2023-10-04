@@ -10,15 +10,11 @@ public static class Mapper
         {
             Email = request.Email,
             Login = request.Login,
-            GroupId = request.GroupId,
             Name = request.Name,
             Surname = request.Surname,
             Country = request.Country,
             City = request.City,
-            University = request.University,
-            WorkPlace = request.WorkPlace,
             Password = request.Password,
-
         };
     }
 

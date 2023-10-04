@@ -1,12 +1,12 @@
 using FastEndpoints;
 using FluentValidation;
-using ZulaMed.API.Domain.Accounts.HospitalAccount;
+using ZulaMed.API.Domain.Accounts.UniversityAccount;
 
-namespace ZulaMed.API.Endpoints.UserRestApi.Register.Hospital;
+namespace ZulaMed.API.Endpoints.UserRestApi.Register.University;
 
 public class Request
 {
-    public required string AccountHospital { get; init; }
+    public required string AccountUniversity { get; init; }
     public required string AccountAddress { get; init; }
     public required string AccountPostCode { get; init; }
     public required string AccountPhone { get; init; }
@@ -23,7 +23,7 @@ public class Validator : Validator<Request>
 {
     public Validator()
     {
-        RuleFor(x => x.AccountHospital).NotEmpty();
+        RuleFor(x => x.AccountUniversity).NotEmpty();
         RuleFor(x => x.AccountAddress).NotEmpty();
         RuleFor(x => x.AccountPostCode).NotEmpty();
         RuleFor(x => x.AccountPhone).NotEmpty();
@@ -37,9 +37,9 @@ public class Validator : Validator<Request>
     }
 }
 
-public class CreateHospitalAccountCommand : Mediator.ICommand<Result<HospitalAccount, Exception>>
+public class CreateUniversityAccountCommand : Mediator.ICommand<Result<UniversityAccount, Exception>>
 {
-    public required string AccountHospital { get; init; }
+    public required string AccountUniversity { get; init; }
     public required string AccountAddress { get; init; }
     public required string AccountPostCode { get; init; }
     public required string AccountPhone { get; init; }
