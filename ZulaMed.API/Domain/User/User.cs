@@ -1,4 +1,7 @@
-﻿using ZulaMed.API.Domain.Subscriptions;
+﻿using ZulaMed.API.Domain.Accounts.HospitalAccount;
+using ZulaMed.API.Domain.Accounts.PersonalAccount;
+using ZulaMed.API.Domain.Accounts.UniversityAccount;
+using ZulaMed.API.Domain.Subscriptions;
 
 namespace ZulaMed.API.Domain.User;
 
@@ -17,4 +20,7 @@ public class User
     public List<Subscription> Subscriptions { get; init; } = new();
     public List<Subscription> Subscribers { get; init; } = new();
     public List<Video.Video> Videos { get; init; } = new();
+    public HospitalAccount? HospitalAccount { get; init; }
+    public UniversityAccount? UniversityAccount { get; init; }
+    public PersonalAccount? PersonalAccount { get; init; }
 }

@@ -9,7 +9,7 @@ public class PersonalAccountConfiguration : IEntityTypeConfiguration<PersonalAcc
 {
     public void Configure(EntityTypeBuilder<PersonalAccount> builder)
     {
-        builder.HasKey(x => x.User);
+        builder.HasKey("UserId");
         builder.Property(x => x.AccountDepartment)
             .HasConversion<AccountDepartment.EfCoreValueConverter>()
             .IsRequired();
@@ -36,13 +36,6 @@ public class PersonalAccountConfiguration : IEntityTypeConfiguration<PersonalAcc
             .IsRequired();        
         builder.Property(x => x.AccountInstitute)
             .HasConversion<AccountInstitute.EfCoreValueConverter>()
-            .IsRequired();
-
-
-        builder.HasKey("UserId");
-        builder.HasOne(x => x.User)
-            .WithMany()
-            .HasForeignKey("UserId")
             .IsRequired();
     }
 }

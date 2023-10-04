@@ -9,7 +9,7 @@ public class HospitalAccountConfiguration : IEntityTypeConfiguration<HospitalAcc
 {
     public void Configure(EntityTypeBuilder<HospitalAccount> builder)
     {
-        builder.HasKey(x => x.User);
+        builder.HasKey(x => x.UserId);
         builder.Property(x => x.AccountAddress)
             .HasConversion<AccountAddress.EfCoreValueConverter>()
             .IsRequired();
@@ -22,12 +22,5 @@ public class HospitalAccountConfiguration : IEntityTypeConfiguration<HospitalAcc
         builder.Property(x => x.AccountHospital)
             .HasConversion<AccountHospital.EfCoreValueConverter>()
             .IsRequired();     
-        
-        
-        builder.HasKey("UserId");
-        builder.HasOne(x => x.User)
-            .WithMany()
-            .HasForeignKey("UserId")
-            .IsRequired();
     }
 }

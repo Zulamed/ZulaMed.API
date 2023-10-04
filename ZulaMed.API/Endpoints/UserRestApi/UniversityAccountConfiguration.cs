@@ -9,7 +9,7 @@ public class UniversityAccountConfiguration : IEntityTypeConfiguration<Universit
 {
     public void Configure(EntityTypeBuilder<UniversityAccount> builder)
     {
-        builder.HasKey(x => x.User);
+        builder.HasKey("UserId");
         builder.Property(x => x.AccountAddress)
             .HasConversion<AccountAddress.EfCoreValueConverter>()
             .IsRequired();
@@ -21,12 +21,6 @@ public class UniversityAccountConfiguration : IEntityTypeConfiguration<Universit
             .IsRequired();    
         builder.Property(x => x.AccountUniversity)
             .HasConversion<AccountUniversity.EfCoreValueConverter>()
-            .IsRequired();
-        
-        builder.HasKey("UserId");
-        builder.HasOne(x => x.User)
-            .WithMany()
-            .HasForeignKey("UserId")
             .IsRequired();
     }
 }

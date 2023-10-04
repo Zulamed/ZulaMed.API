@@ -34,7 +34,7 @@ namespace ZulaMed.API.Data.Migrations
 
                     b.HasIndex("VideosId");
 
-                    b.ToTable("PlaylistVideo");
+                    b.ToTable("PlaylistVideo", (string)null);
                 });
 
             modelBuilder.Entity("ZulaMed.API.Domain.Comments.Comment", b =>
@@ -61,7 +61,7 @@ namespace ZulaMed.API.Data.Migrations
 
                     b.HasIndex("SentById");
 
-                    b.ToTable("Comment");
+                    b.ToTable("Comment", (string)null);
                 });
 
             modelBuilder.Entity("ZulaMed.API.Domain.Comments.Reply", b =>
@@ -76,7 +76,7 @@ namespace ZulaMed.API.Data.Migrations
 
                     b.HasIndex("ReplyCommentId");
 
-                    b.ToTable("Reply");
+                    b.ToTable("Reply", (string)null);
                 });
 
             modelBuilder.Entity("ZulaMed.API.Domain.Dislike.Dislike<ZulaMed.API.Domain.Video.Video>", b =>
@@ -100,7 +100,7 @@ namespace ZulaMed.API.Data.Migrations
 
                     b.HasIndex("ParentId");
 
-                    b.ToTable("Dislike<Video>");
+                    b.ToTable("Dislike<Video>", (string)null);
                 });
 
             modelBuilder.Entity("ZulaMed.API.Domain.Like.Like<ZulaMed.API.Domain.Video.Video>", b =>
@@ -124,7 +124,7 @@ namespace ZulaMed.API.Data.Migrations
 
                     b.HasIndex("ParentId");
 
-                    b.ToTable("Like<Video>");
+                    b.ToTable("Like<Video>", (string)null);
                 });
 
             modelBuilder.Entity("ZulaMed.API.Domain.Playlist.Playlist", b =>
@@ -148,7 +148,7 @@ namespace ZulaMed.API.Data.Migrations
 
                     b.HasIndex("OwnerId");
 
-                    b.ToTable("Playlist");
+                    b.ToTable("Playlist", (string)null);
                 });
 
             modelBuilder.Entity("ZulaMed.API.Domain.SpecialtyGroup.SpecialtyGroup", b =>
@@ -165,7 +165,7 @@ namespace ZulaMed.API.Data.Migrations
 
                     b.HasKey("Id");
 
-                    b.ToTable("SpecialtyGroup");
+                    b.ToTable("SpecialtyGroup", (string)null);
                 });
 
             modelBuilder.Entity("ZulaMed.API.Domain.Subscriptions.Subscription", b =>
@@ -180,7 +180,7 @@ namespace ZulaMed.API.Data.Migrations
 
                     b.HasIndex("SubscribedToId");
 
-                    b.ToTable("Subscription");
+                    b.ToTable("Subscription", (string)null);
                 });
 
             modelBuilder.Entity("ZulaMed.API.Domain.User.User", b =>
@@ -218,11 +218,6 @@ namespace ZulaMed.API.Data.Migrations
                     b.Property<string>("PhotoUrl")
                         .HasColumnType("text");
 
-                    b.Property<int>("SubscriberCount")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("integer")
-                        .HasDefaultValue(0);
-
                     b.Property<string>("Surname")
                         .IsRequired()
                         .HasColumnType("text");
@@ -245,7 +240,7 @@ namespace ZulaMed.API.Data.Migrations
                     b.HasIndex("Login")
                         .IsUnique();
 
-                    b.ToTable("User");
+                    b.ToTable("User", (string)null);
                 });
 
             modelBuilder.Entity("ZulaMed.API.Domain.Video.Video", b =>
@@ -295,7 +290,7 @@ namespace ZulaMed.API.Data.Migrations
 
                     b.HasIndex("PublisherId");
 
-                    b.ToTable("Video");
+                    b.ToTable("Video", (string)null);
                 });
 
             modelBuilder.Entity("ZulaMed.API.Domain.ViewHistory.ViewHistory", b =>
@@ -319,7 +314,7 @@ namespace ZulaMed.API.Data.Migrations
 
                     b.HasIndex("ViewedVideoId");
 
-                    b.ToTable("ViewHistory");
+                    b.ToTable("ViewHistory", (string)null);
                 });
 
             modelBuilder.Entity("PlaylistVideo", b =>

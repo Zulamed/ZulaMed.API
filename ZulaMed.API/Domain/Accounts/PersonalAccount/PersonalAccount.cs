@@ -1,7 +1,10 @@
+using ZulaMed.API.Domain.User;
+
 namespace ZulaMed.API.Domain.Accounts.PersonalAccount;
 
 public class PersonalAccount
 {
+    public UserId UserId { get; init; }
     public required User.User User { get; init; }
     public required AccountGender AccountGender { get; init; }
     public required AccountTitle AccountTitle { get; init; }
