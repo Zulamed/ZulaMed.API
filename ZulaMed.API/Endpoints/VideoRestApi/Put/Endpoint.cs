@@ -27,7 +27,8 @@ public class UpdateVideoCommandHandler : Mediator.ICommandHandler<UpdateVideoCom
                 .ExecuteUpdateAsync(calls => calls
                         .SetProperty(x => x.VideoTitle, (VideoTitle)command.VideoTitle)
                         .SetProperty(x => x.VideoThumbnail, (VideoThumbnail)command.VideoThumbnail)
-                        .SetProperty(x => x.VideoDescription, (VideoDescription)command.VideoDescription),
+                        .SetProperty(x => x.VideoDescription, (VideoDescription)command.VideoDescription)
+                        .SetProperty(x => x.VideoUrl, (VideoUrl)command.VideoUrl),
                     cancellationToken);
             return rows > 0;
         }

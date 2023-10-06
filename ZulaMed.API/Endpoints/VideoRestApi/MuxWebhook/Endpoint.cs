@@ -5,17 +5,27 @@ using Mediator;
 
 namespace ZulaMed.API.Endpoints.VideoRestApi.MuxWebhook;
 
-public class MuxWebHookValidator : IPreProcessor<Request>
+public class Binder : RequestBinder<Request>
 {
-    public Task PreProcessAsync(Request req, HttpContext ctx, List<ValidationFailure> failures, CancellationToken ct)
+    public override async ValueTask<Request> BindAsync(BinderContext ctx, CancellationToken cancellation)
     {
-        return Task.CompletedTask;
+        var req = await base.BindAsync(ctx, cancellation);
+
+        req.MuxData.Metadata = req.Data.TryGetValue("passthrough", out var passthroughJson)
+            ? JsonSerializer.Deserialize<Metadata>(passthroughJson.GetString()!, ctx.SerializerOptions)
+            : null;
+
+        return req;
     }
 }
 
-public class Metadata
+public class MuxWebHookValidator : IPreProcessor<Request>
 {
-    public required Guid VideoId { get; set; }
+    public Task PreProcessAsync(Request req, HttpContext ctx, List<ValidationFailure> failures,
+        CancellationToken ct)
+    {
+        return Task.CompletedTask;
+    }
 }
 
 public class Endpoint : Endpoint<Request>
@@ -29,17 +39,18 @@ public class Endpoint : Endpoint<Request>
 
     public override void Configure()
     {
-        Post();
+        Post("/video/mux/webhook");
         PreProcessors(new MuxWebHookValidator());
+        RequestBinder(new Binder());
+        AllowAnonymous();
     }
 
 
     public override async Task HandleAsync(Request req, CancellationToken ct)
     {
-        var metadata = JsonSerializer.Deserialize<Metadata>(req.Data.Passthrough);
-        if (metadata is null)
+        if (req.MuxData.Metadata is null)
         {
-            AddError("Invalid metadata");
+            AddError("Metadata was null");
             await SendErrorsAsync(cancellation: ct);
             return;
         }
@@ -47,21 +58,21 @@ public class Endpoint : Endpoint<Request>
         switch (req.Type)
         {
             case "video.asset.created":
-                await _mediator.Send(new AssetCreatedEvent()
+                await _mediator.Send(new AssetCreatedEvent
                 {
-                    VideoId = metadata.VideoId
+                    VideoId = req.MuxData.Metadata.VideoId
                 }, ct);
                 break;
             case "video.asset.ready":
-                await _mediator.Send(new AssetReadyEvent()
+                await _mediator.Send(new AssetReadyEvent
                 {
-                    VideoId = metadata.VideoId
+                    VideoId = req.MuxData.Metadata.VideoId
                 }, ct);
                 break;
             case "video.upload.canceled":
-                await _mediator.Send(new UploadCanceledEvent()
+                await _mediator.Send(new UploadCanceledEvent
                 {
-                    VideoId = metadata.VideoId
+                    VideoId = req.MuxData.Metadata.VideoId
                 }, ct);
                 break;
             default:
