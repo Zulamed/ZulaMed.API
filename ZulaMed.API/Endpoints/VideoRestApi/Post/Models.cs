@@ -10,10 +10,6 @@ namespace ZulaMed.API.Endpoints.VideoRestApi.Post;
 public class Request
 {
     public required Guid VideoPublisherId { get; init; }
-    public required string VideoTitle { get; init; } 
-    public required string VideoThumbnail { get; init; }
-    public required string VideoDescription { get; init; }
-    public required IFormFile Video { get; set; }
 }
 
 
@@ -22,17 +18,19 @@ public class Validator : Validator<Request>
     public Validator()
     {
         RuleFor(x => x.VideoPublisherId).NotEmpty();
-        RuleFor(x => x.VideoTitle).NotEmpty();
-        RuleFor(x => x.VideoThumbnail).NotEmpty();
-        RuleFor(x => x.VideoDescription).NotEmpty();
     }
 }
 
-public class CreateVideoCommand : Mediator.ICommand<Result<Video, ValueObjectValidationException>>
+
+public class Response
+{
+    public required Guid Id { get; init; }
+    
+    public required string UploadUrl { get; init; } 
+}
+
+
+public class CreateVideoCommand : Mediator.ICommand<Result<Response, ValueObjectValidationException>>
 {
     public required Guid VideoPublisherId { get; init; }
-    public required string VideoTitle { get; init; } 
-    public required string VideoThumbnail { get; init; }
-    public required string VideoDescription { get; init; }
-    public required IFormFile Video { get; set; }
 }

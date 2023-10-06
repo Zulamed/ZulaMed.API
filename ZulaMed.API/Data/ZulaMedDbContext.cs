@@ -16,5 +16,7 @@ public class ZulaMedDbContext : DbContext
         modelBuilder.ApplyConfigurationsFromAssembly(typeof(Program).Assembly);
         modelBuilder.ApplyConfiguration(new LikeConfiguration<Video>());
         modelBuilder.ApplyConfiguration(new DislikeConfiguration<Video>());
+        
+        modelBuilder.HasPostgresEnum<VideoStatus>();
     }
 }
