@@ -18,7 +18,6 @@ public class GetVideoByIdQueryHandler : IQueryHandler<GetAllUsersQuery, User[]>
     public async ValueTask<User[]> Handle(GetAllUsersQuery query, CancellationToken cancellationToken)
     {
         var users = await _context.Set<User>()
-            .Include(x => x.Group)
             .ToArrayAsync(cancellationToken: cancellationToken);
         return users;
     }

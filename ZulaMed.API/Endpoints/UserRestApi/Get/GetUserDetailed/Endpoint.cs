@@ -58,7 +58,6 @@ public class Endpoint : Endpoint<Request, Response>
         var user = await _dbContext
             .Set<User>()
             .Include(x => x.Videos.OrderByDescending(z => z.VideoPublishedDate))
-            .Include(x => x.Group)
             .FirstOrDefaultAsync(x => (Guid)x.Id == req.UserId, ct);
         if (user is null)
         {

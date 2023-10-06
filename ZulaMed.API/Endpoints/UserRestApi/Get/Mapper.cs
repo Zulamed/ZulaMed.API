@@ -13,11 +13,8 @@ public static class Mapper
             Country = user.Country.Value,
             Email = user.Email.Value,
             Login = user.Login.Value,
-            Group = user.Group.Name.Value,
             Name = user.Name.Value,
             Surname = user.Surname.Value,
-            University = user.University.Value,
-            WorkPlace = user.WorkPlace.Value,
             ProfilePictureUrl = user.PhotoUrl?.Value,
             HistoryPaused = user.HistoryPaused.Value 
         };

@@ -3,6 +3,7 @@ using System;
 using System.Collections.Generic;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 using ZulaMed.API.Data;
@@ -12,9 +13,11 @@ using ZulaMed.API.Data;
 namespace ZulaMed.API.Data.Migrations
 {
     [DbContext(typeof(ZulaMedDbContext))]
-    partial class ZulaMedDbContextModelSnapshot : ModelSnapshot
+    [Migration("20231004203251_AddAccounts")]
+    partial class AddAccounts
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder

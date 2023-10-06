@@ -4,29 +4,30 @@ using Mediator;
 using Microsoft.EntityFrameworkCore;
 using OneOf.Types;
 using ZulaMed.API.Data;
+using ZulaMed.API.Domain.Accounts;
+using ZulaMed.API.Domain.Accounts.HospitalAccount;
 using ZulaMed.API.Domain.User;
-using VoException = Vogen.ValueObjectValidationException;
 
-namespace ZulaMed.API.Endpoints.UserRestApi.Register;
+namespace ZulaMed.API.Endpoints.UserRestApi.Register.Hospital;
 
-public class CreateVideoCommandHandler : Mediator.ICommandHandler<CreateUserCommand, Result<User, Exception>>
+public class CreateHospitalAccountCommandHandler : Mediator.ICommandHandler<CreateHospitalAccountCommand,
+    Result<HospitalAccount, Exception>>
 {
     private readonly ZulaMedDbContext _dbContext;
     private readonly FirebaseAuth _auth;
 
-    public CreateVideoCommandHandler(ZulaMedDbContext dbContext, FirebaseAuth auth)
+    public CreateHospitalAccountCommandHandler(ZulaMedDbContext dbContext, FirebaseAuth auth)
     {
         _dbContext = dbContext;
         _auth = auth;
     }
 
-    public async ValueTask<Result<User, Exception>> Handle(CreateUserCommand command,
+    public async ValueTask<Result<HospitalAccount, Exception>> Handle(CreateHospitalAccountCommand command,
         CancellationToken cancellationToken)
     {
-        var dbSet = _dbContext.Set<User>();
         try
         {
-            var entity = await dbSet.AddAsync(new User
+            var user = new User
             {
                 Id = (UserId)Guid.NewGuid(),
                 Login = (UserLogin)command.Login,
@@ -36,10 +37,22 @@ public class CreateVideoCommandHandler : Mediator.ICommandHandler<CreateUserComm
                 Country = (UserCountry)command.Country,
                 City = (UserCity)command.City,
                 HistoryPaused = (HistoryPaused)false
-            }, cancellationToken);
+            };
+            var userEntity = await _dbContext.Set<User>().AddAsync(user, cancellationToken);
             await _dbContext.SaveChangesAsync(cancellationToken);
-            await AddUserToFirebase(command.Email, command.Password, entity.Entity.Id.Value, cancellationToken);
-            return entity.Entity;
+            await AddUserToFirebase(command.Email, command.Password, userEntity.Entity.Id.Value, cancellationToken);
+
+            var account = new HospitalAccount
+            {
+                User = user,
+                AccountHospital = (AccountHospital)command.AccountHospital,
+                AccountAddress = (AccountAddress)command.AccountAddress,
+                AccountPostCode = (AccountPostCode)command.AccountPostCode,
+                AccountPhone = (AccountPhone)command.AccountPhone
+            };
+            var accountEntity = await _dbContext.Set<HospitalAccount>().AddAsync(account, cancellationToken);
+            await _dbContext.SaveChangesAsync(cancellationToken);
+            return accountEntity.Entity;
         }
         catch (DbUpdateException e)
         {
@@ -52,22 +65,22 @@ public class CreateVideoCommandHandler : Mediator.ICommandHandler<CreateUserComm
         }
     }
 
-    private async Task AddUserToFirebase(string email, string password,Guid userId, CancellationToken token)
+    private async Task AddUserToFirebase(string email, string password, Guid userId, CancellationToken token)
     {
         var user = await _auth.CreateUserAsync(new UserRecordArgs()
         {
             Email = email,
-            Password = password 
+            Password = password
         }, token);
         await _auth.SetCustomUserClaimsAsync(user.Uid, new Dictionary<string, object>()
         {
             ["IsAdmin"] = false,
-            ["UserId"] = userId 
+            ["UserId"] = userId
         }, token);
     }
 }
 
-public class Endpoint : Endpoint<Request, UserDTO>
+public class Endpoint : Endpoint<Request, HospitalAccountDTO>
 {
     private readonly IMediator _mediator;
 
@@ -78,7 +91,7 @@ public class Endpoint : Endpoint<Request, UserDTO>
 
     public override void Configure()
     {
-        Post("/user");
+        Post("/hospitalAccount");
         AllowAnonymous();
     }
 
