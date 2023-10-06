@@ -4,10 +4,7 @@ using Google.Apis.Auth.OAuth2;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Http.Features;
 using Microsoft.IdentityModel.Tokens;
-using Refit;
 using ZulaMed.API;
-using ZulaMed.API.Endpoints.VideoRestApi;
-using ZulaMed.API.Endpoints.VideoRestApi.Upload;
 using ZulaMed.API.Health;
 
 var builder = WebApplication.CreateBuilder(args);

@@ -9,26 +9,22 @@ public static class Mapper
     {
         return new CreateVideoCommand
         {
-            VideoTitle = request.VideoTitle,
             VideoPublisherId = request.VideoPublisherId,
-            VideoThumbnail = request.VideoThumbnail,
-            VideoDescription = request.VideoDescription,
-            Video = request.Video,
         };
     }
 
-    public static VideoDTO MapToResponse(this Video video)
-    {
-        return new VideoDTO
-        {
-            Id = video.Id.Value,
-            VideoPublisherId = video.Publisher.Id.Value,
-            VideoDescription = video.VideoDescription.Value,
-            VideoThumbnail = video.VideoThumbnail.Value,
-            VideoUrl = video.VideoUrl.Value,
-            VideoTitle = video.VideoTitle.Value,
-            VideoPublishedDate = video.VideoPublishedDate.Value,
-            VideoViews = video.VideoView.Value
-        };
-    }
+    // public static VideoDTO MapToResponse(this Video video)
+    // {
+    //     return new VideoDTO
+    //     {
+    //         Id = video.Id.Value,
+    //         VideoPublisherId = video.Publisher.Id.Value,
+    //         VideoDescription = video.VideoDescription.Value,
+    //         VideoThumbnail = video.VideoThumbnail.Value,
+    //         VideoUrl = video.VideoUrl.Value,
+    //         VideoTitle = video.VideoTitle.Value,
+    //         VideoPublishedDate = video.VideoPublishedDate.Value,
+    //         VideoViews = video.VideoView.Value
+    //     };
+    // }
 }
