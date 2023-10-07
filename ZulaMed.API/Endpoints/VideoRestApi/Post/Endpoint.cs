@@ -1,41 +1,34 @@
+using System.Text.Json;
 using Amazon.S3;
 using Amazon.S3.Model;
-using Amazon.SQS;
-using Amazon.SQS.Model;
 using FastEndpoints;
 using Mediator;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Options;
+using Mux.Csharp.Sdk.Api;
+using Mux.Csharp.Sdk.Model;
 using OneOf.Types;
 using Vogen;
 using ZulaMed.API.Data;
 using ZulaMed.API.Domain.User;
 using ZulaMed.API.Domain.Video;
-using System.Text.Json;
 using VoException = Vogen.ValueObjectValidationException;
 
 namespace ZulaMed.API.Endpoints.VideoRestApi.Post;
 
 public class CreateVideoCommandHandler
-    : Mediator.ICommandHandler<CreateVideoCommand, Result<Video, VoException>>
+    : Mediator.ICommandHandler<CreateVideoCommand, Result<Response, VoException>>
 {
-    private readonly IAmazonS3 _s3Client;
-    private readonly IOptions<S3BucketOptions> _s3Options;
-    private readonly IAmazonSQS _sqs;
-    private readonly IOptions<SqsQueueOptions> _sqsOptions;
     private readonly ZulaMedDbContext _dbContext;
+    private readonly DirectUploadsApi _muxUploadClient;
 
-    public CreateVideoCommandHandler(ZulaMedDbContext dbContext, IAmazonS3 s3Client,
-        IOptions<S3BucketOptions> s3Options, IAmazonSQS sqs, IOptions<SqsQueueOptions> sqsOptions)
+    public CreateVideoCommandHandler(ZulaMedDbContext dbContext, DirectUploadsApi muxUploadClient)
     {
         _dbContext = dbContext;
-        _s3Client = s3Client;
-        _s3Options = s3Options;
-        _sqs = sqs;
-        _sqsOptions = sqsOptions;
+        _muxUploadClient = muxUploadClient;
     }
 
-    public async ValueTask<Result<Video, ValueObjectValidationException>> Handle(CreateVideoCommand command,
+    public async ValueTask<Result<Response, ValueObjectValidationException>> Handle(CreateVideoCommand command,
         CancellationToken cancellationToken)
     {
         var dbSet = _dbContext.Set<Video>();
@@ -46,64 +39,63 @@ public class CreateVideoCommandHandler
                 cancellationToken: cancellationToken);
             if (user is null)
             {
-                throw new VoException("User not Found");
+                return new Error<VoException>(new VoException("User not found"));
             }
 
-            var fileExtension = Path.GetExtension(command.Video.FileName);
-            var entity = await dbSet.AddAsync(new Video
+            await dbSet.AddAsync(new Video
             {
                 Id = (VideoId)guid,
-                VideoDescription = (VideoDescription)command.VideoDescription,
-                VideoPublishedDate = (VideoPublishedDate)DateTime.UtcNow,
-                VideoThumbnail = (VideoThumbnail)command.VideoThumbnail,
-                VideoTitle = (VideoTitle)command.VideoTitle,
-                VideoUrl = (VideoUrl)(_s3Options.Value.BaseUrl + $"/videos/{guid}"),
-                Publisher = user
-            }, cancellationToken);
-
-            await _s3Client.PutObjectAsync(new PutObjectRequest
-            {
-                BucketName = _s3Options.Value.BucketName,
-                Key = $"videos/{guid}",
-                ContentType = command.Video.ContentType,
-                InputStream = command.Video.OpenReadStream(),
-                Metadata =
-                {
-                    ["x-amz-meta-originalname"] = command.Video.FileName,
-                    ["x-amz-meta-extension"] = fileExtension
-                },
+                Publisher = user,
+                VideoStatus = VideoStatus.WaitingForUpload,
+                VideoPublishedDate = (VideoPublishedDate)DateTime.UtcNow
             }, cancellationToken);
 
             await _dbContext.SaveChangesAsync(cancellationToken);
-            
-            await _sqs.SendMessageAsync(await GetSqsUrl(),
-                JsonSerializer.Serialize(new { VideoS3Path = $"videos/{guid}" }), cancellationToken);
-            
-            return entity.Entity;
-        }
-        catch (DbUpdateException)
-        {
-            await _s3Client.DeleteObjectAsync(_s3Options.Value.BucketName, $"videos/{guid}", cancellationToken);
-            return new Error<VoException>(new VoException("Error while saving to database"));
+
+            var newAssetSettings = new CreateAssetRequest
+            {
+                AdditionalProperties =
+                {
+                    ["max_resolution_tier"] = "2160p"
+                },
+                Passthrough = JsonSerializer.Serialize(new
+                {
+                    videoId = guid
+                }),
+                PlaybackPolicy = new List<PlaybackPolicy>
+                {
+                    PlaybackPolicy.Public
+                }
+            };
+            var response = await _muxUploadClient.CreateDirectUploadAsync(
+                new CreateUploadRequest(newAssetSettings: newAssetSettings)
+                {
+                    CorsOrigin = "*"
+                }, cancellationToken);
+
+
+            var uploadUrl = response.Data.Url;
+
+            if (uploadUrl is null)
+            {
+                return new Error<VoException>(new VoException("Upload link was null"));
+            }
+
+
+            return new Response
+            {
+                UploadUrl = uploadUrl,
+                Id = guid
+            };
         }
         catch (VoException e)
         {
             return new Error<VoException>(e);
         }
     }
-
-    private async Task<string> GetSqsUrl()
-    {
-        var request = new GetQueueUrlRequest
-        {
-            QueueName = _sqsOptions.Value.QueueName
-        };
-        var response = await _sqs.GetQueueUrlAsync(request);
-        return response.QueueUrl;
-    }
 }
 
-public class Endpoint : Endpoint<Request, VideoDTO>
+public class Endpoint : Endpoint<Request, Response>
 {
     private readonly IMediator _mediator;
 
@@ -116,19 +108,18 @@ public class Endpoint : Endpoint<Request, VideoDTO>
     {
         Post("/video");
         AllowAnonymous();
-        AllowFileUploads();
     }
 
     public override async Task HandleAsync(Request request, CancellationToken ct)
     {
         var result = await _mediator.Send(request.MapToCommand(), ct);
-        if (result.TryPickT0(out var value, out var error))
-        {
-            await SendOkAsync(value.MapToResponse(), ct);
-            return;
-        }
 
-        AddError(error.Value.Message);
-        await SendErrorsAsync(cancellation: ct);
+        await result.Match(
+            r => SendOkAsync(r, ct),
+            e =>
+            {
+                AddError(e.Value.Message);
+                return SendErrorsAsync(cancellation: ct);
+            });
     }
 }

@@ -15,19 +15,15 @@ public class VideoConfiguration : IEntityTypeConfiguration<Video>
             .ValueGeneratedOnAdd()
             .IsRequired();
         builder.Property(x => x.VideoUrl)
-            .HasConversion<VideoUrl.EfCoreValueConverter>()
-            .IsRequired();
+            .HasConversion<VideoUrl.EfCoreValueConverter>();
         builder.Property(x => x.VideoDescription)
             .HasConversion<VideoDescription.EfCoreValueConverter>();
         builder.Property(x => x.VideoPublishedDate)
-            .HasConversion<VideoPublishedDate.EfCoreValueConverter>()
-            .IsRequired();
+            .HasConversion<VideoPublishedDate.EfCoreValueConverter>();
         builder.Property(x => x.VideoThumbnail)
-            .HasConversion<VideoThumbnail.EfCoreValueConverter>()
-            .IsRequired();
+            .HasConversion<VideoThumbnail.EfCoreValueConverter>();
         builder.Property(x => x.VideoTitle)
-            .HasConversion<VideoTitle.EfCoreValueConverter>()
-            .IsRequired();
+            .HasConversion<VideoTitle.EfCoreValueConverter>();
         builder.Property(x => x.VideoLike)
             .HasConversion<VideoLike.EfCoreValueConverter>()
             .HasDefaultValue(VideoLike.Zero);

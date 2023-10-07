@@ -26,6 +26,7 @@ public class GetAllVideosQueryHandler : IQueryHandler<GetAllVideosQuery, (Video[
         
         var videos = await _context.Set<Video>()
             .Include(x => x.Publisher)
+            .Where(x => x.VideoStatus == VideoStatus.Ready)
             .Paginate(x => x.VideoPublishedDate, query.PaginationOptions)
             .ToArrayAsync(cancellationToken: cancellationToken);
         return (videos, count);

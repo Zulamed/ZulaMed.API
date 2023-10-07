@@ -4,14 +4,14 @@ using System.Text.RegularExpressions;
 namespace ZulaMed.API.Domain.Video;
 
 [ValueObject<string>(Conversions.EfCoreValueConverter)]
-public readonly partial struct VideoUrl
+public partial class VideoUrl
 {
-    [GeneratedRegex(@"^\/[a-fA-F0-9]{8}-(?:[a-fA-F0-9]{4}-){3}[a-fA-F0-9]{12}$", 
-        RegexOptions.IgnoreCase | RegexOptions.Compiled, "en-US")]
-    private static partial Regex UrlValidationRegex();
+    // [GeneratedRegex(@"^https:\/\/stream\.mux\.com\/[^\/]+\.m3u8$", 
+    //     RegexOptions.IgnoreCase | RegexOptions.Compiled, "en-US")]
+    // private static partial Regex UrlValidationRegex();
 
     private static Validation Validate(string input)
     {
-        return UrlValidationRegex().IsMatch(input) ? Validation.Ok : Validation.Invalid("URL must be in the format '/GUID'");
+        return !string.IsNullOrWhiteSpace(input) ? Validation.Ok : Validation.Invalid("URL must be in the format '/GUID'");
     }
 }

@@ -4,7 +4,7 @@ using Vogen;
 namespace ZulaMed.API.Domain.Video;
 
 [ValueObject<string>(Conversions.EfCoreValueConverter)]
-public readonly partial struct VideoThumbnail
+public partial class VideoThumbnail
 {
     
     [GeneratedRegex(@"^\/[a-fA-F0-9]{8}-(?:[a-fA-F0-9]{4}-){3}[a-fA-F0-9]{12}\/[^\/]+\.[a-zA-Z]{3,4}$", 

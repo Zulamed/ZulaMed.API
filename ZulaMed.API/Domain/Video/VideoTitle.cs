@@ -3,7 +3,7 @@ using Vogen;
 namespace ZulaMed.API.Domain.Video;
 
 [ValueObject<string>(Conversions.EfCoreValueConverter)]
-public readonly partial struct VideoTitle
+public partial class VideoTitle
 {
     private static Validation Validate(string input)
     {
