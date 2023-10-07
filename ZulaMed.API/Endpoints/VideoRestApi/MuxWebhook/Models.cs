@@ -11,6 +11,10 @@ public class Metadata
 public class MuxData
 {
     public Metadata? Metadata { get; set; }
+    
+    public string? Status { get; set; }
+    
+    public string? PlaybackId { get; set; }
 }
 
 public class Request

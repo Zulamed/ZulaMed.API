@@ -42,7 +42,9 @@ public class AssetCreatedEventHandler : IRequestHandler<AssetCreatedEvent, OneOf
 
 public class AssetReadyEvent : IRequest<OneOf<Success, Error>>
 {
-    public required Guid VideoId { get; set; }
+    public required Guid VideoId { get; init; }
+
+    public required string PlaybackId { get; init; }
 }
 
 public class AssetReadyEventHandler : IRequestHandler<AssetReadyEvent, OneOf<Success, Error>>
@@ -58,10 +60,12 @@ public class AssetReadyEventHandler : IRequestHandler<AssetReadyEvent, OneOf<Suc
     {
         try
         {
+            var videoUrl = VideoUrl.From($"https://stream.mux.com/{request.PlaybackId}.m3u8");
             await _dbContext.Set<Video>()
                 .Where(x => (Guid)x.Id == request.VideoId)
-                .ExecuteUpdateAsync(calls =>
-                        calls.SetProperty(x => x.VideoStatus, VideoStatus.Ready),
+                .ExecuteUpdateAsync(calls => calls
+                        .SetProperty(x => x.VideoStatus, VideoStatus.Ready)
+                        .SetProperty(x => x.VideoUrl, videoUrl),
                     cancellationToken: cancellationToken);
             return new Success();
         }

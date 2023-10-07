@@ -42,38 +42,39 @@ public class CreateVideoCommandHandler
                 return new Error<VoException>(new VoException("User not found"));
             }
 
-            var entity = await dbSet.AddAsync(new Video
+            await dbSet.AddAsync(new Video
             {
                 Id = (VideoId)guid,
                 Publisher = user,
-                VideoStatus = VideoStatus.WaitingForUpload
+                VideoStatus = VideoStatus.WaitingForUpload,
+                VideoPublishedDate = (VideoPublishedDate)DateTime.UtcNow
             }, cancellationToken);
 
             await _dbContext.SaveChangesAsync(cancellationToken);
 
-            var response = await _muxUploadClient.CreateDirectUploadAsync(new CreateUploadRequest()
+            var newAssetSettings = new CreateAssetRequest
             {
-                NewAssetSettings = new CreateAssetRequest
+                AdditionalProperties =
                 {
-                   AdditionalProperties =
-                   {
-                       ["max_resolution_tier"] = "2160p"
-                   },
-                   Passthrough = JsonSerializer.Serialize(new
-                   {
-                       videoId = guid
-                   }),
-                   PlaybackPolicy = new List<PlaybackPolicy>
-                   {
-                       PlaybackPolicy.Public
-                   }
-                   
+                    ["max_resolution_tier"] = "2160p"
                 },
-                CorsOrigin = "*"
-            }, cancellationToken);
+                Passthrough = JsonSerializer.Serialize(new
+                {
+                    videoId = guid
+                }),
+                PlaybackPolicy = new List<PlaybackPolicy>
+                {
+                    PlaybackPolicy.Public
+                }
+            };
+            var response = await _muxUploadClient.CreateDirectUploadAsync(
+                new CreateUploadRequest(newAssetSettings: newAssetSettings)
+                {
+                    CorsOrigin = "*"
+                }, cancellationToken);
 
 
-            var uploadUrl = response.Data.Url; 
+            var uploadUrl = response.Data.Url;
 
             if (uploadUrl is null)
             {

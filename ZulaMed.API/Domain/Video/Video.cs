@@ -16,11 +16,11 @@ public enum VideoStatus
 public class Video
 {
     public required VideoId Id { get; init; }
-    public VideoTitle VideoTitle { get; init; }
-    public VideoUrl VideoUrl { get; init; }
-    public VideoThumbnail VideoThumbnail { get; init; }
-    public VideoDescription VideoDescription { get; init; }
-    public VideoPublishedDate VideoPublishedDate { get; init; }
+    public VideoTitle? VideoTitle { get; init; }
+    public VideoUrl? VideoUrl { get; init; }
+    public VideoThumbnail? VideoThumbnail { get; init; }
+    public VideoDescription? VideoDescription { get; init; }
+    public required VideoPublishedDate VideoPublishedDate { get; init; }
     
     public required VideoStatus VideoStatus { get; init; } 
     
