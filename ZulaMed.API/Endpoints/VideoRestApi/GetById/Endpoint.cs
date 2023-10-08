@@ -80,11 +80,11 @@ public class Endpoint : Endpoint<Request, Response>
             return;
         }
 
-        response.Video = response.Video with
+        if (response.Video.VideoUrl.StartsWith("http"))
         {
-            VideoUrl = $"{_s3Configuration.Value.BaseUrl}{response.Video.VideoUrl}",
-            VideoThumbnail = $"{_s3Configuration.Value.BaseUrl}{response.Video.VideoThumbnail}"
-        };
+            await SendAsync(response, cancellation: ct);
+            return;
+        }
         await SendAsync(response, cancellation: ct);
     }
 }

@@ -100,7 +100,7 @@ public class Endpoint : Endpoint<Request>
             {
                 AddError("Invalid webhook type");
                 await SendErrorsAsync(cancellation: ct);
-                break;
+                return;
             }
         }
 

@@ -43,7 +43,7 @@ public class Endpoint : Endpoint<Request, Response>
 
         await SendAsync(new Response
         {
-            Videos = videos.Videos.Select(x => x.ToResponse(_s3Configuration.Value.BaseUrl)).ToArray(),
+            Videos = videos.Videos.Select(x => x.ToResponse(string.Empty)).ToArray(),
             TotalCount = videos.Count
         }, cancellation: ct);
     }

@@ -13,6 +13,6 @@ public partial class VideoThumbnail
     
     private static Validation Validate(string input)
     {
-        return ThumbnailValidationRegex().IsMatch(input) ? Validation.Ok : Validation.Invalid("Thumbnail URL must be in the format '/GUID/filename.***'.");
+        return !string.IsNullOrWhiteSpace(input) ? Validation.Ok : Validation.Invalid("Thumbnail URL must be in the format '/GUID/filename.***'.");
     }
 }
