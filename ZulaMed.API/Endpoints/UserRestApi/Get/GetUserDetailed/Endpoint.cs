@@ -3,26 +3,26 @@ using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Options;
 using ZulaMed.API.Data;
 using ZulaMed.API.Domain.User;
+using ZulaMed.API.Domain.Video;
 
 namespace ZulaMed.API.Endpoints.UserRestApi.Get.GetUserDetailed;
 
 public class VideoMinimalDTO
 {
     public required Guid Id { get; init; }
-    
-    public required string Title { get; init; }
-    
+
+    public string? Title { get; init; }
+
     public required long Views { get; init; }
-    
+
     public required DateTime CreatedAt { get; init; }
-    
-    public required string Description { get; init; }
-    
-    public required string ThumbnailUrl { get; init; }
+
+    public string? Description { get; init; }
+
+    public string? ThumbnailUrl { get; init; }
 }
 
-
-public class Request 
+public class Request
 {
     public required Guid UserId { get; init; }
 }
@@ -30,9 +30,9 @@ public class Request
 public class Response
 {
     public required UserDTO User { get; init; }
-    
+
     public required VideoMinimalDTO[] Videos { get; init; }
-    
+
     public int NumberOfFollowers { get; init; }
 }
 
@@ -57,11 +57,17 @@ public class Endpoint : Endpoint<Request, Response>
     {
         var user = await _dbContext
             .Set<User>()
-            .Include(x => x.Videos.OrderByDescending(z => z.VideoPublishedDate))
+            .Include(x =>
+                x.Videos
+                    .OrderByDescending(z => z.VideoPublishedDate)
+                    .Where(z =>
+                        z.VideoStatus == VideoStatus.Ready && !z.VideoTitle!.Equals((object?)null)
+                    )
+            )
             .FirstOrDefaultAsync(x => (Guid)x.Id == req.UserId, ct);
         if (user is null)
         {
-            await SendNotFoundAsync(ct); 
+            await SendNotFoundAsync(ct);
             return;
         }
 
@@ -76,7 +82,7 @@ public class Endpoint : Endpoint<Request, Response>
         //     .Query()
         //     .OrderByDescending(x => x.VideoPublishedDate)
         //     .ToArrayAsync(cancellationToken: ct);
-        
+
         await SendAsync(new Response
         {
             NumberOfFollowers = numberOfFollowers,
@@ -84,11 +90,11 @@ public class Endpoint : Endpoint<Request, Response>
             Videos = user.Videos.Select(x => new VideoMinimalDTO
             {
                 Id = x.Id.Value,
-                Title = x.VideoTitle.Value,
+                Title = x.VideoTitle?.Value,
                 Views = x.VideoView.Value,
                 CreatedAt = x.VideoPublishedDate.Value,
-                ThumbnailUrl = $"{_options.Value.BaseUrl}{x.VideoThumbnail.Value}",
-                Description = x.VideoDescription.Value
+                ThumbnailUrl = x.VideoThumbnail?.Value,
+                Description = x.VideoDescription?.Value
             }).ToArray()
         }, cancellation: ct);
     }

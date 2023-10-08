@@ -33,7 +33,7 @@ public class GetByTitleQueryHandler : IQueryHandler<GetByTitleQuery, ValueTuple<
             .Include(x => x.Publisher)
             .Where(x => EF.Functions.ILike((string)x.VideoTitle, $"%{query.Title}%") &&
                         x.VideoStatus == VideoStatus.Ready
-                        && x.VideoUrl.Equals((object?)null))
+                        && x.VideoTitle!.Equals((object?)null))
             .Paginate(x => x.VideoPublishedDate, query.PaginationOptions)
             .ToArrayAsync(cancellationToken: cancellationToken);
         return (videos, count);

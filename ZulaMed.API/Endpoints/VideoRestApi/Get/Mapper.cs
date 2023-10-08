@@ -9,10 +9,10 @@ public static class Mapper
         var videoDto = new VideoDTO
         {
             Id = video.Id.Value,
-            VideoDescription = video.VideoDescription.Value,
-            VideoThumbnail = $"{baseUrl}{video.VideoThumbnail.Value}",
-            VideoUrl = video.VideoUrl.Value,
-            VideoTitle = video.VideoTitle.Value,
+            VideoDescription = video.VideoDescription?.Value,
+            VideoThumbnail = $"{baseUrl}{video.VideoThumbnail?.Value}",
+            VideoUrl = video.VideoUrl?.Value,
+            VideoTitle = video.VideoTitle?.Value,
             VideoPublishedDate = video.VideoPublishedDate.Value,
             VideoPublisherId = video.Publisher.Id.Value,
             VideoViews = video.VideoView.Value

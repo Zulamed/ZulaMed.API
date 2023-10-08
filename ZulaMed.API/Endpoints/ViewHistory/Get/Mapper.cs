@@ -15,10 +15,10 @@ public static class Mapper
             ViewedVideo = new VideoDTO
             {
                 Id = viewHistory.ViewedVideo.Id.Value,
-                VideoTitle = viewHistory.ViewedVideo.VideoTitle.Value,
+                VideoTitle = viewHistory.ViewedVideo.VideoTitle?.Value,
                 VideoPublisherId = viewHistory.ViewedVideo.Publisher.Id.Value,
-                VideoThumbnail = viewHistory.ViewedVideo.VideoThumbnail.Value,
-                VideoDescription = viewHistory.ViewedVideo.VideoDescription.Value,
+                VideoThumbnail = viewHistory.ViewedVideo.VideoThumbnail?.Value,
+                VideoDescription = viewHistory.ViewedVideo.VideoDescription?.Value,
                 VideoViews = viewHistory.ViewedVideo.VideoView.Value
             },
             ViewedAt = viewHistory.ViewedAt.Value,

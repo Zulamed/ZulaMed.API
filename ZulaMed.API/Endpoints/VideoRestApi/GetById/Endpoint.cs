@@ -80,11 +80,6 @@ public class Endpoint : Endpoint<Request, Response>
             return;
         }
 
-        if (response.Video.VideoUrl.StartsWith("http"))
-        {
-            await SendAsync(response, cancellation: ct);
-            return;
-        }
         await SendAsync(response, cancellation: ct);
     }
 }
