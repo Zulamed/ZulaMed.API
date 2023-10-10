@@ -20,6 +20,8 @@ public class Video
     public VideoUrl? VideoUrl { get; init; }
     public VideoThumbnail? VideoThumbnail { get; init; }
     public VideoDescription? VideoDescription { get; init; }
+    
+    public VideoTimelineThumbnail? VideoTimelineThumbnail { get; init; }
     public required VideoPublishedDate VideoPublishedDate { get; init; }
     
     public required VideoStatus VideoStatus { get; init; } 

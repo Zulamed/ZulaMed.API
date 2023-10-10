@@ -10,6 +10,9 @@ public record VideoDTO
     public string? VideoUrl { get; init; }
     public string? VideoThumbnail { get; init; }
     public string? VideoDescription { get; init; }
+    
+    public string? VideoTimelineThumbnail { get; init; }
+    
     public required DateTime VideoPublishedDate { get; init; }
     
     public required long VideoViews { get; init; }

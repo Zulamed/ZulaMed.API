@@ -61,11 +61,13 @@ public class AssetReadyEventHandler : IRequestHandler<AssetReadyEvent, OneOf<Suc
         try
         {
             var videoUrl = VideoUrl.From($"https://stream.mux.com/{request.PlaybackId}.m3u8");
+            var timeLineThumbnail = VideoTimelineThumbnail.From($"https://image.mux.com/{request.PlaybackId}/storyboard.vtt");
             await _dbContext.Set<Video>()
                 .Where(x => (Guid)x.Id == request.VideoId)
                 .ExecuteUpdateAsync(calls => calls
                         .SetProperty(x => x.VideoStatus, VideoStatus.Ready)
-                        .SetProperty(x => x.VideoUrl, videoUrl),
+                        .SetProperty(x => x.VideoUrl, videoUrl)
+                        .SetProperty(x => x.VideoTimelineThumbnail, timeLineThumbnail),
                     cancellationToken: cancellationToken);
             return new Success();
         }
