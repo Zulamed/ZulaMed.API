@@ -22,6 +22,8 @@ public class VideoConfiguration : IEntityTypeConfiguration<Video>
             .HasConversion<VideoPublishedDate.EfCoreValueConverter>();
         builder.Property(x => x.VideoThumbnail)
             .HasConversion<VideoThumbnail.EfCoreValueConverter>();
+        builder.Property(x => x.VideoTimelineThumbnail)
+            .HasConversion<VideoTimelineThumbnail.EfCoreValueConverter>();
         builder.Property(x => x.VideoTitle)
             .HasConversion<VideoTitle.EfCoreValueConverter>();
         builder.Property(x => x.VideoLike)
