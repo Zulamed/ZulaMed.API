@@ -11,6 +11,12 @@ public class Request
     public string? Title { get; init; }
     
     [QueryParam]
+    public Guid? UserId { get; init; }
+    
+    [QueryParam]
+    public bool? Liked { get; init; }
+    
+    [QueryParam]
     public int Page { get; init; } = 1;
     
     [QueryParam]
