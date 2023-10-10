@@ -26,14 +26,16 @@ public class GetUserLikedQueryHandler : IQueryHandler<GetUserLikedQuery, ValueTu
     public async ValueTask<(Video[], int)> Handle(GetUserLikedQuery query, CancellationToken cancellationToken)
     {
         var count = await _context.Set<Video>()
-            .Where(x => x.Publisher.Id == query.UserId)
+            .Where(x => x.Likes.Any(y => y.LikedBy.Id == (UserId)query.UserId) &&
+                        x.VideoStatus == VideoStatus.Ready
+                        && !x.VideoTitle!.Equals((object?)null))
             .CountAsync(cancellationToken: cancellationToken);
 
         var videos = await _context.Set<Video>()
             .Include(x => x.Publisher)
-            .Where(x => x.Likes.Any(y => y.LikedBy.Id == query.UserId) &&
+            .Where(x => x.Likes.Any(y => y.LikedBy.Id == (UserId)query.UserId) &&
                         x.VideoStatus == VideoStatus.Ready
-                        && !x.VideoUrl.Equals((object?)null))
+                        && !x.VideoTitle!.Equals((object?)null))
             .Paginate(x => x.VideoPublishedDate, query.PaginationOptions)
             .ToArrayAsync(cancellationToken: cancellationToken);
         return (videos, count);

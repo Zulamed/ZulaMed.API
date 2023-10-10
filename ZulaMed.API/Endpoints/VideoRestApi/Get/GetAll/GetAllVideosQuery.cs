@@ -22,6 +22,7 @@ public class GetAllVideosQueryHandler : IQueryHandler<GetAllVideosQuery, (Video[
     public async ValueTask<(Video[], int)> Handle(GetAllVideosQuery query, CancellationToken cancellationToken)
     {
         var count = await _context.Set<Video>()
+            .Where(x => x.VideoStatus == VideoStatus.Ready && !x.VideoTitle!.Equals((object?)null))
             .CountAsync(cancellationToken: cancellationToken);
         
         var videos = await _context.Set<Video>()

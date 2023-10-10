@@ -26,14 +26,16 @@ public class GetByTitleQueryHandler : IQueryHandler<GetByTitleQuery, ValueTuple<
     public async ValueTask<(Video[], int)> Handle(GetByTitleQuery query, CancellationToken cancellationToken)
     {
         var count = await _context.Set<Video>()
-            .Where(x => EF.Functions.ILike((string)x.VideoTitle, $"%{query.Title}%"))
+            .Where(x => EF.Functions.ILike((string)x.VideoTitle, $"%{query.Title}%") &&
+                        x.VideoStatus == VideoStatus.Ready
+                        && !x.VideoTitle!.Equals((object?)null))
             .CountAsync(cancellationToken: cancellationToken);
 
         var videos = await _context.Set<Video>()
             .Include(x => x.Publisher)
             .Where(x => EF.Functions.ILike((string)x.VideoTitle, $"%{query.Title}%") &&
                         x.VideoStatus == VideoStatus.Ready
-                        && x.VideoTitle!.Equals((object?)null))
+                        && !x.VideoTitle!.Equals((object?)null))
             .Paginate(x => x.VideoPublishedDate, query.PaginationOptions)
             .ToArrayAsync(cancellationToken: cancellationToken);
         return (videos, count);
