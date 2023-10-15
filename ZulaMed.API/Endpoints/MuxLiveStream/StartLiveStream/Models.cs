@@ -25,7 +25,7 @@ public class Response
 {
     public required Guid StreamId { get; init; }
     
-    public required string PlaybackId { get; init; }
+    public required string PlaybackUrl { get; init; }
     
     public required string StreamKey { get; init; }
 }
