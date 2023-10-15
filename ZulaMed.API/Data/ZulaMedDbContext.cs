@@ -1,4 +1,5 @@
 ﻿using Microsoft.EntityFrameworkCore;
+using Mux.Csharp.Sdk.Model;
 using ZulaMed.API.Domain.Comments;
 using ZulaMed.API.Domain.Video;
 using ZulaMed.API.Endpoints.Dislike;
@@ -18,5 +19,6 @@ public class ZulaMedDbContext : DbContext
         modelBuilder.ApplyConfiguration(new DislikeConfiguration<Video>());
         
         modelBuilder.HasPostgresEnum<VideoStatus>();
+        modelBuilder.HasPostgresEnum<LiveStreamStatus>();
     }
 }

@@ -1,4 +1,5 @@
 using Microsoft.EntityFrameworkCore;
+using Mux.Csharp.Sdk.Model;
 using Npgsql;
 using ZulaMed.API.Data;
 using ZulaMed.API.Domain.Video;
@@ -12,6 +13,7 @@ public static class Database
         var sourceBuilder = new NpgsqlDataSourceBuilder(connectionString);
 
         sourceBuilder.MapEnum<VideoStatus>();
+        sourceBuilder.MapEnum<LiveStreamStatus>();
         
         var dataSource = sourceBuilder.Build();
 
