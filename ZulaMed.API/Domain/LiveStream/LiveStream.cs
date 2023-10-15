@@ -13,4 +13,6 @@ public class LiveStream
     public required string PlaybackId { get; set; } 
     
     public required string StreamKey { get; set; } 
+    
+    public required string MuxStreamId { get; set; }
 }

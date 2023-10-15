@@ -96,7 +96,8 @@ public class
                 RelatedVideo = video,
                 Status = LiveStreamStatus.Idle,
                 PlaybackId = response.Data.PlaybackIds.First().Id,
-                StreamKey = response.Data.StreamKey
+                StreamKey = response.Data.StreamKey,
+                MuxStreamId = response.Data.Id
             }, cancellationToken);
 
             await _dbContext.SaveChangesAsync(cancellationToken);
@@ -148,7 +149,7 @@ public class Endpoint : Endpoint<Request>
         await result.Match(
             s => SendAsync(new Response
             {
-                PlaybackId = s.Value.PlaybackId,
+                PlaybackUrl = $"stream.mux.com/{s.Value.PlaybackId}.m3u8",
                 StreamId = s.Value.Id.Value,
                 StreamKey = s.Value.StreamKey
             }, 201, cancellationToken),

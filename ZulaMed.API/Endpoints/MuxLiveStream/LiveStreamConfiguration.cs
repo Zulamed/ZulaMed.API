@@ -27,5 +27,8 @@ public class LiveStreamConfiguration : IEntityTypeConfiguration<LiveStream>
         builder.Property(x => x.Status)
             .HasDefaultValue(LiveStreamStatus.Idle);
 
+        builder.Property(x => x.MuxStreamId)
+            .IsRequired();
+
     }
 }
