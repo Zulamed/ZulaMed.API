@@ -9,12 +9,12 @@ using VoException = Vogen.ValueObjectValidationException;
 
 namespace ZulaMed.API.Endpoints.UserRestApi.Register;
 
-public class CreateVideoCommandHandler : Mediator.ICommandHandler<CreateUserCommand, Result<User, Exception>>
+public class CreateUserCommandHandler : Mediator.ICommandHandler<CreateUserCommand, Result<User, Exception>>
 {
     private readonly ZulaMedDbContext _dbContext;
     private readonly FirebaseAuth _auth;
 
-    public CreateVideoCommandHandler(ZulaMedDbContext dbContext, FirebaseAuth auth)
+    public CreateUserCommandHandler(ZulaMedDbContext dbContext, FirebaseAuth auth)
     {
         _dbContext = dbContext;
         _auth = auth;

@@ -24,7 +24,7 @@ public static class Mux
         };
 
         services.AddSingleton(new DirectUploadsApi(configuration));
-
+        services.AddSingleton(new LiveStreamsApi(configuration));
 
         services.AddOptions<MuxSettings>()
             .BindConfiguration("MuxSettings")

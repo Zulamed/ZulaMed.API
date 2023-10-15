@@ -9,4 +9,8 @@ public class LiveStream
     public required Video.Video RelatedVideo { get; set; } 
     
     public required LiveStreamStatus Status { get; set; } 
+    
+    public required string PlaybackId { get; set; } 
+    
+    public required string StreamKey { get; set; } 
 }
