@@ -15,8 +15,8 @@ using ZulaMed.API.Domain.Video;
 namespace ZulaMed.API.Data.Migrations
 {
     [DbContext(typeof(ZulaMedDbContext))]
-    [Migration("20231015093537_AddLiveStreamTable")]
-    partial class AddLiveStreamTable
+    [Migration("20231016101904_AddStream")]
+    partial class AddStream
     {
         /// <inheritdoc />
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
@@ -241,6 +241,10 @@ namespace ZulaMed.API.Data.Migrations
                     b.Property<Guid>("Id")
                         .ValueGeneratedOnAdd()
                         .HasColumnType("uuid");
+
+                    b.Property<string>("MuxStreamId")
+                        .IsRequired()
+                        .HasColumnType("text");
 
                     b.Property<string>("PlaybackId")
                         .IsRequired()

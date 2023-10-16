@@ -7,7 +7,7 @@ using Mux.Csharp.Sdk.Model;
 namespace ZulaMed.API.Data.Migrations
 {
     /// <inheritdoc />
-    public partial class AddLiveStreamTable : Migration
+    public partial class AddStream : Migration
     {
         /// <inheritdoc />
         protected override void Up(MigrationBuilder migrationBuilder)
@@ -25,7 +25,8 @@ namespace ZulaMed.API.Data.Migrations
                     RelatedVideoId = table.Column<Guid>(type: "uuid", nullable: false),
                     Status = table.Column<LiveStreamStatus>(type: "live_stream_status", nullable: false, defaultValue: LiveStreamStatus.Idle),
                     PlaybackId = table.Column<string>(type: "text", nullable: false),
-                    StreamKey = table.Column<string>(type: "text", nullable: false)
+                    StreamKey = table.Column<string>(type: "text", nullable: false),
+                    MuxStreamId = table.Column<string>(type: "text", nullable: false)
                 },
                 constraints: table =>
                 {
