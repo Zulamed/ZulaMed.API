@@ -54,10 +54,6 @@ public class CreateVideoCommandHandler
 
             var newAssetSettings = new CreateAssetRequest
             {
-                AdditionalProperties =
-                {
-                    ["max_resolution_tier"] = "2160p"
-                },
                 Passthrough = JsonSerializer.Serialize(new
                 {
                     videoId = guid
@@ -65,12 +61,15 @@ public class CreateVideoCommandHandler
                 PlaybackPolicy = new List<PlaybackPolicy>
                 {
                     PlaybackPolicy.Public
-                }
+                },
+                MaxResolutionTier = CreateAssetRequest.MaxResolutionTierEnum._2160p,
+                Test = true
             };
             var response = await _muxUploadClient.CreateDirectUploadAsync(
                 new CreateUploadRequest(newAssetSettings: newAssetSettings)
                 {
-                    CorsOrigin = "*"
+                    CorsOrigin = "*",
+                    Test = true
                 }, cancellationToken);
 
 
