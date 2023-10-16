@@ -131,6 +131,7 @@ public class Endpoint : Endpoint<Request>
 
     public override async Task HandleAsync(Request req, CancellationToken ct)
     {
+        _logger.LogInformation("Mux Webhook: {Type} - type", req.Type);
         var eventType = TransformToEventType(req.Type);
         if (eventType is null)
         {
@@ -139,7 +140,6 @@ public class Endpoint : Endpoint<Request>
             return;
         }
 
-        _logger.LogInformation("Mux Webhook: {Type} - type", req.Type);
         _logger.LogInformation("Mux Webhook: {Status} - status", req.Status);
         _logger.LogInformation("Mux Webhook: {VideoId} - video id", req.MuxData!.Metadata.VideoId);
 
