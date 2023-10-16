@@ -1,5 +1,4 @@
 using FastEndpoints;
-using FluentValidation;
 using Mediator;
 using Microsoft.EntityFrameworkCore;
 using Mux.Csharp.Sdk.Api;
@@ -10,36 +9,6 @@ using ZulaMed.API.Data;
 using LiveStream = ZulaMed.API.Domain.LiveStream.LiveStream;
 
 namespace ZulaMed.API.Endpoints.MuxLiveStream.EndLiveStream;
-
-public class Request
-{
-    public Guid StreamId { get; init; }
-
-    public string MuxStreamId { get; init; } = null!;
-}
-
-public class Validator : Validator<Request>
-{
-    public Validator()
-    {
-        RuleFor(x => x.StreamId)
-            .NotEmpty()
-            .WithMessage("StreamId is required");
-
-        RuleFor(x => x.MuxStreamId)
-            .NotEmpty()
-            .WithMessage("MuxStreamId is required");
-    }
-}
-
-public class EndLiveStreamCommand : Mediator.ICommand<OneOf<Success, NotFound, Error<string>>>
-{
-    public required Guid StreamId { get; init; }
-
-    public required string MuxStreamId { get; init; }
-
-    public required Guid UserId { get; init; }
-}
 
 public class
     EndLiveStreamCommandHandler : Mediator.ICommandHandler<EndLiveStreamCommand,
@@ -63,10 +32,18 @@ public class
     {
         try
         {
-            var response = await _api.SignalLiveStreamCompleteAsync(command.MuxStreamId, cancellationToken);
+            var stream = await _dbContext.Set<LiveStream>()
+                .SingleOrDefaultAsync(x => (Guid)x.Id == command.StreamId, cancellationToken);
+            if (stream is null)
+            {
+                _logger.LogWarning("Stream not found: {StreamId}", command.StreamId);
+                return new NotFound();
+            }
+            
+            var response = await _api.SignalLiveStreamCompleteAsync(stream.MuxStreamId, cancellationToken);
             if (response is null)
             {
-                _logger.LogWarning("Mux stream not found: {MuxStreamId}", command.MuxStreamId);
+                _logger.LogWarning("Mux stream not found: {MuxStreamId}", stream.MuxStreamId);
                 return new NotFound();
             }
 
@@ -97,7 +74,7 @@ public class Endpoint : Endpoint<Request>
 
     public override void Configure()
     {
-        Delete("/liveStream/{streamId}");
+        Delete("/stream/{streamId}");
     }
 
     public override async Task HandleAsync(Request req, CancellationToken ct)
@@ -108,7 +85,6 @@ public class Endpoint : Endpoint<Request>
         var response = await _mediator.Send(new EndLiveStreamCommand
         {
             StreamId = req.StreamId,
-            MuxStreamId = req.MuxStreamId,
             UserId = userId
         }, ct);
 

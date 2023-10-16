@@ -119,7 +119,7 @@ public class
     }
 }
 
-public class Endpoint : Endpoint<Request>
+public class Endpoint : Endpoint<Request, Response>
 {
     private readonly IMediator _mediator;
 
@@ -131,14 +131,14 @@ public class Endpoint : Endpoint<Request>
     public override void Configure()
     {
         Post("/stream");
-        AllowAnonymous();
     }
 
     public override async Task HandleAsync(Request req, CancellationToken cancellationToken)
     {
+        var userId = Guid.Parse(HttpContext.User.FindFirst("UserId")!.Value);
         var command = new CreateLiveStreamCommand
         {
-            UserId = req.UserId,
+            UserId = userId,
             Name = req.Name,
             Description = req.Description,
             VideoThumbnail = req.VideoThumbnail
@@ -151,7 +151,8 @@ public class Endpoint : Endpoint<Request>
             {
                 PlaybackUrl = $"stream.mux.com/{s.Value.PlaybackId}.m3u8",
                 StreamId = s.Value.Id.Value,
-                StreamKey = s.Value.StreamKey
+                StreamKey = s.Value.StreamKey,
+                MuxStreamId = s.Value.MuxStreamId
             }, 201, cancellationToken),
             notFound => SendNotFoundAsync(cancellationToken),
             error =>

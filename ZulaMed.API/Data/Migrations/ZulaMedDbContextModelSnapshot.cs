@@ -239,6 +239,10 @@ namespace ZulaMed.API.Data.Migrations
                         .ValueGeneratedOnAdd()
                         .HasColumnType("uuid");
 
+                    b.Property<string>("MuxStreamId")
+                        .IsRequired()
+                        .HasColumnType("text");
+
                     b.Property<string>("PlaybackId")
                         .IsRequired()
                         .HasColumnType("text");
