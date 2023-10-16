@@ -4,30 +4,38 @@ using OneOf;
 using OneOf.Types;
 using ZulaMed.API.Data;
 using ZulaMed.API.Domain.Video;
+using Error = OneOf.Types.Error;
 
-namespace ZulaMed.API.Endpoints.VideoRestApi.MuxWebhook;
+namespace ZulaMed.API.Endpoints.MuxWebhook;
 
-public class AssetCreatedEvent : IRequest<OneOf<Success, Error>>
+public interface IMuxEvent : IRequest<OneOf<Success, Error>> 
 {
-    public required Guid VideoId { get; set; }
+    public MuxData Data { get; set; }
 }
 
-public class AssetCreatedEventHandler : IRequestHandler<AssetCreatedEvent, OneOf<Success, Error>>
+
+
+public class VideoAssetCreatedEvent : IMuxEvent
+{
+    public required MuxData Data { get; set; }
+}
+
+public class VideoAssetCreatedEventHandler : IRequestHandler<VideoAssetCreatedEvent, OneOf<Success, Error>>
 {
     private readonly ZulaMedDbContext _dbContext;
 
-    public AssetCreatedEventHandler(ZulaMedDbContext dbContext)
+    public VideoAssetCreatedEventHandler(ZulaMedDbContext dbContext)
     {
         _dbContext = dbContext;
     }
 
 
-    public async ValueTask<OneOf<Success, Error>> Handle(AssetCreatedEvent request, CancellationToken cancellationToken)
+    public async ValueTask<OneOf<Success, Error>> Handle(VideoAssetCreatedEvent request, CancellationToken cancellationToken)
     {
         try
         {
             var rows = await _dbContext.Set<Video>()
-                .Where(x => (Guid)x.Id == request.VideoId)
+                .Where(x => (Guid)x.Id == request.Data.Metadata.VideoId)
                 .ExecuteUpdateAsync(calls =>
                         calls.SetProperty(x => x.VideoStatus, VideoStatus.GettingProcessed),
                     cancellationToken: cancellationToken);
@@ -40,33 +48,34 @@ public class AssetCreatedEventHandler : IRequestHandler<AssetCreatedEvent, OneOf
     }
 }
 
-public class AssetReadyEvent : IRequest<OneOf<Success, Error>>
+public class VideoAssetReadyEvent : IMuxEvent
 {
-    public required Guid VideoId { get; init; }
-
-    public required string PlaybackId { get; init; }
+    public required MuxData Data { get; set; }
 }
 
-public class AssetReadyEventHandler : IRequestHandler<AssetReadyEvent, OneOf<Success, Error>>
+public class VideoAssetReadyEventHandler : IRequestHandler<VideoAssetReadyEvent, OneOf<Success, Error>>
 {
     private readonly ZulaMedDbContext _dbContext;
 
-    public AssetReadyEventHandler(ZulaMedDbContext dbContext)
+    public VideoAssetReadyEventHandler(ZulaMedDbContext dbContext)
     {
         _dbContext = dbContext;
     }
 
-    public async ValueTask<OneOf<Success, Error>> Handle(AssetReadyEvent request, CancellationToken cancellationToken)
+    public async ValueTask<OneOf<Success, Error>> Handle(VideoAssetReadyEvent request, CancellationToken cancellationToken)
     {
         try
         {
-            var videoUrl = VideoUrl.From($"https://stream.mux.com/{request.PlaybackId}.m3u8");
-            var timeLineThumbnail = VideoTimelineThumbnail.From($"https://image.mux.com/{request.PlaybackId}/storyboard.vtt");
+            var playbackId = request.Data.Data.PlaybackIds.First().Id;
+            var videoUrl = VideoUrl.From($"https://stream.mux.com/{playbackId}.m3u8");
+            var timeLineThumbnail = VideoTimelineThumbnail.From($"https://image.mux.com/{playbackId}/storyboard.vtt");
+            var thumbnail = VideoThumbnail.From($"https://image.mux.com/{playbackId}/thumbnail.png");
             await _dbContext.Set<Video>()
-                .Where(x => (Guid)x.Id == request.VideoId)
+                .Where(x => (Guid)x.Id == request.Data.Metadata.VideoId)
                 .ExecuteUpdateAsync(calls => calls
                         .SetProperty(x => x.VideoStatus, VideoStatus.Ready)
                         .SetProperty(x => x.VideoUrl, videoUrl)
+                        .SetProperty(x => x.VideoThumbnail, thumbnail)
                         .SetProperty(x => x.VideoTimelineThumbnail, timeLineThumbnail),
                     cancellationToken: cancellationToken);
             return new Success();
@@ -78,9 +87,9 @@ public class AssetReadyEventHandler : IRequestHandler<AssetReadyEvent, OneOf<Suc
     }
 }
 
-public class UploadCanceledEvent : IRequest<OneOf<Success, Error>>
+public class UploadCanceledEvent : IMuxEvent
 {
-    public required Guid VideoId { get; set; }
+    public required MuxData Data { get; set; }
 }
 
 public class UploadCanceledEventHandler : IRequestHandler<UploadCanceledEvent, OneOf<Success, Error>>
@@ -98,7 +107,7 @@ public class UploadCanceledEventHandler : IRequestHandler<UploadCanceledEvent, O
         try
         {
             await _dbContext.Set<Video>()
-                .Where(x => (Guid)x.Id == request.VideoId)
+                .Where(x => (Guid)x.Id == request.Data.Metadata.VideoId)
                 .ExecuteUpdateAsync(calls =>
                         calls.SetProperty(x => x.VideoStatus, VideoStatus.Cancelled),
                     cancellationToken: cancellationToken);
