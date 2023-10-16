@@ -1,5 +1,6 @@
 using Mediator;
 using Microsoft.EntityFrameworkCore;
+using Mux.Csharp.Sdk.Model;
 using OneOf;
 using OneOf.Types;
 using ZulaMed.API.Data;
@@ -23,15 +24,23 @@ public class VideoAssetCreatedEvent : IMuxEvent
 public class VideoAssetCreatedEventHandler : IRequestHandler<VideoAssetCreatedEvent, OneOf<Success, Error>>
 {
     private readonly ZulaMedDbContext _dbContext;
+    private readonly ILogger<VideoAssetCreatedEventHandler> _logger;
 
-    public VideoAssetCreatedEventHandler(ZulaMedDbContext dbContext)
+    public VideoAssetCreatedEventHandler(ZulaMedDbContext dbContext, ILogger<VideoAssetCreatedEventHandler> logger)
     {
         _dbContext = dbContext;
+        _logger = logger;
     }
+    
 
 
     public async ValueTask<OneOf<Success, Error>> Handle(VideoAssetCreatedEvent request, CancellationToken cancellationToken)
     {
+        if (request.Data.Data.Status == Asset.StatusEnum.Ready)
+        {
+            _logger.LogInformation("Asset {Id} is ready, no reason for video.asset.created", request.Data.Data.Id);
+            return new Error();
+        }
         try
         {
             var rows = await _dbContext.Set<Video>()
