@@ -1,13 +1,42 @@
-using System.Text.Json;
+using System.Security.Cryptography;
+using System.Text;
+using System.Text.Json.Nodes;
 using FastEndpoints;
 using FluentValidation.Results;
 using Mediator;
+using Microsoft.Extensions.Options;
 using Mux.Csharp.Sdk.Model;
 using Newtonsoft.Json;
 using ZulaMed.API.Extensions;
 using JsonSerializer = System.Text.Json.JsonSerializer;
 
 namespace ZulaMed.API.Endpoints.MuxWebhook;
+
+public interface IMuxWebhookValidator
+{
+    public bool Validate(string signature, string timestamp, string body);
+}
+
+public class MuxWebhookValidator : IMuxWebhookValidator
+{
+    private readonly IOptions<MuxSettings> _muxSettings;
+
+    public MuxWebhookValidator(IOptions<MuxSettings> muxSettings)
+    {
+        _muxSettings = muxSettings;
+    }
+
+    public bool Validate(string signature, string timestamp, string body)
+    {
+        var secret = _muxSettings.Value.SigningKey;
+        var payload = $"{timestamp}.{body}";
+        using var hmac = new HMACSHA256();
+        hmac.Key = Encoding.UTF8.GetBytes(secret);
+        var hash = hmac.ComputeHash(Encoding.UTF8.GetBytes(payload));
+        var hex = BitConverter.ToString(hash).Replace("-", "").ToLower();
+        return hex == signature;
+    }
+}
 
 public class Binder : RequestBinder<Request>
 {
@@ -18,22 +47,24 @@ public class Binder : RequestBinder<Request>
         // so basically because Mux's sdk is written with RestSharp which uses NewtonsoftJson,
         // i'll have to use NewtonsoftJson for deserialization
         // When i tried to use System.Text.Json, it was throwing an error
-        
         // So, i just get the data as a JsonObject and then deserialize it with NewtonsoftJson
-        
-        
+        var body = JsonSerializer.Deserialize<JsonObject>(req.Content, ctx.SerializerOptions)!;
+
+        req.Type = (string)body["type"]!;
+        req.Data = body["data"]!.AsObject();
+
         req.Status = (string)req.Data["status"]!;
-        
+
         if (req.Type.StartsWith("video.asset"))
         {
             var asset = JsonConvert.DeserializeObject<Asset>(req.Data.ToString());
             req.MuxData = new MuxData
             {
-                Data = asset!, 
+                Data = asset!,
                 Metadata = JsonSerializer.Deserialize<Metadata>(asset!.Passthrough, ctx.SerializerOptions)!
             };
         }
-        
+
         if (req.Type.StartsWith("video.upload"))
         {
             var upload = JsonConvert.DeserializeObject<Upload>(req.Data.ToString());
@@ -51,10 +82,23 @@ public class Binder : RequestBinder<Request>
 
 public class MuxWebHookValidator : IPreProcessor<Request>
 {
-    public Task PreProcessAsync(Request req, HttpContext ctx, List<ValidationFailure> failures,
+    public async Task PreProcessAsync(Request req, HttpContext ctx, List<ValidationFailure> failures,
         CancellationToken ct)
     {
-        return Task.CompletedTask;
+        var webhookValidator = ctx.Resolve<IMuxWebhookValidator>();
+
+        var values = req.MuxSignature.Split(",");
+        var timestamp = values[0].Replace("t=", "");
+        var signatureValue = values[1].Replace("v1=", "");
+        var body = req.Content;
+
+        var isValid = webhookValidator.Validate(signatureValue, timestamp, body);
+
+        if (!isValid)
+        {
+            failures.Add(new ValidationFailure("mux-signature", "Invalid signature"));
+            await ctx.Response.SendErrorsAsync(failures, cancellation: ct);
+        }
     }
 }
 

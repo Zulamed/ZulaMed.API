@@ -1,5 +1,6 @@
 using Mux.Csharp.Sdk.Api;
 using Mux.Csharp.Sdk.Client;
+using ZulaMed.API.Endpoints.MuxWebhook;
 
 namespace ZulaMed.API;
 
@@ -9,6 +10,8 @@ public class MuxSettings
     public required string SecretKey { get; set; } 
     
     public required string Id { get; set; }
+    
+    public required string SigningKey { get; set; }
 }
 
 
@@ -29,6 +32,8 @@ public static class Mux
         services.AddOptions<MuxSettings>()
             .BindConfiguration("MuxSettings")
             .ValidateDataAnnotations();
+
+        services.AddSingleton<IMuxWebhookValidator, MuxWebhookValidator>();
 
         return services;
     }

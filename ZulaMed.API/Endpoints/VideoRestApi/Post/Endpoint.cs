@@ -63,13 +63,11 @@ public class CreateVideoCommandHandler
                     PlaybackPolicy.Public
                 },
                 MaxResolutionTier = CreateAssetRequest.MaxResolutionTierEnum._2160p,
-                Test = true
             };
             var response = await _muxUploadClient.CreateDirectUploadAsync(
                 new CreateUploadRequest(newAssetSettings: newAssetSettings)
                 {
                     CorsOrigin = "*",
-                    Test = true
                 }, cancellationToken);
 
 
