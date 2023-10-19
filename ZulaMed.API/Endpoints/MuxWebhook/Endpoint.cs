@@ -1,10 +1,9 @@
-using System.Security.Cryptography;
-using System.Text;
+using System.Runtime.Serialization;
+using System.Text.Json;
 using System.Text.Json.Nodes;
 using FastEndpoints;
 using FluentValidation.Results;
 using Mediator;
-using Microsoft.Extensions.Options;
 using Mux.Csharp.Sdk.Model;
 using Newtonsoft.Json;
 using ZulaMed.API.Extensions;
@@ -12,37 +11,13 @@ using JsonSerializer = System.Text.Json.JsonSerializer;
 
 namespace ZulaMed.API.Endpoints.MuxWebhook;
 
-public interface IMuxWebhookValidator
-{
-    public bool Validate(string signature, string timestamp, string body);
-}
-
-public class MuxWebhookValidator : IMuxWebhookValidator
-{
-    private readonly IOptions<MuxSettings> _muxSettings;
-
-    public MuxWebhookValidator(IOptions<MuxSettings> muxSettings)
-    {
-        _muxSettings = muxSettings;
-    }
-
-    public bool Validate(string signature, string timestamp, string body)
-    {
-        var secret = _muxSettings.Value.SigningKey;
-        var payload = $"{timestamp}.{body}";
-        using var hmac = new HMACSHA256();
-        hmac.Key = Encoding.UTF8.GetBytes(secret);
-        var hash = hmac.ComputeHash(Encoding.UTF8.GetBytes(payload));
-        var hex = BitConverter.ToString(hash).Replace("-", "").ToLower();
-        return hex == signature;
-    }
-}
-
 public class Binder : RequestBinder<Request>
 {
     public override async ValueTask<Request> BindAsync(BinderContext ctx, CancellationToken cancellation)
     {
         var req = await base.BindAsync(ctx, cancellation);
+
+        var logger = ctx.Resolve<ILogger<Binder>>();
 
         // so basically because Mux's sdk is written with RestSharp which uses NewtonsoftJson,
         // i'll have to use NewtonsoftJson for deserialization
@@ -53,28 +28,58 @@ public class Binder : RequestBinder<Request>
         req.Type = (string)body["type"]!;
         req.Data = body["data"]!.AsObject();
 
+
+        // So because Mux SDK's Asset class had started_at as a string instead of a object,
+        // the deserialization was giving an exception when the property was present.
+        // The solution was to just remove the property from the json object so that deserialization can happen properly
+        var recordingTimes = req.Data["recording_times"];
+        if (recordingTimes is not null)
+        {
+            foreach (var jsonNode in recordingTimes.AsArray())
+            {
+                jsonNode!.AsObject().Remove("started_at");
+            }
+        }
+        
         req.Status = (string)req.Data["status"]!;
-
-        if (req.Type.StartsWith("video.asset"))
+        try
         {
-            var asset = JsonConvert.DeserializeObject<Asset>(req.Data.ToString());
-            req.MuxData = new MuxData
+            if (req.Type.StartsWith("video.asset"))
             {
-                Data = asset!,
-                Metadata = JsonSerializer.Deserialize<Metadata>(asset!.Passthrough, ctx.SerializerOptions)!
-            };
+                var asset = JsonConvert.DeserializeObject<Asset>(req.Data.ToString());
+                req.MuxData = new MuxData
+                {
+                    Data = asset!,
+                    Metadata = JsonSerializer.Deserialize<Metadata>(asset!.Passthrough, ctx.SerializerOptions)!
+                };
+            }
+
+            else if (req.Type.StartsWith("video.upload"))
+            {
+                var upload = JsonConvert.DeserializeObject<Upload>(req.Data.ToString());
+                req.MuxData = new MuxData
+                {
+                    Data = upload!.NewAssetSettings,
+                    Metadata = JsonSerializer.Deserialize<Metadata>(upload.NewAssetSettings.Passthrough,
+                        ctx.SerializerOptions)!
+                };
+            }
+            else if (req.Type.StartsWith("video.live_stream"))
+            {
+                var liveStream = JsonConvert.DeserializeObject<LiveStream>(req.Data.ToString());
+                req.MuxData = new MuxData
+                {
+                    Data = liveStream!,
+                    Metadata = JsonSerializer.Deserialize<Metadata>(liveStream!.Passthrough, ctx.SerializerOptions)!
+                };
+            }
+        }
+        catch (JsonReaderException e)
+        {
+            logger.LogError("An error occured while deserializing Mux webhook data: {Message}", e.Message);
+            throw;
         }
 
-        if (req.Type.StartsWith("video.upload"))
-        {
-            var upload = JsonConvert.DeserializeObject<Upload>(req.Data.ToString());
-            req.MuxData = new MuxData
-            {
-                Data = upload!.NewAssetSettings,
-                Metadata = JsonSerializer.Deserialize<Metadata>(upload.NewAssetSettings.Passthrough,
-                    ctx.SerializerOptions)!
-            };
-        }
 
         return req;
     }
@@ -124,9 +129,21 @@ public class Endpoint : Endpoint<Request>
 
     private static Type? TransformToEventType(string muxEventType)
     {
-        var capitalized = muxEventType.Split(".").Select(x => x.Capitalize());
-        var joined = string.Join("", capitalized);
-        return Type.GetType("ZulaMed.API.Endpoints.MuxWebhook." + joined + "Event");
+        var capitalized = muxEventType.Split(".").Select(x => x.Capitalize()).ToArray();
+        if (capitalized[1].Contains('_'))
+        {
+            var split = capitalized[1].Split("_").Select(x => x.Capitalize());
+            capitalized[1] = string.Join("", split);
+        }
+
+        if (capitalized[2].Contains('_'))
+        {
+            var split = capitalized[2].Split("_").Select(x => x.Capitalize());
+            capitalized[2] = string.Join("", split);
+        }
+
+        var name = $"{capitalized[1]}{capitalized[2]}Event";
+        return Type.GetType($"ZulaMed.API.Endpoints.MuxWebhook.{name}");
     }
 
     public override async Task HandleAsync(Request req, CancellationToken ct)
@@ -135,8 +152,8 @@ public class Endpoint : Endpoint<Request>
         var eventType = TransformToEventType(req.Type);
         if (eventType is null)
         {
-            AddError("Invalid webhook type");
-            await SendErrorsAsync(cancellation: ct);
+            // i'm gonna send a 200 response because i don't want Mux to keep sending the webhook
+            await SendOkAsync(ct);
             return;
         }
 

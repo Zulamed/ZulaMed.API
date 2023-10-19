@@ -40,6 +40,8 @@ public class
                 return new NotFound();
             }
             
+            // disable the stream on mux so that encoder can't send data to it and then signal that the stream is complete
+            await _api.DisableLiveStreamAsync(stream.MuxStreamId, cancellationToken: cancellationToken);
             var response = await _api.SignalLiveStreamCompleteAsync(stream.MuxStreamId, cancellationToken);
             if (response is null)
             {

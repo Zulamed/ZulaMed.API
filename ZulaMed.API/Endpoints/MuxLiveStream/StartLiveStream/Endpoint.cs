@@ -82,12 +82,14 @@ public class
                 PlaybackPolicy = playbackPolicies,
                 Passthrough = JsonSerializer.Serialize(new
                 {
-                    StreamId = streamGuid
+                    StreamId = streamGuid,
+                    VideoId = videoGuid
                 }),
                 NewAssetSettings = new CreateAssetRequest
                 {
-                    PlaybackPolicy = playbackPolicies
-                }
+                    PlaybackPolicy = playbackPolicies,
+                },
+                Test = true
             }, cancellationToken);
 
             var addedEntity = await _dbContext.Set<LiveStream>().AddAsync(new LiveStream
