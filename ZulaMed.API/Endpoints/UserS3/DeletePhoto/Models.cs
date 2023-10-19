@@ -6,14 +6,14 @@ namespace ZulaMed.API.Endpoints.UserS3.DeletePhoto;
 
 public class Request
 {
-    public required Guid Id { get; init; }
+    public required Guid FileId { get; init; }
 }
 
 public class RequestValidator : Validator<Request>
 {
     public RequestValidator()
     {
-        RuleFor(x => x.Id)
+        RuleFor(x => x.FileId)
             .NotEmpty()
             .WithMessage("Id is required");
     }

@@ -24,6 +24,7 @@ public class Validator : Validator<Request>
 public class UpdatePlaylistCommand : Mediator.ICommand<Result<bool, ValueObjectValidationException>>
 {
     public required Guid PlaylistId { get; init; }
+    public required Guid OwnerId { get; init; }
     public required string PlaylistName { get; init; } 
     public required string PlaylistDescription { get; init; } 
 }

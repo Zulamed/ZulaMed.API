@@ -2,6 +2,7 @@ using FastEndpoints;
 using Mediator;
 using Microsoft.EntityFrameworkCore;
 using ZulaMed.API.Data;
+using ZulaMed.API.Endpoints.ViewHistory.DeleteHistory;
 
 namespace ZulaMed.API.Endpoints.ViewHistory.DeleteHistoryByUser;
 
@@ -34,12 +35,20 @@ public class Endpoint : Endpoint<Request>
     public override void Configure()
     {
         Delete("/viewHistory/owner/{ownerId}");
-        AllowAnonymous();
     }
 
     public override async Task HandleAsync(Request req, CancellationToken ct)
     {
-        var result = await _mediator.Send(req.ToCommand(), ct);
+        var userId = Guid.Parse(HttpContext.User.Claims.FirstOrDefault(x => x.Type == "UserId")!.Value);
+        if (userId != req.OwnerId)
+        {
+            await SendUnauthorizedAsync(ct);
+            return;
+        }
+        var result = await _mediator.Send(new DeleteHistoryByUserCommand
+        {
+            OwnerId = req.OwnerId,
+        }, ct);
         if (result)
         {
             await SendOkAsync(ct);

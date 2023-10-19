@@ -22,5 +22,6 @@ public class Validator : Validator<Request>
 public class AddVideosToPlaylistCommand : Mediator.ICommand<Result<bool, Exception>>
 {
     public required Guid PlaylistId { get; init; }
+    public required Guid OwnerId { get; init; }
     public required List<Guid> VideosIds { get; init; }
 }

@@ -45,12 +45,20 @@ public class Endpoint : Endpoint<Request>
     public override void Configure()
     {
         Delete("/user/{id}/photo");
-        AllowAnonymous();
     }
 
     public override async Task HandleAsync(Request req, CancellationToken ct)
     {
-        var response = await _mediator.Send(req.MapToCommand(), ct);
+        var userId = Guid.Parse(HttpContext.User.Claims.FirstOrDefault(x => x.Type == "UserId")!.Value);
+        if (userId != req.FileId)
+        {
+            await SendUnauthorizedAsync(ct);
+            return;
+        }
+        var response = await _mediator.Send(new DeletePhotoCommand
+        {
+            FileId = req.FileId,
+        }, ct);
         switch (response.StatusCode)
         {
             case HttpStatusCode.NoContent:

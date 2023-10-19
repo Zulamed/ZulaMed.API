@@ -51,12 +51,20 @@ public class Endpoint : Endpoint<Request>
     public override void Configure()
     {
         Put("/user/{id}");
-        AllowAnonymous();
     }
 
     public override async Task HandleAsync(Request req, CancellationToken ct)
     {
-        var result = await _mediator.Send(req.MapToCommand(), ct);
+        var userId = Guid.Parse(HttpContext.User.Claims.FirstOrDefault(x => x.Type == "UserId")!.Value);
+        var result = await _mediator.Send(new UpdateUserCommand
+        {
+            Id = userId,
+            Email = req.Email,
+            Name = req.Name,
+            Surname = req.Surname,
+            Country = req.Country,
+            City = req.City,
+        }, ct);
         if (result.TryPickT0(out var isUpdated, out var error))
         {
             if (!isUpdated)

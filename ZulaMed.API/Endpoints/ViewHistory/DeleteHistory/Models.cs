@@ -21,4 +21,5 @@ public class RequestValidator : Validator<Request>
 public class DeleteHistoryCommand : Mediator.ICommand<bool>
 {
     public required Guid Id { get; init; }
+    public required Guid UserId { get; init; }
 }

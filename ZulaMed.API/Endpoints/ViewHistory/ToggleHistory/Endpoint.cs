@@ -37,11 +37,16 @@ public class Endpoint : Endpoint<Request>
     public override void Configure()
     {
         Put("/viewHistory/{ownerId}");
-        AllowAnonymous();
     }
 
     public override async Task HandleAsync(Request req, CancellationToken ct)
     {
+        var userId = Guid.Parse(HttpContext.User.Claims.FirstOrDefault(x => x.Type == "UserId")!.Value);
+        if (userId != req.Id)
+        {
+            await SendUnauthorizedAsync(ct);
+            return;
+        }
         var result = await _mediator.Send(req.ToCommand(), ct);
         if (result)
         {

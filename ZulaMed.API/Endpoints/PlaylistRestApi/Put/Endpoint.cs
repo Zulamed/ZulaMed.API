@@ -22,7 +22,7 @@ public class UpdatePlaylistCommandHandler : Mediator.ICommandHandler<UpdatePlayl
         try
         {
             var rows = await _dbContext.Set<Playlist>()
-                .Where(x => x.Id == command.PlaylistId)
+                .Where(x => (Guid)x.Id == command.PlaylistId && command.OwnerId == (Guid)x.Owner.Id)
                 .ExecuteUpdateAsync(calls => calls
                     .SetProperty(x => x.PlaylistName, (PlaylistName)command.PlaylistName)
                     .SetProperty(x => x.PlaylistDescription, (PlaylistDescription)command.PlaylistDescription),
@@ -48,12 +48,18 @@ public class Endpoint : Endpoint<Request>
     public override void Configure()
     {
         Put("/playlist/{id}");
-        AllowAnonymous();
     }
 
     public override async Task HandleAsync(Request req, CancellationToken ct)
     {
-        var result = await _mediator.Send(req.MapToCommand(), ct);
+        var userId = Guid.Parse(HttpContext.User.Claims.FirstOrDefault(x => x.Type == "UserId")!.Value);
+        var result = await _mediator.Send(new UpdatePlaylistCommand
+        {
+            PlaylistId = req.PlaylistId,
+            OwnerId = userId,
+            PlaylistName = req.PlaylistName,
+            PlaylistDescription = req.PlaylistDescription
+        }, ct);
         if (result.TryPickT0(out var isUpdated, out var error))
         {
             if (!isUpdated)

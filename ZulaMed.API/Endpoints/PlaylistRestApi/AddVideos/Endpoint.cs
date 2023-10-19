@@ -4,6 +4,7 @@ using Microsoft.EntityFrameworkCore;
 using OneOf.Types;
 using ZulaMed.API.Data;
 using ZulaMed.API.Domain.Playlist;
+using ZulaMed.API.Domain.User;
 using ZulaMed.API.Domain.Video;
 
 namespace ZulaMed.API.Endpoints.PlaylistRestApi.AddVideos;
@@ -22,10 +23,14 @@ public class AddVideosToPlaylistCommandHandler : Mediator.ICommandHandler<AddVid
         var playlist = await _dbContext.Set<Playlist>().FirstOrDefaultAsync(x => (Guid)x.Id == command.PlaylistId, cancellationToken);
         if (playlist is null)
         {
-            return new Error<Exception>(new Exception("Owner by provided id was not found"));
+            return new Error<Exception>(new Exception("playlist by provided id was not found"));
+        }
+        if ((Guid)playlist.Owner.Id != command.OwnerId)
+        {
+            return new Error<Exception>(new Exception("User is not an owner of the playlist"));
         }
         var videos = await _dbContext.Set<Video>().Where(x => command.VideosIds.Contains((Guid)x.Id)).ToArrayAsync(cancellationToken);
-        try
+        try 
         {
             playlist.Videos.AddRange(videos.ToList());
             await _dbContext.SaveChangesAsync(cancellationToken);
@@ -50,15 +55,16 @@ public class Endpoint : Endpoint<Request>
     public override void Configure()
     {
         Post("/playlist/{playlistId}/video");
-        AllowAnonymous();
     }
 
     public override async Task HandleAsync(Request req, CancellationToken ct)
     {
+        var userId = Guid.Parse(HttpContext.User.Claims.FirstOrDefault(x => x.Type == "UserId")!.Value);
         var result = await _mediator.Send(new AddVideosToPlaylistCommand
         {
             PlaylistId = req.PlaylistId,
-            VideosIds = req.VideosIds
+            VideosIds = req.VideosIds,
+            OwnerId = userId
         }, ct);
         if (result.TryPickT0(out var isUpdated, out var error))
         {

@@ -21,5 +21,6 @@ public class Validator : Validator<Request>
 public class DeleteVideoFromPlaylistCommand : Mediator.ICommand<Result<bool, Exception>>
 {
     public required Guid PlaylistId { get; init; }
+    public required Guid OwnerId { get; init; }
     public required Guid VideoId { get; init; }
 }

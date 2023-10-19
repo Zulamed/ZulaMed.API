@@ -59,12 +59,17 @@ public class Endpoint : Endpoint<Request, PlaylistDTO>
     public override void Configure()
     {
         Post("/playlist");
-        AllowAnonymous();
     }
 
     public override async Task HandleAsync(Request req, CancellationToken ct)
     {
-        var result = await _mediator.Send(req.MapToCommand(), ct);
+        var userId = Guid.Parse(HttpContext.User.Claims.FirstOrDefault(x => x.Type == "UserId")!.Value);
+        var result = await _mediator.Send(new CreatePlaylistCommand
+        {
+            OwnerId = userId,
+            PlaylistName = req.PlaylistName,
+            PlaylistDescription = req.PlaylistDescription
+        }, ct);
         if (result.TryPickT0(out var value, out var error))
         {
             await SendOkAsync(value.MapToResponse(), ct);
