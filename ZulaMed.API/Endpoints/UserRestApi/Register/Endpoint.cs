@@ -4,7 +4,13 @@ using Mediator;
 using Microsoft.EntityFrameworkCore;
 using OneOf.Types;
 using ZulaMed.API.Data;
+using ZulaMed.API.Domain.Accounts.HospitalAccount;
+using ZulaMed.API.Domain.Accounts.PersonalAccount;
+using ZulaMed.API.Domain.Accounts.UniversityAccount;
 using ZulaMed.API.Domain.User;
+using ZulaMed.API.Endpoints.UserRestApi.Register.Hospital;
+using ZulaMed.API.Endpoints.UserRestApi.Register.Personal;
+using ZulaMed.API.Endpoints.UserRestApi.Register.University;
 using VoException = Vogen.ValueObjectValidationException;
 
 namespace ZulaMed.API.Endpoints.UserRestApi.Register;
@@ -84,14 +90,111 @@ public class Endpoint : Endpoint<Request, UserDTO>
 
     public override async Task HandleAsync(Request request, CancellationToken ct)
     {
-        var result = await _mediator.Send(request.MapToCommand(), ct);
-        if (result.TryPickT0(out var value, out var error))
+        switch (request.AccountType)
         {
-            await SendOkAsync(value.MapToResponse(), ct);
-            return;
+            case AccountType.Personal:
+                var personalResult = await _mediator.Send(new CreatePersonalAccountCommand
+                {
+                    Email = request.Email,
+                    Login = request.Login,
+                    Password = request.Password,
+                    Name = request.Name,
+                    Surname = request.Surname,
+                    Country = request.Country,
+                    City = request.City,
+                    AccountGender = request.AccountGender.Value,
+                    AccountTitle = request.AccountTitle,
+                    AccountCareerStage = request.AccountCareerStage,
+                    AccountProfessionalActivity = request.AccountProfessionalActivity,
+                    AccountSpecialty = request.AccountSpecialty,
+                    AccountDepartment = request.AccountDepartment,
+                    AccountBirthDate = request.AccountBirthDate.Value,
+                    AccountInstitute = request.AccountInstitute,
+                    AccountRole = request.AccountRole,
+                    PlacesOfWork = request.PlacesOfWork
+                }, ct);
+                if (personalResult.TryPickT0(out var personalValue, out var error1))
+                {
+                    await SendOkAsync(new UserDTO
+                    {
+                        Id = personalValue.UserId.Value,
+                        Email = personalValue.User.Email.Value,
+                        Login = personalValue.User.Login.Value,
+                        Name = personalValue.User.Name.Value,
+                        Surname = personalValue.User.Surname.Value,
+                        Country = personalValue.User.Country.Value,
+                        City = personalValue.User.City.Value,
+                        HistoryPaused = personalValue.User.HistoryPaused.Value
+                    }, ct);
+                    return;
+                }
+                AddError(error1.Value.Message);
+                break;
+            case AccountType.Hospital:
+                var hospitalResult = await _mediator.Send(new CreateHospitalAccountCommand
+                {
+                    Email = request.Email,
+                    Login = request.Login,
+                    Password = request.Password,
+                    Name = request.Name,
+                    Surname = request.Surname,
+                    Country = request.Country,
+                    City = request.City,
+                    AccountHospital = request.AccountHospital,
+                    AccountAddress = request.AccountAddress,
+                    AccountPostCode = request.AccountPostCode,
+                    AccountPhone = request.AccountPhone,
+                }, ct);
+                if (hospitalResult.TryPickT0(out var hospitalAccount, out var error2))
+                {
+                    await SendOkAsync(new UserDTO
+                    {
+                        Id = hospitalAccount.UserId.Value,
+                        Email = hospitalAccount.User.Email.Value,
+                        Login = hospitalAccount.User.Login.Value,
+                        Name = hospitalAccount.User.Name.Value,
+                        Surname = hospitalAccount.User.Surname.Value,
+                        Country = hospitalAccount.User.Country.Value,
+                        City = hospitalAccount.User.City.Value,
+                        HistoryPaused = hospitalAccount.User.HistoryPaused.Value
+                    }, ct);
+                    return; 
+                }
+                AddError(error2.Value.Message);
+                break;
+            case AccountType.University:
+                var universityResult = await _mediator.Send(new CreateUniversityAccountCommand()
+                {
+                    Email = request.Email,
+                    Login = request.Login,
+                    Password = request.Password,
+                    Name = request.Name,
+                    Surname = request.Surname,
+                    Country = request.Country,
+                    City = request.City,
+                    AccountUniversity = request.AccountUniversity,
+                    AccountAddress = request.AccountAddress,
+                    AccountPostCode = request.AccountPostCode,
+                    AccountPhone = request.AccountPhone,
+                }, ct);
+                if (universityResult.TryPickT0(out var universityAccount, out var error))
+                {
+                    await SendOkAsync(new UserDTO
+                    {
+                        Id = universityAccount.UserId.Value,
+                        Email = universityAccount.User.Email.Value,
+                        Login = universityAccount.User.Login.Value,
+                        Name = universityAccount.User.Name.Value,
+                        Surname = universityAccount.User.Surname.Value,
+                        Country = universityAccount.User.Country.Value,
+                        City = universityAccount.User.City.Value,
+                        HistoryPaused = universityAccount.User.HistoryPaused.Value
+                    }, ct);
+                    return; 
+                }
+                AddError(error.Value.Message);
+                break;
         }
-
-        AddError(error.Value.Message);
         await SendErrorsAsync(cancellation: ct);
     }
 }

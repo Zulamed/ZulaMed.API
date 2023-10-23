@@ -5,24 +5,38 @@ using Microsoft.EntityFrameworkCore;
 using OneOf.Types;
 using ZulaMed.API.Data;
 using ZulaMed.API.Domain.Accounts;
-using ZulaMed.API.Domain.Accounts.HospitalAccount;
+using ZulaMed.API.Domain.Accounts.UniversityAccount;
 using ZulaMed.API.Domain.User;
 
-namespace ZulaMed.API.Endpoints.UserRestApi.Register.Hospital;
+namespace ZulaMed.API.Endpoints.UserRestApi.Register.University;
 
-public class CreateHospitalAccountCommandHandler : Mediator.ICommandHandler<CreateHospitalAccountCommand,
-    Result<HospitalAccount, Exception>>
+public class CreateUniversityAccountCommand : Mediator.ICommand<Result<UniversityAccount, Exception>>
+{
+    public required string AccountUniversity { get; init; }
+    public required string AccountAddress { get; init; }
+    public required string AccountPostCode { get; init; }
+    public required string AccountPhone { get; init; }
+    public required string Email { get; init; }
+    public required string Login { get; init; }
+    public required string Password { get; init; }
+    public required string Name { get; init; }
+    public required string Surname { get; init; }
+    public required string Country { get; init; }
+    public required string City { get; init; }
+}
+public class CreateUniversityAccountCommandHandler : Mediator.ICommandHandler<CreateUniversityAccountCommand,
+    Result<UniversityAccount, Exception>>
 {
     private readonly ZulaMedDbContext _dbContext;
     private readonly FirebaseAuth _auth;
 
-    public CreateHospitalAccountCommandHandler(ZulaMedDbContext dbContext, FirebaseAuth auth)
+    public CreateUniversityAccountCommandHandler(ZulaMedDbContext dbContext, FirebaseAuth auth)
     {
         _dbContext = dbContext;
         _auth = auth;
     }
 
-    public async ValueTask<Result<HospitalAccount, Exception>> Handle(CreateHospitalAccountCommand command,
+    public async ValueTask<Result<UniversityAccount, Exception>> Handle(CreateUniversityAccountCommand command,
         CancellationToken cancellationToken)
     {
         try
@@ -42,15 +56,15 @@ public class CreateHospitalAccountCommandHandler : Mediator.ICommandHandler<Crea
             await _dbContext.SaveChangesAsync(cancellationToken);
             await AddUserToFirebase(command.Email, command.Password, userEntity.Entity.Id.Value, cancellationToken);
 
-            var account = new HospitalAccount
+            var account = new UniversityAccount
             {
                 User = user,
-                AccountHospital = (AccountHospital)command.AccountHospital,
                 AccountAddress = (AccountAddress)command.AccountAddress,
                 AccountPostCode = (AccountPostCode)command.AccountPostCode,
-                AccountPhone = (AccountPhone)command.AccountPhone
+                AccountPhone = (AccountPhone)command.AccountPhone,
+                AccountUniversity = (AccountUniversity)command.AccountUniversity 
             };
-            var accountEntity = await _dbContext.Set<HospitalAccount>().AddAsync(account, cancellationToken);
+            var accountEntity = await _dbContext.Set<UniversityAccount>().AddAsync(account, cancellationToken);
             await _dbContext.SaveChangesAsync(cancellationToken);
             return accountEntity.Entity;
         }
@@ -77,34 +91,5 @@ public class CreateHospitalAccountCommandHandler : Mediator.ICommandHandler<Crea
             ["IsAdmin"] = false,
             ["UserId"] = userId
         }, token);
-    }
-}
-
-public class Endpoint : Endpoint<Request, HospitalAccountDTO>
-{
-    private readonly IMediator _mediator;
-
-    public Endpoint(IMediator mediator)
-    {
-        _mediator = mediator;
-    }
-
-    public override void Configure()
-    {
-        Post("/hospitalAccount");
-        AllowAnonymous();
-    }
-
-    public override async Task HandleAsync(Request request, CancellationToken ct)
-    {
-        var result = await _mediator.Send(request.MapToCommand(), ct);
-        if (result.TryPickT0(out var value, out var error))
-        {
-            await SendOkAsync(value.MapToResponse(), ct);
-            return;
-        }
-
-        AddError(error.Value.Message);
-        await SendErrorsAsync(cancellation: ct);
     }
 }

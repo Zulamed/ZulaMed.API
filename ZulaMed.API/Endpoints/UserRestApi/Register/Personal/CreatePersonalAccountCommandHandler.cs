@@ -9,6 +9,26 @@ using ZulaMed.API.Domain.User;
 
 namespace ZulaMed.API.Endpoints.UserRestApi.Register.Personal;
 
+public class CreatePersonalAccountCommand : Mediator.ICommand<Result<PersonalAccount, Exception>>
+{
+    public required string Email { get; init; }
+    public required string Login { get; init; }
+    public required string Password { get; init; }
+    public required string Name { get; init; }
+    public required string Surname { get; init; }
+    public required string Country { get; init; }
+    public required string City { get; init; }
+    public required bool AccountGender { get; init; }
+    public required string AccountTitle { get; init; }
+    public required string AccountCareerStage { get; init; }
+    public required string AccountProfessionalActivity { get; init; }
+    public required string AccountSpecialty { get; init; }
+    public required string AccountDepartment { get; init; }
+    public required DateOnly AccountBirthDate { get; init; }
+    public required string AccountInstitute { get; init; }
+    public required string AccountRole { get; init; }
+    public required List<string> PlacesOfWork { get; init; } = new();
+}
 public class CreatePersonalAccountCommandHandler : Mediator.ICommandHandler<CreatePersonalAccountCommand,
     Result<PersonalAccount, Exception>>
 {
@@ -82,34 +102,5 @@ public class CreatePersonalAccountCommandHandler : Mediator.ICommandHandler<Crea
             ["IsAdmin"] = false,
             ["UserId"] = userId
         }, token);
-    }
-}
-
-public class Endpoint : Endpoint<Request, PersonalAccountDTO>
-{
-    private readonly IMediator _mediator;
-
-    public Endpoint(IMediator mediator)
-    {
-        _mediator = mediator;
-    }
-
-    public override void Configure()
-    {
-        Post("/personalAccount");
-        AllowAnonymous();
-    }
-
-    public override async Task HandleAsync(Request request, CancellationToken ct)
-    {
-        var result = await _mediator.Send(request.MapToCommand(), ct);
-        if (result.TryPickT0(out var value, out var error))
-        {
-            await SendOkAsync(value.MapToResponse(), ct);
-            return;
-        }
-
-        AddError(error.Value.Message);
-        await SendErrorsAsync(cancellation: ct);
     }
 }
