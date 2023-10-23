@@ -16,7 +16,8 @@ public class DeleteHistoryCommandHandler : Mediator.ICommandHandler<DeleteHistor
 
     public async ValueTask<bool> Handle(DeleteHistoryCommand byUserCommand, CancellationToken cancellationToken)
     {
-        var rows = await _dbContext.Set<Domain.ViewHistory.ViewHistory>().Where(x => byUserCommand.Id == (Guid)x.Id)
+        var rows = await _dbContext.Set<Domain.ViewHistory.ViewHistory>().Where(x =>
+                byUserCommand.Id == (Guid)x.Id && byUserCommand.UserId == (Guid)x.ViewedBy.Id)
             .ExecuteDeleteAsync(cancellationToken: cancellationToken);
         return rows > 0;
     }
@@ -34,17 +35,22 @@ public class Endpoint : Endpoint<Request>
     public override void Configure()
     {
         Delete("/viewHistory/history/{Id}");
-        AllowAnonymous();
     }
 
     public override async Task HandleAsync(Request req, CancellationToken ct)
     {
-        var result = await _mediator.Send(req.ToCommand(), ct);
+        var userId = Guid.Parse(HttpContext.User.Claims.FirstOrDefault(x => x.Type == "UserId")!.Value);
+        var result = await _mediator.Send(new DeleteHistoryCommand
+        {
+            Id = req.Id,
+            UserId = userId
+        }, ct);
         if (result)
         {
             await SendOkAsync(ct);
             return;
         }
+
         await SendNotFoundAsync(ct);
     }
 }

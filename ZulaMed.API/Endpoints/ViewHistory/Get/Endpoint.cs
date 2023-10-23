@@ -18,11 +18,16 @@ public class Endpoint : Endpoint<Request, Response>
     public override void Configure()
     {
         Get("/viewHistory/{ownerId}");
-        AllowAnonymous();
     }
 
     public override async Task HandleAsync(Request req, CancellationToken ct)
     {
+        var userId = Guid.Parse(HttpContext.User.Claims.FirstOrDefault(x => x.Type == "UserId")!.Value);
+        if (userId != req.OwnerId)
+        {
+            await SendUnauthorizedAsync(ct);
+            return;
+        }
         Response response;
         if (req.Title is not null)
         {

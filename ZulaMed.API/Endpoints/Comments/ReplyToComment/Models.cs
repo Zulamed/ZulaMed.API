@@ -10,8 +10,6 @@ public class Request
     public Guid VideoId { get; init; }
     
     public required string Content { get; init; }
-    
-    public Guid SentBy { get; init; } 
 }
 
 public class RequestValidator : Validator<Request>
@@ -21,6 +19,5 @@ public class RequestValidator : Validator<Request>
         RuleFor(x => x.ParentCommentId).NotEmpty();
         RuleFor(x => x.VideoId).NotEmpty();
         RuleFor(x => x.Content).NotEmpty();
-        RuleFor(x => x.SentBy).NotEmpty();
     }
 }

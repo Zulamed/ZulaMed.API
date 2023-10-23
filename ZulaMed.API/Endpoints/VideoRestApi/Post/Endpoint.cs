@@ -92,7 +92,7 @@ public class CreateVideoCommandHandler
     }
 }
 
-public class Endpoint : Endpoint<Request, Response>
+public class Endpoint : EndpointWithoutRequest<Response>
 {
     private readonly IMediator _mediator;
 
@@ -104,12 +104,16 @@ public class Endpoint : Endpoint<Request, Response>
     public override void Configure()
     {
         Post("/video");
-        AllowAnonymous();
     }
 
-    public override async Task HandleAsync(Request request, CancellationToken ct)
+    public override async Task HandleAsync(CancellationToken ct)
     {
-        var result = await _mediator.Send(request.MapToCommand(), ct);
+        var userId = Guid.Parse(HttpContext.User.Claims.FirstOrDefault(x => x.Type == "UserId")!.Value);
+
+        var result = await _mediator.Send(new CreateVideoCommand
+        {
+            VideoPublisherId = userId
+        }, ct);
 
         await result.Match(
             r => SendOkAsync(r, ct),

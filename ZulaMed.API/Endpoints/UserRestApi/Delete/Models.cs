@@ -19,4 +19,5 @@ public class RequestValidator : Validator<Request>
 public class DeleteUserCommand : Mediator.ICommand<bool>
 {
     public required Guid Id { get; init; }
+    public required Guid UserId { get; init; }
 }

@@ -23,7 +23,7 @@ public class UpdateVideoCommandHandler : Mediator.ICommandHandler<UpdateVideoCom
     {
         try
         {
-            var rows = await _dbContext.Set<Video>().Where(x => x.Id == command.Id)
+            var rows = await _dbContext.Set<Video>().Where(x => (Guid)x.Id == command.Id && command.UserId == (Guid)x.Publisher.Id)
                 .ExecuteUpdateAsync(calls => calls
                         .SetProperty(x => x.VideoTitle, (VideoTitle)command.VideoTitle)
                         .SetProperty(x => x.VideoThumbnail, (VideoThumbnail)command.VideoThumbnail)
@@ -51,12 +51,20 @@ public class Endpoint : Endpoint<Request>
     public override void Configure()
     {
         Put("/video/{id}");
-        AllowAnonymous();
     }
 
     public override async Task HandleAsync(Request req, CancellationToken ct)
     {
-        var result = await _mediator.Send(req.MapToCommand(), ct);
+        var userId = Guid.Parse(HttpContext.User.Claims.FirstOrDefault(x => x.Type == "UserId")!.Value);
+        var result = await _mediator.Send(new UpdateVideoCommand
+        {
+            Id = req.Id,
+            UserId = userId,
+            VideoTitle = req.VideoTitle,
+            VideoThumbnail = req.VideoThumbnail,
+            VideoDescription = req.VideoDescription,
+            VideoUrl = req.VideoUrl
+        }, ct);
         if (result.TryPickT0(out var isUpdated, out var error))
         {
             if (!isUpdated)

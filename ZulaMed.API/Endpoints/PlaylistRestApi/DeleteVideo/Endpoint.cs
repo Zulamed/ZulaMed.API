@@ -31,6 +31,10 @@ public class AddVideosToPlaylistCommandHandler : Mediator.ICommandHandler<Delete
         {
             return new Error<Exception>(new Exception("Video by provided id was not found"));
         }
+        if ((Guid)playlist.Owner.Id != command.OwnerId)
+        {
+            return new Error<Exception>(new Exception("User is not an owner of the playlist"));
+        }
         try
         {
             playlist.Videos.Remove(video);
@@ -56,15 +60,16 @@ public class Endpoint : Endpoint<Request>
     public override void Configure()
     {
         Delete("/playlist/{playlistId}/video");
-        AllowAnonymous();
     }
 
     public override async Task HandleAsync(Request req, CancellationToken ct)
     {
-        var result = await _mediator.Send(new DeleteVideoFromPlaylistCommand()
+        var userId = Guid.Parse(HttpContext.User.Claims.FirstOrDefault(x => x.Type == "UserId")!.Value);
+        var result = await _mediator.Send(new DeleteVideoFromPlaylistCommand
         {
             PlaylistId = req.PlaylistId,
-            VideoId = req.VideoId
+            VideoId = req.VideoId,
+            OwnerId = userId
         }, ct);
         if (result.TryPickT0(out var isUpdated, out var error))
         {

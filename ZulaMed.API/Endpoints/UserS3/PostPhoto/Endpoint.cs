@@ -67,11 +67,16 @@ public class UploadPhotoEndpoint : Endpoint<Request, Response>
     {
         Post("/user/{id}/photo");
         AllowFileUploads();
-        AllowAnonymous();
     }
 
     public override async Task HandleAsync(Request req, CancellationToken ct)
     {
+        var userId = Guid.Parse(HttpContext.User.Claims.FirstOrDefault(x => x.Type == "UserId")!.Value);
+        if (userId != req.UserId)
+        {
+            await SendUnauthorizedAsync(ct);
+            return;
+        }
         var response = await _mediator.Send(new UploadPhotoCommand
         {
             Photo = req.Photo,
