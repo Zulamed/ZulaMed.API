@@ -22,6 +22,7 @@ public class ViewCommandHandler : Mediator.ICommandHandler<ViewCommand, OneOf<Su
     public async ValueTask<OneOf<Success, Error<string>, NotFound>> Handle(ViewCommand command,
         CancellationToken cancellationToken)
     {
+        var transaction = await _dbContext.Database.BeginTransactionAsync(cancellationToken);
         try
         {
             var video = await _dbContext.Set<Video>()
@@ -30,12 +31,14 @@ public class ViewCommandHandler : Mediator.ICommandHandler<ViewCommand, OneOf<Su
             {
                 return new NotFound();
             }
+
             User? user = null;
             if (command.WatchedBy is not null)
             {
                 user = await _dbContext.Set<User>()
                     .FirstOrDefaultAsync(x => (Guid)x.Id == command.WatchedBy.Value, cancellationToken);
             }
+
             if (user is not null && !user.HistoryPaused.Value)
             {
                 var row = await _dbContext.Database.ExecuteSqlAsync(
@@ -52,10 +55,13 @@ public class ViewCommandHandler : Mediator.ICommandHandler<ViewCommand, OneOf<Su
             var rows = await _dbContext.Database.ExecuteSqlAsync(
                 $"""UPDATE "Video" SET "VideoView" = "VideoView" + 1 WHERE "Id" = {command.Id}""",
                 cancellationToken: cancellationToken);
+
+            await transaction.CommitAsync(cancellationToken);
             return rows > 0 ? new Success() : new NotFound();
         }
         catch (Exception e)
         {
+            await transaction.RollbackAsync(cancellationToken);
             return new Error<string>(e.Message);
         }
     }
@@ -72,14 +78,21 @@ public class Endpoint : Endpoint<Request>
 
     public override void Configure()
     {
-        Post("video/{id}/{watchedBy}/view");
+        Post("video/{id}/view");
         AllowAnonymous();
         Description(b => { }, clearDefaults: true);
     }
 
     public override async Task HandleAsync(Request req, CancellationToken ct)
     {
-        var result = await _mediator.Send(new ViewCommand { Id = req.Id, WatchedBy = req.WatchedBy }, ct);
+        var claim = HttpContext.User.Claims.FirstOrDefault(x => x.Type == "UserId");
+        Guid? userId = null;
+        if (claim is not null)
+        {
+            userId = Guid.Parse(claim.Value);
+        }
+        
+        var result = await _mediator.Send(new ViewCommand { Id = req.Id, WatchedBy = userId }, ct);
         await result.Match(
             s => SendOkAsync(ct),
             e => SendAsync(new
