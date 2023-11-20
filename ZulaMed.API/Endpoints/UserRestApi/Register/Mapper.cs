@@ -15,7 +15,6 @@ public static class Mapper
             Country = request.Country,
             City = request.City,
             Password = request.Password,
-            AccountType = request.AccountType,
         };
     }
 
