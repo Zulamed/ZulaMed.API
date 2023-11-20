@@ -17,6 +17,9 @@ public class Request
     public bool? Liked { get; init; }
     
     [QueryParam]
+    public bool? Subscriptions { get; init; }
+    
+    [QueryParam]
     public int Page { get; init; } = 1;
     
     [QueryParam]
