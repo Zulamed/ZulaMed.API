@@ -15,8 +15,12 @@ FROM build AS publish
 RUN dotnet publish "ZulaMed.API.csproj" -c Release -o /app/publish /p:UseAppHost=false
 
 FROM base AS final
+ARG CONNECTION_STRING=null
+ARG MUX_SIGNING_KEY
+ARG MUX_SECRET
 WORKDIR /app
 COPY --from=publish /app/publish .
-ARG CONNECTION_STRING
 ENV DATABASE_CONNECTION_STRING=$CONNECTION_STRING
+ENV MUX_SIGNING_KEY=$MUX_SIGNING_KEY
+ENV MUX_SECRET=$MUX_SECRET
 ENTRYPOINT ["dotnet", "ZulaMed.API.dll"]
