@@ -28,18 +28,22 @@ public class Endpoint : Endpoint<Request, Response>
 
     public override async Task HandleAsync(Request req, CancellationToken ct)
     {
+        var claim = HttpContext.User.Claims.FirstOrDefault(x => x.Type == "UserId")?.Value;
+        Guid? userId = null;
+        if (claim is not null)
+            userId = Guid.Parse(claim);
         (Video[] Videos, int Count) videos;
-
+        
         if (req.Title is not null)
             videos = await _mediator.Send(new GetByTitleQuery
             {
                 Title = req.Title,
                 PaginationOptions = new PaginationOptions(req.Page, req.PageSize)
             }, ct);
-        else if (req.UserId is not null && req.Liked is not null && req.Liked.Value)
+        else if (userId is not null && req.Liked is not null && req.Liked.Value)
             videos = await _mediator.Send(new GetUserLikedQuery()
             {
-                UserId = req.UserId.Value,
+                UserId = userId.Value,
                 PaginationOptions = new PaginationOptions(req.Page, req.PageSize)
             }, ct);
         else if (req.UserId is not null)
@@ -53,6 +57,7 @@ public class Endpoint : Endpoint<Request, Response>
             {
                 PaginationOptions = new PaginationOptions(req.Page, req.PageSize)
             }, ct);
+        
 
         await SendAsync(new Response
         {

@@ -19,6 +19,15 @@ builder.Services.Configure<FormOptions>(options =>
 
 builder.Services.AddCors();
 
+builder.Configuration["MuxSettings:Secret"] = string.IsNullOrEmpty(builder.Configuration["MUX_SECRET"])
+    ? builder.Configuration["MuxSettings:Secret"]
+    : builder.Configuration["MUX_SECRET"];
+
+builder.Configuration["MuxSettings:SigningKey"] = string.IsNullOrEmpty(builder.Configuration["MUX_SIGNING_KEY"])
+    ? builder.Configuration["MuxSettings:SigningKey"]
+    : builder.Configuration["MUX_SIGNING_KEY"];
+
+
 builder.Services.AddMux(builder.Configuration["MuxSettings:Secret"]!,
     builder.Configuration["MuxSettings:Id"]!);
 
