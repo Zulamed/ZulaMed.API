@@ -17,23 +17,21 @@ public class Endpoint : Endpoint<Request, Response>
 
     public override void Configure()
     {
-        Get("/viewHistory/{ownerId}");
+        Get("/viewHistory");
     }
 
     public override async Task HandleAsync(Request req, CancellationToken ct)
     {
-        var userId = Guid.Parse(HttpContext.User.Claims.FirstOrDefault(x => x.Type == "UserId")!.Value);
-        if (userId != req.OwnerId)
-        {
-            await SendUnauthorizedAsync(ct);
-            return;
-        }
+        var claim = HttpContext.User.Claims.FirstOrDefault(x => x.Type == "UserId")?.Value;
+        Guid? userId = null;
+        if (claim is not null)
+            userId = Guid.Parse(claim);
         Response response;
         if (req.Title is not null)
         {
             response = await _mediator.Send(new GetByTitleQuery
             {
-                OwnerId = req.OwnerId,
+                OwnerId = userId.Value,
                 Title = req.Title,
                 PaginationOptions = new PaginationOptions(req.Page, req.PageSize)
             }, ct);
@@ -42,7 +40,7 @@ public class Endpoint : Endpoint<Request, Response>
         {
             response = await _mediator.Send(new GetByUserQuery
             {
-                OwnerId = req.OwnerId,
+                OwnerId = userId.Value,
                 PaginationOptions = new PaginationOptions(req.Page, req.PageSize)
             }, ct);
         }
