@@ -7,6 +7,7 @@ public class ViewHistoryDTO
 {
     public required Guid ViewHistoryId { get; init; }
     public required UserDTO ViewedBy { get; set; }
+    public required UserDTO Owner { get; set; }
     public required VideoDTO ViewedVideo { get; set; }
     public required DateTime ViewedAt { get; init; } 
 }
