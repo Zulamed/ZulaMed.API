@@ -25,6 +25,12 @@ public static class Mapper
                 VideoViews = viewHistory.ViewedVideo.VideoView.Value
             },
             ViewedAt = viewHistory.ViewedAt.Value,
+            Owner = new UserDTO
+            {
+                Id = viewHistory.ViewedVideo.Publisher.Id.Value,
+                Username = viewHistory.ViewedVideo.Publisher.Login.Value,
+                UserProfileUrl = viewHistory.ViewedVideo.Publisher.PhotoUrl?.Value!
+            }
         };
     }
 }
