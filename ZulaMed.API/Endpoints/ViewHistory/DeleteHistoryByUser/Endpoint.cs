@@ -34,20 +34,18 @@ public class Endpoint : Endpoint<Request>
 
     public override void Configure()
     {
-        Delete("/viewHistory/owner/{ownerId}");
+        Delete("/viewHistory/owner");
     }
 
     public override async Task HandleAsync(Request req, CancellationToken ct)
     {
-        var userId = Guid.Parse(HttpContext.User.Claims.FirstOrDefault(x => x.Type == "UserId")!.Value);
-        if (userId != req.OwnerId)
-        {
-            await SendUnauthorizedAsync(ct);
-            return;
-        }
+        var claim = HttpContext.User.Claims.FirstOrDefault(x => x.Type == "UserId")?.Value;
+        Guid? userId = null;
+        if (claim is not null)
+            userId = Guid.Parse(claim);
         var result = await _mediator.Send(new DeleteHistoryByUserCommand
         {
-            OwnerId = req.OwnerId,
+            OwnerId = userId.Value,
         }, ct);
         if (result)
         {

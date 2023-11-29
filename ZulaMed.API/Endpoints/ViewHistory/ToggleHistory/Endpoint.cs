@@ -25,7 +25,7 @@ public class ToggleHistoryCommandHandler : Mediator.ICommandHandler<ToggleHistor
     }
 }
 
-public class Endpoint : Endpoint<Request>
+public class Endpoint : EndpointWithoutRequest
 {
     private readonly IMediator _mediator;
 
@@ -36,18 +36,19 @@ public class Endpoint : Endpoint<Request>
 
     public override void Configure()
     {
-        Put("/viewHistory/{ownerId}");
+        Put("/viewHistory");
     }
 
-    public override async Task HandleAsync(Request req, CancellationToken ct)
+    public override async Task HandleAsync(CancellationToken ct)
     {
-        var userId = Guid.Parse(HttpContext.User.Claims.FirstOrDefault(x => x.Type == "UserId")!.Value);
-        if (userId != req.Id)
+        var claim = HttpContext.User.Claims.FirstOrDefault(x => x.Type == "UserId")?.Value;
+        Guid? userId = null;
+        if (claim is not null)
+            userId = Guid.Parse(claim);
+        var result = await _mediator.Send(new ToggleHistoryCommand
         {
-            await SendUnauthorizedAsync(ct);
-            return;
-        }
-        var result = await _mediator.Send(req.ToCommand(), ct);
+            Id = userId.Value
+        }, ct);
         if (result)
         {
             await SendOkAsync(ct);
