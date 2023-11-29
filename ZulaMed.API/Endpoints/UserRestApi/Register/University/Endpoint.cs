@@ -91,7 +91,7 @@ public class Endpoint : Endpoint<Request, UniversityAccountDTO>
 
     public override void Configure()
     {
-        Post("/universityAccount");
+        Post("/user/university");
         AllowAnonymous();
     }
 
