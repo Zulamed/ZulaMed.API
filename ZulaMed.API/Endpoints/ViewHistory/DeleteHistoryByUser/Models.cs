@@ -6,17 +6,8 @@ namespace ZulaMed.API.Endpoints.ViewHistory.DeleteHistoryByUser;
 
 public class Request
 {
-    public required Guid OwnerId { get; init; }
-}
-
-public class RequestValidator : Validator<Request>
-{
-    public RequestValidator()
-    {
-        RuleFor(x => x.OwnerId)
-            .NotEmpty()
-            .WithMessage("Id is required");
-    }
+    [QueryParam]
+    public Guid? OwnerId { get; init; }
 }
 
 public class DeleteHistoryByUserCommand : Mediator.ICommand<bool>
