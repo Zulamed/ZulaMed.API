@@ -83,7 +83,6 @@ public class CreateVideoCommandHandler
             {
                 UploadUrl = uploadUrl,
                 Id = guid,
-                MuxPlaybackId = response.Data.NewAssetSettings.PlaybackIds.First().Id
             };
         }
         catch (VoException e)

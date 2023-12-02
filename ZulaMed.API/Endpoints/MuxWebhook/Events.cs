@@ -62,12 +62,12 @@ public class AssetCreatedEventHandler : IMuxEventHandler<AssetCreatedEvent>
     }
 }
 
-public class VideoAssetReadyEvent : IMuxEvent
+public class AssetReadyEvent : IMuxEvent
 {
     public required MuxData Data { get; set; }
 }
 
-public class AssetReadyEventHandler : IMuxEventHandler<VideoAssetReadyEvent>
+public class AssetReadyEventHandler : IMuxEventHandler<AssetReadyEvent>
 {
     private readonly ZulaMedDbContext _dbContext;
 
@@ -76,7 +76,7 @@ public class AssetReadyEventHandler : IMuxEventHandler<VideoAssetReadyEvent>
         _dbContext = dbContext;
     }
 
-    public async ValueTask<OneOf<Success, Error>> Handle(VideoAssetReadyEvent request,
+    public async ValueTask<OneOf<Success, Error>> Handle(AssetReadyEvent request,
         CancellationToken cancellationToken)
     {
         var asset = request.Data.Data.AsT0;
