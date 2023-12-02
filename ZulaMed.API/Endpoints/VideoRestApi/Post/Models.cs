@@ -10,6 +10,8 @@ public class Response
     public required Guid Id { get; init; }
     
     public required string UploadUrl { get; init; } 
+    
+    public required string MuxPlaybackId { get; init; }
 }
 
 
