@@ -1,10 +1,13 @@
+using System.Linq.Expressions;
 using FastEndpoints;
 using Mediator;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.EntityFrameworkCore.Query;
 using OneOf.Types;
 using Vogen;
 using ZulaMed.API.Data;
 using ZulaMed.API.Domain.Video;
+using ZulaMed.API.Extensions;
 
 namespace ZulaMed.API.Endpoints.VideoRestApi.Put;
 
@@ -23,12 +26,20 @@ public class UpdateVideoCommandHandler : Mediator.ICommandHandler<UpdateVideoCom
     {
         try
         {
-            var rows = await _dbContext.Set<Video>().Where(x => (Guid)x.Id == command.Id && command.UserId == (Guid)x.Publisher.Id)
-                .ExecuteUpdateAsync(calls => calls
-                        .SetProperty(x => x.VideoTitle, (VideoTitle)command.VideoTitle)
-                        .SetProperty(x => x.VideoThumbnail, (VideoThumbnail)command.VideoThumbnail)
-                        .SetProperty(x => x.VideoDescription, (VideoDescription)command.VideoDescription)
-                        .SetProperty(x => x.VideoUrl, (VideoUrl)command.VideoUrl),
+            Expression<Func<SetPropertyCalls<Video>, SetPropertyCalls<Video>>> set =
+                calls => calls;
+            if (!string.IsNullOrWhiteSpace(command.VideoDescription))
+            {
+                set = SetPropertyCallsExtensions.AppendSetProperty(set, s => s
+                    .SetProperty(video => video.VideoDescription, (VideoDescription)command.VideoDescription));
+            }
+
+            set = SetPropertyCallsExtensions.AppendSetProperty(set, s => s
+                .SetProperty(video => video.VideoTitle, (VideoTitle)command.VideoTitle));
+
+            var rows = await _dbContext.Set<Video>()
+                .Where(x => (Guid)x.Id == command.Id && command.UserId == (Guid)x.Publisher.Id)
+                .ExecuteUpdateAsync(set,
                     cancellationToken);
             return rows > 0;
         }
@@ -61,9 +72,7 @@ public class Endpoint : Endpoint<Request>
             Id = req.Id,
             UserId = userId,
             VideoTitle = req.VideoTitle,
-            VideoThumbnail = req.VideoThumbnail,
             VideoDescription = req.VideoDescription,
-            VideoUrl = req.VideoUrl
         }, ct);
         if (result.TryPickT0(out var isUpdated, out var error))
         {
@@ -72,6 +81,7 @@ public class Endpoint : Endpoint<Request>
                 await SendNotFoundAsync(ct);
                 return;
             }
+
             await SendOkAsync(ct);
             return;
         }
