@@ -9,6 +9,8 @@ public class Request
 {
     [QueryParam]
     public string? Title { get; init; }
+    [QueryParam]
+    public bool? Own { get; init; }
     
     [QueryParam]
     public bool? Liked { get; init; }
