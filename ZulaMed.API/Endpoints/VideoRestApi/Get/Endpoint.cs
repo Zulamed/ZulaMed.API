@@ -42,11 +42,11 @@ public class Endpoint : Endpoint<Request, Response>
                 Title = req.Title,
                 PaginationOptions = new PaginationOptions(req.Page, req.PageSize)
             }, ct);
-        else if (req.UserId is not null)
+        else if (userId is not null && req.Own is not null && req.Own.Value)
         {
             videos = await _mediator.Send(new GetByUserQuery()
             {
-                Id = req.UserId.Value,
+                Id = userId.Value,
                 PaginationOptions = new PaginationOptions(req.Page, req.PageSize)
             }, ct);
         }
