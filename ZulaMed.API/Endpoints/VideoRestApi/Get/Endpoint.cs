@@ -4,6 +4,7 @@ using Microsoft.Extensions.Options;
 using ZulaMed.API.Domain.Video;
 using ZulaMed.API.Endpoints.VideoRestApi.Get.GetAll;
 using ZulaMed.API.Endpoints.VideoRestApi.Get.GetByTitle;
+using ZulaMed.API.Endpoints.VideoRestApi.Get.GetByUser;
 using ZulaMed.API.Endpoints.VideoRestApi.Get.GetByUserSubscriptions;
 using ZulaMed.API.Endpoints.VideoRestApi.Get.GetUserLiked;
 using ZulaMed.API.Extensions;
@@ -41,6 +42,14 @@ public class Endpoint : Endpoint<Request, Response>
                 Title = req.Title,
                 PaginationOptions = new PaginationOptions(req.Page, req.PageSize)
             }, ct);
+        else if (req.UserId is not null)
+        {
+            videos = await _mediator.Send(new GetByUserQuery()
+            {
+                Id = req.UserId.Value,
+                PaginationOptions = new PaginationOptions(req.Page, req.PageSize)
+            }, ct);
+        }
         else if (userId is not null && req.Liked is not null && req.Liked.Value)
             videos = await _mediator.Send(new GetUserLikedQuery()
             {

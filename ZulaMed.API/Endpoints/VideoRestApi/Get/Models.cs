@@ -8,6 +8,8 @@ namespace ZulaMed.API.Endpoints.VideoRestApi.Get;
 public class Request
 {
     [QueryParam]
+    public Guid? UserId { get; init; }
+    [QueryParam]
     public string? Title { get; init; }
     
     [QueryParam]
