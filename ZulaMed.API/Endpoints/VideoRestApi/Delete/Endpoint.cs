@@ -1,6 +1,7 @@
 using FastEndpoints;
 using Mediator;
 using Microsoft.EntityFrameworkCore;
+using Mux.Csharp.Sdk.Api;
 using ZulaMed.API.Data;
 using ZulaMed.API.Domain.Video;
 
@@ -9,17 +10,50 @@ namespace ZulaMed.API.Endpoints.VideoRestApi.Delete;
 public class DeleteVideoCommandHandler : Mediator.ICommandHandler<DeleteVideoCommand, bool>
 {
     private readonly ZulaMedDbContext _dbContext;
+    private readonly AssetsApi _assetsApi;
+    private readonly PlaybackIDApi _playbackIdApi;
 
-    public DeleteVideoCommandHandler(ZulaMedDbContext dbContext)
+    public DeleteVideoCommandHandler(ZulaMedDbContext dbContext, AssetsApi assetsApi, PlaybackIDApi playbackIdApi)
     {
         _dbContext = dbContext;
+        _assetsApi = assetsApi;
+        _playbackIdApi = playbackIdApi;
+    }
+
+
+    private string GetPlaybackId(string playbackId)
+    {
+        var playbackIdParts = playbackId.Split("/");
+        return playbackIdParts[^1].Replace(".m3u8", "");
     }
 
     public async ValueTask<bool> Handle(DeleteVideoCommand command, CancellationToken cancellationToken)
     {
-        var rows = await _dbContext.Set<Video>().Where(x => command.Id == (Guid)x.Id && command.UserId == (Guid)x.Publisher.Id)
-            .ExecuteDeleteAsync(cancellationToken: cancellationToken);
-        return rows > 0;
+        var video = await _dbContext.Set<Video>().SingleOrDefaultAsync(
+            x => command.Id == (Guid)x.Id && command.UserId == (Guid)x.Publisher.Id,
+            cancellationToken: cancellationToken);
+
+        if (video == null)
+        {
+            return false;
+        }
+
+        if (video.VideoUrl is not null)
+        {
+            var asset = await _playbackIdApi.GetAssetOrLivestreamIdAsync(GetPlaybackId(video.VideoUrl.Value),
+                cancellationToken);
+            if (asset != null)
+            {
+                await _assetsApi.DeleteAssetAsync(asset.Data.Id, cancellationToken);
+            }
+        }
+
+        _dbContext.Set<Video>().Remove(video);
+
+        await _dbContext.SaveChangesAsync(cancellationToken);
+
+
+        return true;
     }
 }
 
@@ -50,6 +84,7 @@ public class Endpoint : Endpoint<Request>
             await SendOkAsync(ct);
             return;
         }
+
         await SendNotFoundAsync(ct);
     }
 }
