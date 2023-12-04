@@ -44,7 +44,7 @@ public class DeleteVideoCommandHandler : Mediator.ICommandHandler<DeleteVideoCom
                 cancellationToken);
             if (asset != null)
             {
-                await _assetsApi.DeleteAssetAsync(asset.Data.Id, cancellationToken);
+                await _assetsApi.DeleteAssetAsync(asset.Data.Object.Id, cancellationToken);
             }
         }
 
