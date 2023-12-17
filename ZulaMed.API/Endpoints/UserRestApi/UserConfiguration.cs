@@ -56,6 +56,9 @@ public class UserConfiguration : IEntityTypeConfiguration<User>
         builder.Property(x => x.SubscriberCount)
             .HasConversion<SubscriberCount.EfCoreValueConverter>()
             .HasDefaultValue(SubscriberCount.Zero);
+
+        builder.Property(x => x.Description)
+            .HasConversion<Description.EfCoreValueConverter>();
     }
 }
 

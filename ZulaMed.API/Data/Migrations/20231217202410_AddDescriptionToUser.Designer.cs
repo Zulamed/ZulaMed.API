@@ -3,6 +3,7 @@ using System;
 using System.Collections.Generic;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using Mux.Csharp.Sdk.Model;
 using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
@@ -14,9 +15,11 @@ using ZulaMed.API.Domain.Video;
 namespace ZulaMed.API.Data.Migrations
 {
     [DbContext(typeof(ZulaMedDbContext))]
-    partial class ZulaMedDbContextModelSnapshot : ModelSnapshot
+    [Migration("20231217202410_AddDescriptionToUser")]
+    partial class AddDescriptionToUser
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder

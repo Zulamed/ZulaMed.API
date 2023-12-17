@@ -23,14 +23,9 @@ public class UpdateUserCommandHandler : Mediator.ICommandHandler<UpdateUserComma
             var rows = await _dbContext.Set<User>()
                 .Where(x => (Guid)x.Id == command.Id)
                 .ExecuteUpdateAsync(calls => calls
-                    .SetProperty(x => x.Name, (UserName)command.Name)
-                    .SetProperty(x => x.Surname, (UserSurname)command.Surname)
-                    .SetProperty(x => x.Country, (UserCountry)command.Country)
-                    .SetProperty(x => x.City, (UserCity)command.City)
-                    .SetProperty(x => x.Email, (UserEmail)command.Email),
+                    .SetProperty(x => x.Description, (Description)command.Description),
                     cancellationToken);
             return rows > 0;
-
         }
         catch (ValueObjectValidationException e)
         {
@@ -59,11 +54,7 @@ public class Endpoint : Endpoint<Request>
         var result = await _mediator.Send(new UpdateUserCommand
         {
             Id = userId,
-            Email = req.Email,
-            Name = req.Name,
-            Surname = req.Surname,
-            Country = req.Country,
-            City = req.City,
+            Description = req.Description
         }, ct);
         if (result.TryPickT0(out var isUpdated, out var error))
         {
