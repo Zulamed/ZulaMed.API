@@ -40,11 +40,15 @@ public class DeleteVideoCommandHandler : Mediator.ICommandHandler<DeleteVideoCom
 
         if (video.VideoUrl is not null)
         {
-            var asset = await _playbackIdApi.GetAssetOrLivestreamIdAsync(GetPlaybackId(video.VideoUrl.Value),
-                cancellationToken);
-            if (asset != null)
+            try
             {
+                var asset = await _playbackIdApi.GetAssetOrLivestreamIdAsync(GetPlaybackId(video.VideoUrl.Value),
+                    cancellationToken);
                 await _assetsApi.DeleteAssetAsync(asset.Data.Object.Id, cancellationToken);
+            }
+            catch
+            {
+                // ignored
             }
         }
 
