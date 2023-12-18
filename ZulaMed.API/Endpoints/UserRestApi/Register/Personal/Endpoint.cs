@@ -2,6 +2,7 @@ using FastEndpoints;
 using FirebaseAdmin.Auth;
 using Mediator;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.Options;
 using OneOf.Types;
 using ZulaMed.API.Data;
 using ZulaMed.API.Domain.Accounts.PersonalAccount;
@@ -14,11 +15,13 @@ public class CreatePersonalAccountCommandHandler : Mediator.ICommandHandler<Crea
 {
     private readonly ZulaMedDbContext _dbContext;
     private readonly FirebaseAuth _auth;
+    private readonly IOptions<S3BucketOptions> _s3Options;
 
-    public CreatePersonalAccountCommandHandler(ZulaMedDbContext dbContext, FirebaseAuth auth)
+    public CreatePersonalAccountCommandHandler(ZulaMedDbContext dbContext, FirebaseAuth auth, IOptions<S3BucketOptions> s3Options)
     {
         _dbContext = dbContext;
         _auth = auth;
+        _s3Options = s3Options;
     }
 
     public async ValueTask<Result<PersonalAccount, Exception>> Handle(CreatePersonalAccountCommand command,
@@ -35,7 +38,8 @@ public class CreatePersonalAccountCommandHandler : Mediator.ICommandHandler<Crea
                 Surname = (UserSurname)command.Surname,
                 Country = (UserCountry)command.Country,
                 City = (UserCity)command.City,
-                HistoryPaused = (HistoryPaused)false
+                HistoryPaused = (HistoryPaused)false,
+                PhotoUrl = (PhotoUrl)$"{_s3Options.Value.BaseUrl}/users/images/personal.jpg"
             };
             var userEntity = await _dbContext.Set<User>().AddAsync(user, cancellationToken);
             await _dbContext.SaveChangesAsync(cancellationToken);

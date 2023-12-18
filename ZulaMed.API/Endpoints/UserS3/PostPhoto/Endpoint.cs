@@ -10,7 +10,7 @@ using ZulaMed.API.Domain.User;
 
 namespace ZulaMed.API.Endpoints.UserS3.PostPhoto;
 
-public class UploadPhotoCommandHandler : Mediator.ICommandHandler<UploadPhotoCommand, UploadResponse>
+public class UploadPhotoCommandHandler : Mediator.ICommandHandler<UploadPhotoCommand, UploadResponse?>
 {
     private readonly IAmazonS3 _s3Client;
     private readonly IOptions<S3BucketOptions> _s3Options;
@@ -23,10 +23,15 @@ public class UploadPhotoCommandHandler : Mediator.ICommandHandler<UploadPhotoCom
         _dbContext = dbContext;
     }
 
-    public async ValueTask<UploadResponse> Handle(UploadPhotoCommand command, CancellationToken cancellationToken)
+    public async ValueTask<UploadResponse?> Handle(UploadPhotoCommand command, CancellationToken cancellationToken)
     {
         var fileExtension = Path.GetExtension(command.Photo.FileName);
         var guid = command.UserId;
+        var user = await _dbContext.Set<User>().FirstOrDefaultAsync(x => command.UserId == (Guid)x.Id, cancellationToken: cancellationToken);
+        if (user is null)
+        {
+            return null;
+        }
 
         var response = await _s3Client.PutObjectAsync(new PutObjectRequest()
         {
@@ -40,12 +45,8 @@ public class UploadPhotoCommandHandler : Mediator.ICommandHandler<UploadPhotoCom
                 ["x-amz-meta-extension"] = fileExtension
             }
         }, cancellationToken);
-        var user = await _dbContext.Set<User>().FirstOrDefaultAsync(x => command.UserId == (Guid)x.Id);
-        if (user is not null)
-        {
-            user.PhotoUrl = (PhotoUrl)(_s3Options.Value.BaseUrl + $"users/images/{guid}");
-            await _dbContext.SaveChangesAsync(cancellationToken);
-        }
+        user.PhotoUrl = (PhotoUrl)(_s3Options.Value.BaseUrl + $"/users/images/{guid}");
+        await _dbContext.SaveChangesAsync(cancellationToken);
         return new UploadResponse
         {
             PhotoUrl = _s3Options.Value.BaseUrl + $"users/images/{guid}",
@@ -65,7 +66,7 @@ public class UploadPhotoEndpoint : Endpoint<Request, Response>
 
     public override void Configure()
     {
-        Post("/user/{id}/photo");
+        Post("/user/{userId}/photo");
         AllowFileUploads();
     }
 
@@ -82,6 +83,12 @@ public class UploadPhotoEndpoint : Endpoint<Request, Response>
             Photo = req.Photo,
             UserId = req.UserId
         }, ct);
+
+        if (response is null)
+        {
+            await SendNotFoundAsync(ct);
+            return;
+        }
         
         switch (response.PutResponse.HttpStatusCode)
         {
