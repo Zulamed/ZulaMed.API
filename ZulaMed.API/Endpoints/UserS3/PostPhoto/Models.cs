@@ -35,7 +35,7 @@ public class UploadResponse
     public required PutObjectResponse PutResponse { get; set; }
 }
 
-public class UploadPhotoCommand : Mediator.ICommand<UploadResponse>
+public class UploadPhotoCommand : Mediator.ICommand<UploadResponse?>
 {
     public required IFormFile Photo { get; init; }
     public required Guid UserId { get; init; }

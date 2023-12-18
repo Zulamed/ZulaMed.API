@@ -1,4 +1,6 @@
 using System.Net;
+using Amazon.CloudFront;
+using Amazon.CloudFront.Model;
 using Amazon.S3;
 using Amazon.S3.Model;
 using FastEndpoints;
@@ -15,12 +17,17 @@ public class UploadPhotoCommandHandler : Mediator.ICommandHandler<UploadPhotoCom
     private readonly IAmazonS3 _s3Client;
     private readonly IOptions<S3BucketOptions> _s3Options;
     private readonly ZulaMedDbContext _dbContext;
+    private readonly IAmazonCloudFront _cloudFront;
+    private readonly IOptions<CloudFrontOptions> _cloudfrontOptions;
 
-    public UploadPhotoCommandHandler(IAmazonS3 s3Client, IOptions<S3BucketOptions> s3Options, ZulaMedDbContext dbContext)
+    public UploadPhotoCommandHandler(IAmazonS3 s3Client, IOptions<S3BucketOptions> s3Options, ZulaMedDbContext dbContext, IAmazonCloudFront cloudFront, 
+        IOptions<CloudFrontOptions> cloudfrontOptions)
     {
         _s3Client = s3Client;
         _s3Options = s3Options;
         _dbContext = dbContext;
+        _cloudFront = cloudFront;
+        _cloudfrontOptions = cloudfrontOptions;
     }
 
     public async ValueTask<UploadResponse?> Handle(UploadPhotoCommand command, CancellationToken cancellationToken)
@@ -43,6 +50,19 @@ public class UploadPhotoCommandHandler : Mediator.ICommandHandler<UploadPhotoCom
             {
                 ["x-amz-meta-originalname"] = command.Photo.FileName,
                 ["x-amz-meta-extension"] = fileExtension
+            }
+        }, cancellationToken);
+        await _cloudFront.CreateInvalidationAsync(new CreateInvalidationRequest()
+        {
+            DistributionId = _cloudfrontOptions.Value.DistributionId,
+            InvalidationBatch = new InvalidationBatch()
+            {
+                CallerReference = DateTime.Now.Ticks.ToString(),
+                Paths = new Paths
+                {
+                    Items = {$"/users/images/{guid}"},
+                    Quantity = 1
+                }
             }
         }, cancellationToken);
         user.PhotoUrl = (PhotoUrl)(_s3Options.Value.BaseUrl + $"/users/images/{guid}");

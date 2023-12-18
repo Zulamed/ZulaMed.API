@@ -9,6 +9,7 @@
     </PropertyGroup>
 
     <ItemGroup>
+      <PackageReference Include="AWSSDK.CloudFront" Version="3.7.301.14" />
       <PackageReference Include="AWSSDK.S3" Version="3.7.104.17" />
       <PackageReference Include="EntityFrameworkCore.Exceptions.PostgreSQL" Version="6.0.3" />
       <PackageReference Include="FastEndpoints" Version="5.10.0" />
