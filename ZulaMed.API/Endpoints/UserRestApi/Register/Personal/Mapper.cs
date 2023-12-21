@@ -21,7 +21,7 @@ public static class Mapper
             AccountProfessionalActivity = request.AccountProfessionalActivity,
             AccountSpecialty = request.AccountSpecialty,
             AccountDepartment = request.AccountDepartment,
-            AccountBirthDate = request.AccountBirthDate,
+            AccountBirthDate = DateOnly.FromDateTime(request.AccountBirthDate),
             AccountInstitute = request.AccountInstitute,
             AccountRole = request.AccountRole,
             PlacesOfWork = request.PlacesOfWork,
