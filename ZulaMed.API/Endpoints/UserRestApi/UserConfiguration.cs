@@ -59,6 +59,10 @@ public class UserConfiguration : IEntityTypeConfiguration<User>
 
         builder.Property(x => x.Description)
             .HasConversion<Description.EfCoreValueConverter>();
+
+        builder.Property(x => x.IsVerified)
+            .HasConversion<IsVerified.EfCoreValueConverter>()
+            .HasDefaultValue(IsVerified.From(false));
     }
 }
 
@@ -67,11 +71,10 @@ public class SubscriptionConfiguration : IEntityTypeConfiguration<Subscription>
     public void Configure(EntityTypeBuilder<Subscription> builder)
     {
         builder.HasKey(x => new {x.SubscriberId, x.SubscribedToId});
-        
+
         builder.HasOne(x => x.Subscriber)
             .WithMany(x => x.Subscriptions)
-            .HasForeignKey(x => x.SubscriberId)
-            .OnDelete(DeleteBehavior.Restrict);
+            .HasForeignKey(x => x.SubscriberId);
 
         builder.HasOne(x => x.SubscribedTo)
             .WithMany(x => x.Subscribers)

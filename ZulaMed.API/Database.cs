@@ -17,6 +17,7 @@ public static class Database
         
         var dataSource = sourceBuilder.Build();
 
-        services.AddDbContext<ZulaMedDbContext>(options => { options.UseNpgsql(dataSource); });
+        services.AddDbContext<ZulaMedDbContext>(options => options.UseNpgsql(dataSource), optionsLifetime: ServiceLifetime.Singleton);
+        services.AddDbContextFactory<ZulaMedDbContext>(options => options.UseNpgsql(dataSource));
     }
 }

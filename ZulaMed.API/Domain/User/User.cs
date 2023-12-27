@@ -6,6 +6,11 @@ using ZulaMed.API.Domain.Subscriptions;
 
 namespace ZulaMed.API.Domain.User;
 
+[ValueObject<bool>(Conversions.EfCoreValueConverter)]
+public readonly partial struct IsVerified
+{
+}
+
 
 
 [ValueObject<string>(Conversions.EfCoreValueConverter)]
@@ -30,6 +35,7 @@ public class User
     public Description? Description { get; set; }
     public HistoryPaused HistoryPaused { get; init; } 
     public SubscriberCount SubscriberCount { get; init; } = SubscriberCount.Zero;
+    public IsVerified IsVerified { get; init; } = IsVerified.From(false);
     public List<Subscription> Subscriptions { get; init; } = new();
     public List<Subscription> Subscribers { get; init; } = new();
     public List<Video.Video> Videos { get; init; } = new();

@@ -85,6 +85,8 @@ builder.Services
         };
     });
 
+builder.Services.AddCleanUpService();
+
 var app = builder.Build();
 
 app.UseCors(c =>
