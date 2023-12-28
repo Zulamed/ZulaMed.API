@@ -20,7 +20,7 @@ public class UploadPhotoCommandHandler : Mediator.ICommandHandler<UploadPhotoCom
     private readonly IAmazonCloudFront _cloudFront;
     private readonly IOptions<CloudFrontOptions> _cloudfrontOptions;
 
-    public UploadPhotoCommandHandler(IAmazonS3 s3Client, IOptions<S3BucketOptions> s3Options, ZulaMedDbContext dbContext, IAmazonCloudFront cloudFront, 
+    public UploadPhotoCommandHandler(IAmazonS3 s3Client, IOptions<S3BucketOptions> s3Options, ZulaMedDbContext dbContext, IAmazonCloudFront cloudFront,
         IOptions<CloudFrontOptions> cloudfrontOptions)
     {
         _s3Client = s3Client;
@@ -65,11 +65,13 @@ public class UploadPhotoCommandHandler : Mediator.ICommandHandler<UploadPhotoCom
                 }
             }
         }, cancellationToken);
-        user.PhotoUrl = (PhotoUrl)(_s3Options.Value.BaseUrl + $"/users/images/{guid}");
+        var ticks = DateTime.Now.Ticks;
+        var url = _s3Options.Value.BaseUrl + $"/users/images/{guid}?{ticks}";
+        user.PhotoUrl = (PhotoUrl)url;
         await _dbContext.SaveChangesAsync(cancellationToken);
         return new UploadResponse
         {
-            PhotoUrl = _s3Options.Value.BaseUrl + $"users/images/{guid}",
+            PhotoUrl = url,
             PutResponse = response
         };
     }
@@ -109,7 +111,7 @@ public class UploadPhotoEndpoint : Endpoint<Request, Response>
             await SendNotFoundAsync(ct);
             return;
         }
-        
+
         switch (response.PutResponse.HttpStatusCode)
         {
             case HttpStatusCode.OK:
