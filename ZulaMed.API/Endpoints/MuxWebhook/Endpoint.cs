@@ -40,7 +40,7 @@ public class Binder : RequestBinder<Request>
                 jsonNode!.AsObject().Remove("started_at");
             }
         }
-        
+
         req.Status = (string)req.Data["status"]!;
         try
         {
@@ -101,6 +101,8 @@ public class MuxWebHookValidator : IPreProcessor<Request>
 
         if (!isValid)
         {
+            var logger = ctx.Resolve<ILogger<MuxWebHookValidator>>();
+            logger.LogWarning("Invalid signature for Mux webhook");
             failures.Add(new ValidationFailure("mux-signature", "Invalid signature"));
             await ctx.Response.SendErrorsAsync(failures, cancellation: ct);
         }
