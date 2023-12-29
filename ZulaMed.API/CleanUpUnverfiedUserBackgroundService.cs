@@ -41,7 +41,7 @@ public class CleanUpUnverifiedUserBackgroundService : BackgroundService
     private async Task CleanUp(CancellationToken token)
     {
         await using var dbContext = await _dbContextFactory.CreateDbContextAsync(token);
-        var query = 
+        var query =
             dbContext.Set<User>().Where(x => x.IsVerified == IsVerified.From(false));
         var emails = await query.Select(x => x.Email).ToListAsync(cancellationToken: token);
         foreach (var email in emails)
@@ -57,6 +57,8 @@ public class CleanUpUnverifiedUserBackgroundService : BackgroundService
                 _logger.LogError(e, "Failed to delete user with email {Email}", email);
             }
         }
+        if (emails.Count == 0)
+            return;
         await query.ExecuteDeleteAsync(cancellationToken: token);
     }
 }
