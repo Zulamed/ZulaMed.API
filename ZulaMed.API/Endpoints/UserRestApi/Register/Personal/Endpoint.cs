@@ -39,7 +39,8 @@ public class CreatePersonalAccountCommandHandler : Mediator.ICommandHandler<Crea
                 Country = (UserCountry)command.Country,
                 City = (UserCity)command.City,
                 HistoryPaused = (HistoryPaused)false,
-                PhotoUrl = (PhotoUrl)$"{_s3Options.Value.BaseUrl}/users/images/personal.jpg"
+                PhotoUrl = (PhotoUrl)$"{_s3Options.Value.BaseUrl}/users/images/personal.jpg",
+                RegistrationTime = (RegistrationTime)DateTime.UtcNow
             };
             var userEntity = await _dbContext.Set<User>().AddAsync(user, cancellationToken);
             await _dbContext.SaveChangesAsync(cancellationToken);

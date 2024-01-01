@@ -35,7 +35,8 @@ public class CreateUserCommandHandler : Mediator.ICommandHandler<CreateUserComma
                 Surname = (UserSurname)command.Surname,
                 Country = (UserCountry)command.Country,
                 City = (UserCity)command.City,
-                HistoryPaused = (HistoryPaused)false
+                HistoryPaused = (HistoryPaused)false,
+                RegistrationTime = (RegistrationTime)DateTime.UtcNow
             }, cancellationToken);
             await _dbContext.SaveChangesAsync(cancellationToken);
             await AddUserToFirebase(command.Email, command.Password, entity.Entity.Id.Value, cancellationToken);

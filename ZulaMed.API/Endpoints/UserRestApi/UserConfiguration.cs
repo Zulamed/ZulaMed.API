@@ -63,6 +63,9 @@ public class UserConfiguration : IEntityTypeConfiguration<User>
         builder.Property(x => x.IsVerified)
             .HasConversion<IsVerified.EfCoreValueConverter>()
             .HasDefaultValue(IsVerified.From(false));
+
+        builder.Property(x => x.RegistrationTime)
+            .HasConversion<RegistrationTime.EfCoreValueConverter>();
     }
 }
 

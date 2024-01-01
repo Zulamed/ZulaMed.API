@@ -23,7 +23,7 @@ public class VerifyEndpoint : EndpointWithoutRequest
     {
         var userId = Guid.Parse(HttpContext.User.Claims.FirstOrDefault(x => x.Type == "UserId")!.Value);
         var rows = await _dbContext.Set<User>()
-            .Where(x => (Guid)x.Id == userId && (bool)x.IsVerified)
+            .Where(x => (Guid)x.Id == userId && IsVerified.From(false) == x.IsVerified)
             .ExecuteUpdateAsync(calls => 
                     calls.SetProperty(u => u.IsVerified, IsVerified.From(true)), cancellationToken: ct);
         if (rows <= 0)
