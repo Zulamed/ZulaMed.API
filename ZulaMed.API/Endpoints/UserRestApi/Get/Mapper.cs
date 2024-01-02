@@ -17,7 +17,8 @@ public static class Mapper
             Surname = user.Surname.Value,
             ProfilePictureUrl = user.PhotoUrl?.Value,
             HistoryPaused = user.HistoryPaused.Value,
-            Description = user.Description?.Value
+            Description = user.Description?.Value,
+            IsVerified = user.IsVerified.Value
         };
     }
 }

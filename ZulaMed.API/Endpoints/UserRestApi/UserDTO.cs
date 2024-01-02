@@ -12,6 +12,8 @@ public class UserDTO
     public required string City { get; init; }
     public required bool HistoryPaused { get; init; }
     
+    public bool IsVerified { get; init; }
+    
     public string? Description { get; init; }
     public string? ProfilePictureUrl { get; init; }
 }

@@ -22,7 +22,7 @@ public class GetUserByIdQueryHandler : IQueryHandler<GetUserByIdQuery, Response>
     }
 }
 
-public class Endpoint : Endpoint<Request>
+public class Endpoint : Endpoint<Request, Response>
 {
     private readonly IMediator _mediator;
 

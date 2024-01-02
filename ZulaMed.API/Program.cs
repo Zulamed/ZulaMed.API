@@ -4,7 +4,9 @@ using Google.Apis.Auth.OAuth2;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Http.Features;
 using Microsoft.IdentityModel.Tokens;
+using Refit;
 using ZulaMed.API;
+using ZulaMed.API.Endpoints.UserRestApi.Verify;
 using ZulaMed.API.Health;
 
 var builder = WebApplication.CreateBuilder(args);
@@ -86,6 +88,12 @@ builder.Services
     });
 
 builder.Services.AddCleanUpService();
+
+builder.Services.AddRefitClient<IFirebaseEmailVerifier>()
+    .ConfigureHttpClient(c =>
+    {
+        c.BaseAddress = new Uri("https://identitytoolkit.googleapis.com/v1");
+    });
 
 var app = builder.Build();
 
