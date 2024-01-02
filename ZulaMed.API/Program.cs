@@ -29,6 +29,10 @@ builder.Configuration["MuxSettings:SigningKey"] = string.IsNullOrEmpty(builder.C
     ? builder.Configuration["MuxSettings:SigningKey"]
     : builder.Configuration["MUX_SIGNING_KEY"];
 
+builder.Configuration["Firebase:ApiKey"] = string.IsNullOrEmpty(builder.Configuration["FIREBASE_API_KEY"])
+    ? builder.Configuration["Firebase:ApiKey"]
+    : builder.Configuration["FIREBASE_API_KEY"];
+
 
 builder.Services.AddMux(builder.Configuration["MuxSettings:Secret"]!,
     builder.Configuration["MuxSettings:Id"]!);
