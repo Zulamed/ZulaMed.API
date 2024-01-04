@@ -18,7 +18,8 @@ public static class Mapper
             ProfilePictureUrl = user.PhotoUrl?.Value,
             HistoryPaused = user.HistoryPaused.Value,
             Description = user.Description?.Value,
-            IsVerified = user.IsVerified.Value
+            IsVerified = user.IsVerified.Value,
+            BannerUrl = user.BannerUrl?.Value
         };
     }
 }

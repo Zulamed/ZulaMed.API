@@ -15,6 +15,7 @@ public class User
     public required UserCountry Country { get; init; }
     public required UserCity City { get; init; }
     public PhotoUrl? PhotoUrl { get; set; }
+    public BannerUrl? BannerUrl { get; set; }
     public Description? Description { get; set; }
     public HistoryPaused HistoryPaused { get; init; } 
     public SubscriberCount SubscriberCount { get; init; } = SubscriberCount.Zero;

@@ -66,6 +66,9 @@ public class UserConfiguration : IEntityTypeConfiguration<User>
 
         builder.Property(x => x.RegistrationTime)
             .HasConversion<RegistrationTime.EfCoreValueConverter>();
+        
+        builder.Property(x => x.BannerUrl)
+            .HasConversion<BannerUrl.EfCoreValueConverter>();
     }
 }
 

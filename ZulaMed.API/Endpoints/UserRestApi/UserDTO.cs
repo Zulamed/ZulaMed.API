@@ -16,4 +16,6 @@ public class UserDTO
     
     public string? Description { get; init; }
     public string? ProfilePictureUrl { get; init; }
+    
+    public string? BannerUrl { get; init; }
 }
