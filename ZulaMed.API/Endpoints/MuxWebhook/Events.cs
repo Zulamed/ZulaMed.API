@@ -89,7 +89,7 @@ public class AssetReadyEventHandler : IMuxEventHandler<AssetReadyEvent>
             var playbackId = asset.PlaybackIds.First().Id;
             var videoUrl = VideoUrl.From($"https://stream.mux.com/{playbackId}.m3u8");
             var timeLineThumbnail = VideoTimelineThumbnail.From($"https://image.mux.com/{playbackId}/storyboard.vtt");
-            var thumbnail = VideoThumbnail.From($"https://image.mux.com/{playbackId}/thumbnail.png");
+            var thumbnail = VideoThumbnail.From($"https://image.mux.com/{playbackId}/thumbnail.webp");
             await _dbContext.Set<Video>()
                 .Where(x => (Guid)x.Id == request.Data.Metadata.VideoId)
                 .ExecuteUpdateAsync(calls => calls
