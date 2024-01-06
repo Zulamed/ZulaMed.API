@@ -3,6 +3,7 @@ using FastEndpoints.Swagger;
 using Google.Apis.Auth.OAuth2;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Http.Features;
+using Microsoft.AspNetCore.Server.Kestrel.Core;
 using Microsoft.IdentityModel.Tokens;
 using Refit;
 using ZulaMed.API;
@@ -11,7 +12,14 @@ using ZulaMed.API.Health;
 
 var builder = WebApplication.CreateBuilder(args);
 
-builder.WebHost.ConfigureKestrel(options => { options.Limits.MaxRequestBodySize = int.MaxValue; });
+builder.WebHost.ConfigureKestrel(options =>
+{
+    options.Limits.MaxRequestBodySize = int.MaxValue;
+    options.ConfigureEndpointDefaults(o =>
+    {
+        o.UseHttps();
+    });
+});
 
 builder.Services.Configure<FormOptions>(options =>
 {
@@ -36,7 +44,6 @@ builder.Configuration["Firebase:ApiKey"] = string.IsNullOrEmpty(builder.Configur
 
 builder.Services.AddMux(builder.Configuration["MuxSettings:Secret"]!,
     builder.Configuration["MuxSettings:Id"]!);
-
 
 
 builder.Services.AddFastEndpoints(options => { options.SourceGeneratorDiscoveredTypes = DiscoveredTypes.All; });
@@ -94,10 +101,7 @@ builder.Services
 builder.Services.AddCleanUpService();
 
 builder.Services.AddRefitClient<IFirebaseEmailVerifier>()
-    .ConfigureHttpClient(c =>
-    {
-        c.BaseAddress = new Uri("https://identitytoolkit.googleapis.com/v1");
-    });
+    .ConfigureHttpClient(c => { c.BaseAddress = new Uri("https://identitytoolkit.googleapis.com/v1"); });
 
 var app = builder.Build();
 
