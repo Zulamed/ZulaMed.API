@@ -3,7 +3,6 @@ using FastEndpoints.Swagger;
 using Google.Apis.Auth.OAuth2;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Http.Features;
-using Microsoft.AspNetCore.Server.Kestrel.Core;
 using Microsoft.IdentityModel.Tokens;
 using Refit;
 using ZulaMed.API;
@@ -15,10 +14,6 @@ var builder = WebApplication.CreateBuilder(args);
 builder.WebHost.ConfigureKestrel(options =>
 {
     options.Limits.MaxRequestBodySize = int.MaxValue;
-    options.ConfigureEndpointDefaults(o =>
-    {
-        o.UseHttps();
-    });
 });
 
 builder.Services.Configure<FormOptions>(options =>
@@ -46,19 +41,20 @@ builder.Services.AddMux(builder.Configuration["MuxSettings:Secret"]!,
     builder.Configuration["MuxSettings:Id"]!);
 
 
-builder.Services.AddFastEndpoints(options => { options.SourceGeneratorDiscoveredTypes = DiscoveredTypes.All; });
+builder.Services.AddFastEndpoints(options =>
+{
+    options.SourceGeneratorDiscoveredTypes.AddRange(DiscoveredTypes.All);
+});
+
+builder.Services.AddAuthorization();
 
 builder.Services.SwaggerDocument(o =>
 {
     o.DocumentSettings = s =>
     {
-        s.Title = "Web API";
-        s.Version = "v0.0";
-        s.SchemaType = NJsonSchema.SchemaType.OpenApi3;
+        s.Title = "ZulaMed API";
+        s.Version = "v1";
     };
-    o.SerializerSettings = x => x.PropertyNamingPolicy = null;
-    o.TagCase = TagCase.TitleCase;
-    o.RemoveEmptyRequestSchema = false;
 });
 
 builder.Services.AddAmazon();

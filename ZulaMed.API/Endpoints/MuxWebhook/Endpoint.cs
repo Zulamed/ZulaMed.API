@@ -87,24 +87,44 @@ public class Binder : RequestBinder<Request>
 
 public class MuxWebHookValidator : IPreProcessor<Request>
 {
-    public async Task PreProcessAsync(Request req, HttpContext ctx, List<ValidationFailure> failures,
-        CancellationToken ct)
-    {
-        var webhookValidator = ctx.Resolve<IMuxWebhookValidator>();
+    // public async Task PreProcessAsync(Request req, HttpContext ctx, List<ValidationFailure> failures,
+    //     CancellationToken ct)
+    // {
+    //     var webhookValidator = ctx.Resolve<IMuxWebhookValidator>();
+    //
+    //     var values = req.MuxSignature.Split(",");
+    //     var timestamp = values[0].Replace("t=", "");
+    //     var signatureValue = values[1].Replace("v1=", "");
+    //     var body = req.Content;
+    //
+    //     var isValid = webhookValidator.Validate(signatureValue, timestamp, body);
+    //
+    //     if (!isValid)
+    //     {
+    //         var logger = ctx.Resolve<ILogger<MuxWebHookValidator>>();
+    //         logger.LogWarning("Invalid signature for Mux webhook");
+    //         failures.Add(new ValidationFailure("mux-signature", "Invalid signature"));
+    //         await ctx.Response.SendErrorsAsync(failures, cancellation: ct);
+    //     }
+    // }
 
-        var values = req.MuxSignature.Split(",");
+    public async Task PreProcessAsync(IPreProcessorContext<Request> ctx, CancellationToken ct)
+    {
+        var webhookValidator = ctx.HttpContext.Resolve<IMuxWebhookValidator>();
+        
+        var values = ctx.Request.MuxSignature.Split(",");
         var timestamp = values[0].Replace("t=", "");
         var signatureValue = values[1].Replace("v1=", "");
-        var body = req.Content;
-
+        var body = ctx.Request.Content;
+        
         var isValid = webhookValidator.Validate(signatureValue, timestamp, body);
-
+        
         if (!isValid)
         {
-            var logger = ctx.Resolve<ILogger<MuxWebHookValidator>>();
+            var logger = ctx.HttpContext.Resolve<ILogger<MuxWebHookValidator>>();
             logger.LogWarning("Invalid signature for Mux webhook");
-            failures.Add(new ValidationFailure("mux-signature", "Invalid signature"));
-            await ctx.Response.SendErrorsAsync(failures, cancellation: ct);
+            ctx.ValidationFailures.Add(new ValidationFailure("mux-signature", "Invalid signature"));
+            await ctx.HttpContext.Response.SendErrorsAsync(ctx.ValidationFailures, cancellation: ct);
         }
     }
 }
