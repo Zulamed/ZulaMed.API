@@ -15,7 +15,7 @@ public static class Mapper
             Surname = request.Surname,
             Country = request.Country,
             City = request.City,
-            AccountGender = request.AccountGender,
+            AccountGender = Enum.Parse<Gender>(request.AccountGender),
             AccountTitle = request.AccountTitle,
             AccountCareerStage = request.AccountCareerStage,
             AccountProfessionalActivity = request.AccountProfessionalActivity,

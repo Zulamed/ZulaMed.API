@@ -49,7 +49,7 @@ public class CreatePersonalAccountCommandHandler : Mediator.ICommandHandler<Crea
             var account = new PersonalAccount
             {
                 User = user,
-                AccountGender = (AccountGender)(command.AccountGender ? Gender.Male : Gender.Female),
+                AccountGender = (AccountGender)command.AccountGender,
                 AccountTitle = (AccountTitle)command.AccountTitle,
                 AccountCareerStage = (AccountCareerStage)command.AccountCareerStage,
                 AccountProfessionalActivity = (AccountProfessionalActivity)command.AccountProfessionalActivity,

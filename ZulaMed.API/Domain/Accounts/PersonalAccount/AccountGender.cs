@@ -5,7 +5,8 @@ namespace ZulaMed.API.Domain.Accounts.PersonalAccount;
 public enum Gender
 {
     Male,
-    Female
+    Female,
+    Other
 }
 
 [ValueObject<Gender>(Conversions.EfCoreValueConverter)]
