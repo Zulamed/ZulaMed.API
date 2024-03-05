@@ -30,8 +30,9 @@ public class Endpoint : Endpoint<Request>
         // var isSubscribedTo = await _dbContext.Set<User>()
         //     .AnyAsync(u => (Guid)u.Id == userId && u.Subscriptions.Any(x => (Guid)x.Id == req.UserId)
         //         ,cancellationToken: ct);
-
-
+        
+        
+        
         // fuck ef core
           var isSubscribedTo = await _dbContext.Database
               .SqlQuery<bool>(

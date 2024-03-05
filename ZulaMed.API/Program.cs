@@ -6,6 +6,7 @@ using Microsoft.AspNetCore.Http.Features;
 using Microsoft.IdentityModel.Tokens;
 using Refit;
 using ZulaMed.API;
+using ZulaMed.API.Endpoints.ChatAI.OpenAISerivce;
 using ZulaMed.API.Endpoints.UserRestApi.Verify;
 using ZulaMed.API.Health;
 
@@ -56,6 +57,8 @@ builder.Services.SwaggerDocument(o =>
         s.Version = "v1";
     };
 });
+
+builder.Services.AddSingleton<IOpenAIService, OpenAIService>();
 
 builder.Services.AddAmazon();
 
