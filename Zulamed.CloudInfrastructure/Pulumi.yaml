@@ -1,0 +1,3 @@
+name: Zulamed.CloudInfrastructure
+runtime: dotnet
+description: Zulamed AWS Pulumi program
